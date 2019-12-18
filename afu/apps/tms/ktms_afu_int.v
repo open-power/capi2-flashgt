@@ -40,7 +40,7 @@ module ktms_afu_int#
     output [0:ctxtid_width-1] o_ctxt_rst_id,
 
     input 		      i_ctxt_rst_ack_v,
-    input [0:ctxtid_width-1]  i_ctxt_rst_ack_id,   // parity checked in afu_timeout kch 
+    input [0:ctxtid_width-1]  i_ctxt_rst_ack_id,
     
     // limited backpressure possible here
     output 		      i_croom_err_r,
@@ -54,7 +54,7 @@ module ktms_afu_int#
     input [0:sintrid_width-1] i_sintr_id,
 
     input 		      i_croom_we,
-    input [0:ctxtid_width-2]  i_croom_wa,   // no parity on this kch 
+    input [0:ctxtid_width-2]  i_croom_wa,
     input [0:croom_width-1]   i_croom_wd,
 
     input 		      o_tscheck_r,
@@ -118,11 +118,11 @@ module ktms_afu_int#
    wire 		       int_rnw;  // read not write
    wire 		       int_vld;  // valid 
    wire 		       int_dw;   // double word
-   wire [0:64] 		       int_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       int_data;  
    wire [0:24]  	       int_addr;
    wire [0:4+24+64-1]          int_mmiobus;
-   assign {int_vld,int_cfg,int_rnw,int_dw,int_addr,int_data} = i_mmiobus; // omit any extra data bits
-   assign int_mmiobus = {int_vld,int_cfg,int_rnw,int_dw,int_addr[0:23],int_data[0:63]};  // created to strip of parity 
+   assign {int_vld,int_cfg,int_rnw,int_dw,int_addr,int_data} = i_mmiobus;
+   assign int_mmiobus = {int_vld,int_cfg,int_rnw,int_dw,int_addr[0:23],int_data[0:63]}; 
    wire [0:ctxtid_width-1]    s1_wr_ctxt;
    wire [63:0] 		      s1_wr_d;
    ktms_mmwr_mc_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmio_ht_addr),.lcladdr_width(lcladdr_width+1)) immwr_dec
@@ -494,9 +494,9 @@ module ktms_afu_int#
 
    // croom
    wire [0:croom_width-1]      s2_rd_d7;
-   base_mem#(.addr_width(ctxtid_width-1),.width(croom_width)) rmem_mem7   // added -1 to strip off parity kch 
+   base_mem#(.addr_width(ctxtid_width-1),.width(croom_width)) rmem_mem7 
      (.clk(clk),
-      .we(i_croom_we),.wa(i_croom_wa),.wd(i_croom_wd),   // i_crom_wa does not have parity kch 
+      .we(i_croom_we),.wa(i_croom_wa),.wd(i_croom_wd),
       .re(s1_rd_en),.ra(s1_rd_ctxt[0:ctxtid_width-2]),.rd(s2_rd_d7)
       );
 

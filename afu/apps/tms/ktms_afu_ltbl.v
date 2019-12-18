@@ -63,14 +63,14 @@ module ktms_afu_ltbl#
    wire 		       ltbl_rnw;  // read not write
    wire 		       ltbl_vld;  // valid 
    wire 		       ltbl_dw;   // double word
-   wire [0:64] 		       ltbl_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       ltbl_data; 
    wire [0:24]  	       ltbl_addr;
    wire [0:4+24+64-1]             ltbl_mmiobus;
-   assign {ltbl_vld,ltbl_cfg,ltbl_rnw,ltbl_dw,ltbl_addr,ltbl_data} = i_mmiobus; // omit any extra data bits kch
-   assign ltbl_mmiobus = {ltbl_vld,ltbl_cfg,ltbl_rnw,ltbl_dw,ltbl_addr[0:23],ltbl_data[0:63]};  // created to strip of parity  kch
-   ktms_mmwr_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmio_addr),.lcladdr_width(mmio_addr_width+1)) immwr_dec   /// lcladdr_width(mmio_addr_width+1) original kch 
+   assign {ltbl_vld,ltbl_cfg,ltbl_rnw,ltbl_dw,ltbl_addr,ltbl_data} = i_mmiobus; 
+   assign ltbl_mmiobus = {ltbl_vld,ltbl_cfg,ltbl_rnw,ltbl_dw,ltbl_addr[0:23],ltbl_data[0:63]}; 
+   ktms_mmwr_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmio_addr),.lcladdr_width(mmio_addr_width+1)) immwr_dec 
      (.clk(clk),.reset(reset), 
-      .i_mmiobus(ltbl_mmiobus),  //strip off parity kch
+      .i_mmiobus(ltbl_mmiobus), 
       .o_wr_r(s1_wr_r),.o_wr_v(s1_wr_v),.o_wr_addr(s1_wr_lcladdr),.o_wr_d(s1_wr_d[0:lunid_width_w_par-2])
       );
     
@@ -78,7 +78,6 @@ module ktms_afu_ltbl#
 
    assign s1_wr_r = 1'b1;
 
-// need to change s1_wr_addr_port for ports 2 and 3 kch
 // lun table mmio map  use address bits 10 and bits bits 13  
 // port 0  0x400   psl address 0x000100   
 // port 1  0x500   psl address 0x000140
@@ -148,7 +147,7 @@ module ktms_afu_ltbl#
    wire [0:63] 			s2_rd_qd = s2_rd_idx_err ? 64'd0 : ~s2_rd_d;
    ktms_mmrd_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmio_addr),.lcladdr_width(mmio_addr_width+1)) immrd_dec
      (.clk(clk),.reset(reset),
-      .i_mmiobus(ltbl_mmiobus),  // strip off parity kch
+      .i_mmiobus(ltbl_mmiobus),
       .o_rd_v(s1_rd_v),.o_rd_r(s1_rd_r),.o_rd_addr(s1_rd_lcladdr),
       .i_rd_v(s2_rd_v),.i_rd_r(s2_rd_r),.i_rd_d(~s2_rd_qd),
       .o_mmio_rd_v(o_mmio_rd_v),.o_mmio_rd_d(o_mmio_rd_d)

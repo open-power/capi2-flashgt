@@ -59,12 +59,12 @@ module ktms_mmrd_mc_dec#
 //   wire 		       s0_is_per_ctxt = ~ha_cfg & ~(| ha_addr[addr_width-1:(ctxtid_width+ctxtid_start)]);
 
    wire 		       s0_addr_matchl = (ha_addr[ctxtid_start-1:lcladdr_width] == addr[ctxtid_start-1:lcladdr_width]);
-   wire 		       s0_addr_matchh = (ha_addr[addr_width-1:ctxtid_start+ctxtid_width-1] == addr[addr_width-1:ctxtid_start+ctxtid_width-1]); //added -1 kch
+   wire 		       s0_addr_matchh = (ha_addr[addr_width-1:ctxtid_start+ctxtid_width-1] == addr[addr_width-1:ctxtid_start+ctxtid_width-1]);
 						 
    wire 		       s0_v = s0_addr_matchl & s0_addr_matchh & ha_vld & ha_rnw & ~ha_cfg;
 
    wire                        s0_ctxt_par;
-   wire [0:ctxtid_width-1]     s0_ctxt = {ha_addr[ctxtid_start+ctxtid_width-2:ctxtid_start],s0_ctxt_par}; // changed -1 to -2 kch
+   wire [0:ctxtid_width-1]     s0_ctxt = {ha_addr[ctxtid_start+ctxtid_width-2:ctxtid_start],s0_ctxt_par};
    wire [0:lcladdr_width-1]    s0_lcladdr = ha_addr [lcladdr_width-1:0];
 
    wire [lcladdr_width-1:0]    s1_ra;
@@ -74,7 +74,7 @@ module ktms_mmrd_mc_dec#
    wire  		       s1a_v,s1a_r;
    wire  		       s1b_v,s1b_r;
 
-   capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) immrd_mc_pgen(.i_d(s0_ctxt[0:ctxtid_width-2]),.o_d(s0_ctxt_par)); // added kch
+   capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) immrd_mc_pgen(.i_d(s0_ctxt[0:ctxtid_width-2]),.o_d(s0_ctxt_par));
    base_alatch#(.width(1+ctxtid_width+lcladdr_width)) is1_lat
      (.clk(clk),.reset(reset),
       .i_v(s0_v),.i_r(),.i_d({ha_dw,s0_ctxt,s0_lcladdr}),

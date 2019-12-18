@@ -98,8 +98,8 @@ module nvme_pcie_txcc
    output       [1:0] user_txcc_perror_ind,
    input              regs_pcie_pe_errinj_valid,
    input       [15:0] regs_xxx_pe_errinj_decode, 
-   input              user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain kch 
-   input              regs_wdata_pe_errinj_valid  // 1 cycle pulse in sislite domain kch 
+   input              user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain  
+   input              regs_wdata_pe_errinj_valid  // 1 cycle pulse in sislite domain
    
 
 );
@@ -112,7 +112,7 @@ module nvme_pcie_txcc
    wire         [1:0] s1_uperror;
    wire         [1:0] txcc_uperror_int;
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors 
    nvme_srlat#
      (.width(3))  itxcc_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(txcc_perror_int));
@@ -555,7 +555,6 @@ module nvme_pcie_txcc
                          if( rd_last )
                            begin
                               // completion with no data
-                              // todo - BMP   
                               // see pg156 - page 140 
                               cpl_rack = 1'b1;
                            end
@@ -568,7 +567,6 @@ module nvme_pcie_txcc
                     else
                       begin
                          // error - expecting first to be active
-                         // todo - BMP
                          cpl_rack = 1'b1;
                       end
                  end
@@ -614,7 +612,7 @@ module nvme_pcie_txcc
                if( rd_cpl_status != 3'h0 )
                  begin
                     tkeep = 4'hF;
-                    tdata = zero[127:0];  // todo: spec says this should be descriptor from request
+                    tdata = zero[127:0];  // spec says this should be descriptor from request
                  end
                else
                  begin               
@@ -656,7 +654,7 @@ module nvme_pcie_txcc
    // interface does not allow for gaps
 
    localparam s1_pwidth = 16;   
-   localparam s1_width = 128 + 1 + 4 + 1 + 1+ s1_pwidth;   // added s1_pwidth kch 
+   localparam s1_width = 128 + 1 + 4 + 1 + 1+ s1_pwidth; 
    reg                  s1_write;
    reg   [s1_width-1:0] s1_din;
    wire [s1_pwidth-1:0] s1_din_par;
@@ -739,7 +737,7 @@ module nvme_pcie_txcc
    //-------------------------------------------------------
    // output stage for timing
    localparam s2_pwidth = 16; 
-   localparam s2_width = 128 + 1 + 4 + 1 + 1 + s2_pwidth;  // added +1  kch
+   localparam s2_width = 128 + 1 + 4 + 1 + 1 + s2_pwidth;
    wire [s2_width-1:0] s2_dout;
    wire [15:0]         s2_din_par;
    reg                 s2_ready;
@@ -761,10 +759,8 @@ module nvme_pcie_txcc
      begin
         s2_ready = s_axis_cc_tready==4'hF;
         s_axis_cc_tvalid = s2_valid;
-        //        {  s_axis_cc_tlast, s2_discontinue, s_axis_cc_tkeep,s_axis_cc_tdata } = s2_dout[134:0];	            
         { s_axis_cc_tlast, s2_first, s2_discontinue, s_axis_cc_tkeep, s_axis_cc_tdata } = s2_dout;	            
         s_axis_cc_tuser = { zero[15:0], s2_din_par[15:1],s2_din_par[0]^user_txcc_pe_inj_q[2], s2_discontinue };         
-        //        s_axis_cc_tuser = { s2_discontinue, zero[31:0] }; // todo: parity BMP                       
      end
 
    //generate parity for just 128 bit interface to pci hip

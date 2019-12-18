@@ -18,7 +18,7 @@
 
 `timescale 1ns/1ns
 
-// Surelock NVMe
+// FlashGT+
 // PCIe control request/response queue
 //
 // - handle requests and responses for nvme_control and
@@ -152,7 +152,7 @@ module nvme_pcie_ctlff
    wire           ctlff_perror_int;
 
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors  
    nvme_srlat#
      (.width(1))  ictlff_sr  
        (.clk(user_clk),.reset(user_reset),.set_in(s1_uperror),.hold_out(ctlff_uperror_int));
@@ -243,7 +243,7 @@ module nvme_pcie_ctlff
    reg     [31:0] addr0_q, addr0_d;
    reg     [31:0] addr1_q, addr1_d;
    reg     [31:0] rddata_q, rddata_d;
-   wire    [3:0]  rddatap;   // added kch 
+   wire    [3:0]  rddatap;
    reg     [3:0]  rddatap_q, rddatap_d;
    reg            ack_q,   ack_d;
    reg            init_done_q, init_done_d;
@@ -334,7 +334,7 @@ module nvme_pcie_ctlff
         addr1_d          = addr1_q;
         ack_d            = 1'b0;
         rddata_d         = rddata_q;
-        rddatap_d        = rddatap_q ; // added kch 
+        rddatap_d        = rddatap_q ; 
         cpl_timeout_d    = cpl_timeout_q;
 
         init_done_d      = init_done_q; // cleared if link up goes inactive after pcie init is completed
@@ -386,7 +386,7 @@ module nvme_pcie_ctlff
         if (ctl_pcie_ioread_strobe )
           begin
              ack_d = 1'b1;
-             rddatap_d     = rddatap ; // added kch 
+             rddatap_d     = rddatap ; 
              case (ctl_pcie_ioaddress[7:0])
                8'h00: rddata_d  = cmd_q;
                8'h04: rddata_d  = status_q;
@@ -995,7 +995,7 @@ module nvme_pcie_ctlff
       .oddpar(1'b1),
       .datap(rq_rdatap),
       .check(rq_rval),
-      .parerr(s1_uperror)   // user_clk kch
+      .parerr(s1_uperror)  
       );
 
    //-------------------------------------------------------

@@ -15,21 +15,6 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
-
 module ktms_chnl_alloc#
   (parameter channels=1,
    parameter afu_tag_width=1,
@@ -102,10 +87,7 @@ module ktms_chnl_alloc#
    
    wire [0:channels-1] 	       s0_pm = i_portmsk & s0_avail & s0_chnl_msk;
 
-   wire [0:channels-1] 	       s0_chnl_dec;   // need to fix thius for more general solution ??? kch 3/12/17
-//   wire 		       s0_ch0_pri;
-//   assign s0_chnl_dec[0] = s0_pm[0] & ( s0_ch0_pri | ~s0_pm[1]);
-//   assign s0_chnl_dec[1] = s0_pm[1] & (~s0_ch0_pri | ~s0_pm[0]);
+   wire [0:channels-1] 	       s0_chnl_dec;  
    assign s0_chnl_dec[0] = s0_pm[0];
    assign s0_chnl_dec[1] = s0_pm[1];
    assign s0_chnl_dec[2] = s0_pm[2];
@@ -124,7 +106,6 @@ module ktms_chnl_alloc#
    base_bitswap#(.width(channels)) is0_avail_swp(.i_d(s0_avail),.o_d(s0_avail_r));
    base_bitswap#(.width(channels)) is0_portmsk_swp(.i_d(i_portmsk),.o_d(s0_portmsk_r));
 
-//   wire [0:erc_width-1]        s0_erc_in = {{erc_width-(channels*2){1'b0}},s0_avail_r,s0_portmsk_r};  // original 02/17/kch
    wire [0:erc_width-1]        s0_erc_in = {s0_avail_r,s0_portmsk_r};
    ktms_afu_errmux#(.rc_width(rc_width+erc_width)) ierr_mux(.i_ok(i_ok),.i_rc({i_rc,i_erc}),.i_err(~s0_ok_in),.i_err_rc({afuerr_no_channel,s0_erc_in}),.o_ok(s0_ok),.o_rc({s0_rc,s0_erc}));
 
@@ -136,10 +117,9 @@ module ktms_chnl_alloc#
    base_decode#(.enc_width(chnlid_width),.dec_width(channels)) ifree_chnl_dec
      (.en(i_free_v),.din(i_free_chnl),.dout(s0_free_chnl_dec));
 
-   localparam cnt_width = fc_tag_width+1-1;                             // removed parity from fclength 2/17/17 kch 
+   localparam cnt_width = fc_tag_width+1-1;              
    wire [0:channels*cnt_width-1]    outst_cnt;
 
-// new logic to support 4 ports 02/17/17 kch
 
    wire [0:fc_tag_width]             outst_cnt0_v,outst_cnt1_v,outst_cnt2_v,outst_cnt3_v;
    reg  [0:fc_tag_width]            lt_outst_cnt01,lt_outst_cnt23; 
@@ -149,44 +129,6 @@ module ktms_chnl_alloc#
    assign outst_cnt2_v = 2*outst_cnt[cnt_width:cnt_width*3-1] | {fc_tag_width{~s0_pm[2]}};
    assign outst_cnt3_v = 3*outst_cnt[cnt_width:cnt_width*4-1] | {fc_tag_width{~s0_pm[3]}};
 
-// this is the more general solution where data could exist on more than 1 port. did not time so commenting out for psuedo 4 port work 
-//   always @*
-//     begin
-//      if (outst_cnt0_v <= outst_cnt1_v)
-//         begin 
-//            lt_outst_cnt01 = outst_cnt0_v;
-//            lt_win01 = 2'b10;
-//         end
-//      else
-//         begin   
-//            lt_outst_cnt01 = outst_cnt1_v;
-//            lt_win01 = 2'b01;
-//         end
-
- //     if (outst_cnt2_v <= outst_cnt3_v)
- //        begin 
- //           lt_outst_cnt23 = outst_cnt2_v;
- //           lt_win23 = 2'b10;
- //        end
- //     else
- //        begin   
- //           lt_outst_cnt23 = outst_cnt3_v;
- //           lt_win23 = 2'b01;
- //        end
-
- //     if (lt_outst_cnt01 <= lt_outst_cnt23)
- //        begin     
- //           s0_chnl_dec = {lt_win01,2'b00} & s0_pm;
- //        end
- //     else
- //        begin   
- //           s0_chnl_dec = {2'b00,lt_win23} & s0_pm;
- //        end
- //    end
-            
-   // HACK does not generalize to more than 2 channels
-//   assign s0_ch0_pri = outst_cnt[0:cnt_width-1] <= outst_cnt[cnt_width:cnt_width*2-1];
-
 wire [0:channels-1] inc_hp_tag_cnt, dec_hp_tag_cnt;
 wire [0:channels*10-1]    outst_hp_cnt;  // max of 512 hp tags cause thats how deep a bram is
 wire [0:channels*10-1]    outst_hp_retry_cnt;  // max of 512 hp tags cause thats how deep a bram is
@@ -195,10 +137,8 @@ wire [0:channels-1] s2a_retry_cmd_v,s2a_retry_cmd_r;
 wire [0:channels*64-1] s2_retry_cmd_timestamp;
 wire [0:channels*65-1] s2_retry_cmd_ea;
 wire [0:channels*10-1] s2_retry_cmd_ctxt;
-//wire [0:3] s1_retry_fifo_v,s1_retry_fifo_r;
 wire [0:3] s0a_retry_fifo_v,s0a_retry_fifo_r;
 wire [0:3] retry_tag_avail;
-//wire s2a_retry_cmd_d[0:channels*(64+65+10)-1];
 wire [0:555] s2a_retry_cmd_d;
 wire [0:channels-1] inc_hp_retry_cnt = s0a_retry_fifo_v & s0a_retry_fifo_r; 
 wire [0:channels-1] dec_hp_retry_cnt = s2_retry_cmd_v & s2_retry_cmd_r; 
@@ -256,13 +196,9 @@ wire [0:3] retry_fifo_threshold;
          
       end
    endgenerate
-//                             s2_retry_cmd_timestamp[64:64+63],s2_retry_cmd_ea[65:65+64],s2_retry_cmd_ctxt[10:10+9],
-//                             s2_retry_cmd_timestamp[2*64:2*64+63],s2_retry_cmd_ea[2*65:2*65+64],s2_retry_cmd_ctxt[2*10:2*10+9],
-//                             s2_retry_cmd_timestamp[3*64:3*64+63],s2_retry_cmd_ea[3*65:3*65+64],s2_retry_cmd_ctxt[3*10:3*10+9]};
    base_amlrr_arb#(.ways(channels),.width(64+65+10),.stage_ways(channels)) iretry_mux   
      (.clk(clk),.reset(reset),
       .i_r(s2a_retry_cmd_r),.i_v(s2a_retry_cmd_v),.i_d(s2a_retry_cmd_d),.i_h(4'b0),
-//      .i_r(s2_retry_cmd_r),.i_v(s2_retry_cmd_v),.i_d(s2_retry_cmd_d),.i_h(4'b0),
       .o_r(o_retry_cmd_r), .o_v(o_retry_cmd_v), .o_d(o_retry_cmd_d),.o_h()
       );
 
@@ -291,20 +227,13 @@ wire [0:3] retry_fifo_threshold;
    assign s0b_tag_r = s0_r[2];
    wire send_to_fc;
    wire s0_gated_v,s0_gated_r;
-   base_aforce is0_frc(.i_v(s0a_tag_v),.i_r(s0a_tag_r),.o_v(s0b_tag_v),.o_r(s0b_tag_r),.en(~s0_force & s0_gated_v & send_to_fc));   // start here kch 
-   
-
-// changes to retry commands to prevent head of line blocking kch 02/09/18
+   base_aforce is0_frc(.i_v(s0a_tag_v),.i_r(s0a_tag_r),.o_v(s0b_tag_v),.o_r(s0b_tag_r),.en(~s0_force & s0_gated_v & send_to_fc)); 
 
    wire [0:1] s0_retry_fifo_v,s0_retry_fifo_r;
    wire       s0_retry_v,s0_retry_r;
    wire s1_dly_v,s1_dly_r;
    wire [0:afu_tag_width-1] s1_tag;
 
-//    base_alatch#(.width(afu_tag_width)) idly
-//     (.clk(clk),.reset(reset),.i_v(i_v),.i_r(i_r),.i_d({i_tag}),.o_v(s1_dly_v),.o_r(s1_dly_r),.o_d(s1_tag)
-//      );
-// set/reset latch to block back to back commands. Need a dead cycle for arraty data to be valid kkkk
 
   wire s1_valid_cycle;
 
@@ -316,8 +245,6 @@ wire [0:3] retry_fifo_threshold;
   assign o_dbg_cnt_inc[0] = s0_gated_v & s0_gated_r & ~i_rcb_hp; 
   assign o_dbg_cnt_inc[1] = s0_gated_v & s0_gated_r & i_rcb_hp; 
 
-// temp to block commands to look at pipelines. 
-//  base_agate icmd_gate   (.i_v(i_v),.i_r(i_r),.o_v(s0_gated_v),.o_r(s0_gated_r),.en(~s1_valid_cycle & ~(i_gate_retry & ~s0a_tag_v) & 1'b0 ));
 
   base_acombine#(.ni(1),.no(2)) icmb(.i_v(s0_gated_v),.i_r(s0_gated_r),.o_v(s0_v[0:1]),.o_r(s0_r[0:1]));
   wire lp_tag_avail;
@@ -332,19 +259,10 @@ wire [0:3] retry_fifo_threshold;
    wire retry_fifo_ready;
    assign retry_fifo_full = ~retry_fifo_ready;
    base_emux#(.ways(channels),.width(1)) irdymux(.sel(s0_chnl),.din(s0a_retry_fifo_r),.dout(retry_fifo_ready)); 
-//   wire port_outst_cnt_eq_0 = (port_outst_hp_cnt == 10'b000000000);
    assign port_outst_cnt_retry_eq_0 = (port_outst_hp_retry_cnt == 10'b000000000);
 
-//   assign lp_tag_avail =  ((port_outst_hp_cnt + {3'b000,port_outst_cnt}) < 256);
    assign lp_tag_avail =  (port_outst_cnt_retry_eq_0 & port_retry_tag_avail) | retry_fifo_full ;
-//   assign hp_tag_avail = (port_outst_hp_cnt < 256);
-//   wire [0:63] port_s2_retry_cmd_timestamp;
-//   base_emux#(.ways(channels),.width(64)) itscntmux(.sel(retry_sel),.din(s2_retry_cmd_timestamp),.dout(port_s2_retry_cmd_timestamp));
-//   wire [0:64] port_s2_retry_cmd_ea;
-//   base_emux#(.ways(channels),.width(64)) ieacntmux(.sel(retry_sel),.din(s2_retry_cmd_ea),.dout(port_s2_retry_cmd_ea));
-//  assign send_to_fc = s0a_tag_v & (lp_tag_avail | i_rcb_hp  | i_gate_retry)  ;
   assign send_to_fc = (s0a_tag_v & (lp_tag_avail | i_rcb_hp  | i_gate_retry)) | s0_force  ;
-//  wire cmd_is_retried = ~send_to_fc & ~i_gate_retry;
   wire cmd_is_retried = (~(lp_tag_avail | i_rcb_hp  | i_gate_retry) | (~s0a_tag_v & ~retry_fifo_full)) & ~s0_force ;
   wire [0:channels-1] send_to_retry = cmd_is_retried ? s0_chnl_dec : 4'h0;
 
@@ -366,16 +284,12 @@ wire [0:3] retry_fifo_threshold;
    assign o_dbg_cnt_inc[7] = o_reset_afu_cmd_tag_v & o_reset_afu_cmd_tag_r; 
    assign o_dbg_cnt_inc[8] = o_retry_cmd_v & o_retry_cmd_r;
 
-//   assign inc_hp_tag_cnt = s0_retry_v & s0_retry_r & ~i_rcb_hp ? s0_chnl_dec : 4'h0;
      assign inc_hp_tag_cnt = s2_retry_cmd_v & s2_retry_cmd_r;
    assign dec_hp_tag_cnt = s0_v[2] & s0_r[2] & i_rcb_hp ? s0_chnl_dec & ~s0_force : 4'h0;
 
-//   base_acombine#(.ni(1),.no(2)) icmb_dec(.i_v(s0_v[2]),.i_r(s0_r[2]),.o_v({s0_v[3],o_dec_croom_v}),.o_r({s0_r[3],o_dec_croom_r}));
 
    assign o_croom_ctxt = i_rcb_ctxt;  
 
-//   base_acombine#(.ni(2),.no(1)) icmb(.i_v({i_v,s0b_tag_v}),.i_r({i_r,s0b_tag_r}),.o_v(s0_v),.o_r(s0_r));
-// change alatch to aburp_alatch  for timing fix  changed it back :)
    base_alatch#(.width(afu_tag_width+1+fc_tag_width+chnlid_width+1+rc_width+erc_width+aux_width)) is1_lat
      (.clk(clk),.reset(reset),
       .i_v(s0_v[2]),.i_r(s0_r[2]),.i_d({i_tag, ~s0_force, s0a_tag_d, s0_chnl,s0_ok,s0_rc,s0_erc,i_aux}),

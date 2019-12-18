@@ -65,7 +65,7 @@ module ktms_debug_reg#
    wire 		       debug_reg_rnw;  // read not write
    wire 		       debug_reg_vld;  // valid 
    wire 		       debug_reg_dw;   // double word
-   wire [0:64] 		       debug_reg_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       debug_reg_data; 
    wire [0:24]  	       debug_reg_addr;
     wire [0:4+24+64-1]         debug_reg_mmiobus;
    assign {debug_reg_vld,debug_reg_cfg,debug_reg_rnw,debug_reg_dw,debug_reg_addr,debug_reg_data} = i_mmiobus; // omit any extra data bits

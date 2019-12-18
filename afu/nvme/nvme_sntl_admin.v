@@ -56,13 +56,13 @@ module nvme_sntl_admin#
 
     //-------------------------------------------------------
     // requests from sislite 
-    // this interface is checked at output of nvme_sntl_cmd.v  - no parity coverage needed kch 
+    // this interface is checked at output of nvme_sntl_cmd.v
     //-------------------------------------------------------
     input                              cmd_admin_valid,
     output reg                         admin_cmd_ack,
     input              [cmd_width-1:0] cmd_admin_cmd, 
     input                       [15:0] cmd_admin_cid, 
-    input                        [1:0] cmd_admin_cid_par, // added kch 
+    input                        [1:0] cmd_admin_cid_par,
     input            [lunid_width-1:0] cmd_admin_lun, 
     input          [datalen_width-1:0] cmd_admin_length, 
     input                      [127:0] cmd_admin_cdb,
@@ -74,7 +74,7 @@ module nvme_sntl_admin#
   
     input                              dma_admin_valid,
     input             [addr_width-1:0] dma_admin_addr, 
-    input                   [16+127:0] dma_admin_data, // added 16+ for parity  
+    input                   [16+127:0] dma_admin_data,
     
     // ----------------------------------------------------
     // admin host DMA read request
@@ -82,7 +82,7 @@ module nvme_sntl_admin#
 
     output reg                         admin_dma_req_valid,
     output reg         [tag_width-1:0] admin_dma_req_tag, // afu req tag
-    output reg                   [0:0] admin_dma_req_tag_par, // added kch 
+    output reg                   [0:0] admin_dma_req_tag_par, 
     output reg     [datalen_width-1:0] admin_dma_req_reloff, // offset from start address of this command
     output reg    [wdatalen_width-1:0] admin_dma_req_length, // number of bytes to request, max 512B
     output reg                         admin_dma_req_length_par, 
@@ -227,7 +227,7 @@ module nvme_sntl_admin#
    
    reg   [31:0] ioread_regs_data;
    reg   [31:0] ioread_sisl_data;
-   reg [4+31:0] ioread_adq_data;   // added 4+ kch 
+   reg [4+31:0] ioread_adq_data;  
    reg   [31:0] ioread_other_data;
    
    wire   [3:0] admin_perror_int;
@@ -235,7 +235,7 @@ module nvme_sntl_admin#
 
    // Parity error srlat 
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors
    nvme_srlat#
      (.width(4))  iadmin_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(admin_perror_int));
@@ -427,7 +427,6 @@ module nvme_sntl_admin#
       ) ipcheck_ctl_sntl_iowrite_data
        (.oddpar(1'b1),.data({ctl_sntl_iowrite_data[31:1],(ctl_sntl_iowrite_data[0]^admin_pe_inj_q[0])}),.datap(ctl_sntl_iowrite_data[35:32]),.check(ctl_sntl_iowrite_strobe),.parerr(s1_perror[0])); 
 
-   // pgen sisl_reloff_d fixit 
    
    wire                      sisl_reloff_par;
    nvme_pgen#
@@ -453,7 +452,6 @@ module nvme_sntl_admin#
       ) ipgen_admin_cmd_cpl_length 
        (.oddpar(1'b1),.data(admin_cmd_cpl_length),.datap(admin_cmd_cpl_length_par_in)); 
 
-   // parity check fixit 
    nvme_pcheck#
      (
       .bits_per_parity_bit(64),
@@ -461,7 +459,6 @@ module nvme_sntl_admin#
       ) ipcheck_sisl_reloff_q
        (.oddpar(1'b1),.data({sisl_reloff_q[datalen_width-1:1],(sisl_reloff_q[0]^admin_pe_inj_q[2])}),.datap(sisl_reloff_par_q),.check(admin_cmd_cpl_valid),.parerr(s1_perror[2])); 
 
-   // parity check fixit 
    nvme_pcheck#
      (
       .bits_per_parity_bit(64),
@@ -639,7 +636,7 @@ module nvme_sntl_admin#
    reg                                              sislbuf_read;
    reg [   sislbuf_par_wrwidth+sislbuf_wrwidth-1:0] sislbuf_rddata_dw;
 
-   // conver 8 bit parity to 64 bit parity  kch 
+   // conver 8 bit parity to 64 bit parity 
    wire                     [data_fc_par_width-1:0] sislbuf_rddata_fc_par;
    nvme_pgen#
      (
@@ -695,7 +692,7 @@ module nvme_sntl_admin#
    
 
    always @(posedge clk)  
-     if( rmw_sislbuf_read ) /// added sislbuf_wren kch 
+     if( rmw_sislbuf_read ) /// added sislbuf_wren
        sislbuf_rddata <= sislbuf_mem[rmw_sislbuf_rdaddr];
 
    always @(posedge clk)
@@ -1005,7 +1002,7 @@ module nvme_sntl_admin#
 
 
    reg [     adbuf_par_width+adbuf_width-1:0] adbuf_mem[adbuf_num_words-1:0];   
-   reg [     adbuf_par_width+adbuf_width-1:0] adbuf_wrdata;  // added par_width kch 
+   reg [     adbuf_par_width+adbuf_width-1:0] adbuf_wrdata; 
    reg [     adbuf_par_width+adbuf_width-1:0] adbuf_wrdata_d,adbuf_wrdata_q;
    reg [     adbuf_par_width+adbuf_width-1:0] rmw_adbuf_wrdata;
    reg              [     adbuf_num_wren-1:0] adbuf_wren;
@@ -1013,7 +1010,7 @@ module nvme_sntl_admin#
    reg                                        rmw_adbuf_wren;
    reg            [     adbuf_addr_width-1:0] adbuf_wraddr;
    reg                 [adbuf_addr_width-1:0] rmw_adbuf_wraddr_d,rmw_adbuf_wraddr_q;
-   reg [     adbuf_par_width+adbuf_width-1:0] adbuf_rddata;  // added par_width kch 
+   reg [     adbuf_par_width+adbuf_width-1:0] adbuf_rddata; 
    reg            [     adbuf_addr_width-1:0] adbuf_rdaddr;   
    reg                 [adbuf_addr_width-1:0] rmw_adbuf_rdaddr;
    reg [ adbuf_par_rdwidth+adbuf_rdwidth-1:0] adbuf_rddata_dw;    
@@ -1050,12 +1047,12 @@ module nvme_sntl_admin#
            if (rmw_adbuf_wren_q[adq])
              begin
                 rmw_adbuf_wrdata[(adq+1)*adbuf_wrwidth-1:adq*adbuf_wrwidth] <= adbuf_wrdata_q[(adq+1)*adbuf_wrwidth-1:adq*adbuf_wrwidth];
-                rmw_adbuf_wrdata[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth] <= adbuf_wrdata_q[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth];  // kch 
+                rmw_adbuf_wrdata[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth] <= adbuf_wrdata_q[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth];
              end
            else 
              begin
                 rmw_adbuf_wrdata[(adq+1)*adbuf_wrwidth-1:adq*adbuf_wrwidth] <= adbuf_rddata[(adq+1)*adbuf_wrwidth-1:adq*adbuf_wrwidth];
-                rmw_adbuf_wrdata[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth] <= adbuf_rddata[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth];  // kch 
+                rmw_adbuf_wrdata[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth] <= adbuf_rddata[(128+(adq+1)*adbuf_par_wrwidth)-1:128+adq*adbuf_par_wrwidth];
              end
       end
    endgenerate

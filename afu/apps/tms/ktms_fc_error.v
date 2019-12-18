@@ -29,16 +29,16 @@ module ktms_fc_error#
     input [0:ways-1] 		i_v,
     output [0:ways-1] 		i_r,
     input [0:ways-1] 		i_error,
-    input [0:ways*tag_width_w_par-1] 	i_tag,  // added w_par kch 
+    input [0:ways*tag_width_w_par-1] 	i_tag,
     input [0:ways*width-1] 	i_d,
 
     input [0:ways-1] 		o_r, 
     output [0:ways-1] 		o_v,
-    output [0:ways*tag_width_w_par-1] o_tag,   // added w_par kch 
+    output [0:ways*tag_width_w_par-1] o_tag,
     
     input 			i_rd_v,
     output 			i_rd_r,
-    input [0:tag_width_w_par-1] 	i_rd_tag,  //added w_par kch 
+    input [0:tag_width_w_par-1] 	i_rd_tag,
     input [0:aux_width-1] 	i_rd_aux,
     
     input 			o_rd_r,
@@ -46,20 +46,20 @@ module ktms_fc_error#
     output 			o_rd_dv, // this tag has been written since last read
     output [0:width-1] 		o_rd_d, // last value written
     output [0:aux_width-1] 	o_rd_aux,
-    output [0:tag_width_w_par-1] 	o_rd_tag ,     // has parity kch 
-    output                      o_perror                // added o_perror
+    output [0:tag_width_w_par-1] 	o_rd_tag ,
+    output                      o_perror
     );
 
 
    wire 		       rd1_v, rd1_r;
    wire [0:aux_width-1]        rd1_aux;
-   wire [0:tag_width_w_par-1]        rd1_tag;   // w_par kch 
+   wire [0:tag_width_w_par-1]        rd1_tag;
 
-   base_alatch#(.width(tag_width_w_par+aux_width)) ird1_lat(.clk(clk),.reset(reset),.i_v(i_rd_v),.i_r(i_rd_r),.i_d({i_rd_tag,i_rd_aux}),.o_v(rd1_v),.o_r(rd1_r),.o_d({rd1_tag,rd1_aux})); // added w_par kch 
+   base_alatch#(.width(tag_width_w_par+aux_width)) ird1_lat(.clk(clk),.reset(reset),.i_v(i_rd_v),.i_r(i_rd_r),.i_d({i_rd_tag,i_rd_aux}),.o_v(rd1_v),.o_r(rd1_r),.o_d({rd1_tag,rd1_aux}));
 
    wire 		       rd2_v, rd2_r,rd2_en;
    wire [0:aux_width-1]        rd2_aux;
-   wire [0:tag_width_w_par-1]        rd2_tag;    // added w_par kch 
+   wire [0:tag_width_w_par-1]        rd2_tag;
    
    base_amem_rd_fltr#(.awidth(tag_width_w_par),.dwidth(aux_width)) ird2_lat
      (.clk(clk),.reset(reset),
@@ -69,11 +69,11 @@ module ktms_fc_error#
 
    wire [0:width-1] 	       rd2_d,s2_d;
    wire 		       s2_we;
-   wire [0:tag_width_w_par-1]        s2_tag;  // added w_par kch 
+   wire [0:tag_width_w_par-1]        s2_tag;
 
    wire 		       s1a_v, s1a_r;
    wire 		       s2_v, s2_r;
-   wire [0:tag_width_w_par-1]        s1a_tag;   // added w_par kch 
+   wire [0:tag_width_w_par-1]        s1a_tag;
    wire [0:2]                   s1_perror;
    capi_parcheck#(.width(tag_width)) rd2_tag_pcheck(.clk(clk),.reset(reset),.i_v(rd2_v),.i_d(rd2_tag[0:tag_width_w_par-2]),.i_p(rd2_tag[tag_width_w_par-1]),.o_error(s1_perror[0]));
    capi_parcheck#(.width(tag_width)) s2_tag_pcheck(.clk(clk),.reset(reset),.i_v(s2_v),.i_d(s2_tag[0:tag_width_w_par-2]),.i_p(s2_tag[tag_width_w_par-1]),.o_error(s1_perror[1]));
@@ -95,7 +95,7 @@ module ktms_fc_error#
      (.clk(clk),.reset(reset),
       .i_rd_en({1'b1,s1_en}),.i_rd_a({rd2_tag[0:tag_width_w_par-2],s1a_tag[0:tag_width_w_par-2]}),.o_rd_d({rd2_dv,s2_dv}),  
       .i_set_v(s2_we),.i_set_a(s2_tag[0:tag_width_w_par-2]),   
-      .i_rst_v(o_rd_v & o_rd_r),.i_rst_a(o_rd_tag[0:tag_width_w_par-2])   //same as rd2_tag kch 
+      .i_rst_v(o_rd_v & o_rd_r),.i_rst_a(o_rd_tag[0:tag_width_w_par-2])
       );
 
    // don't allow read while write is pending 
@@ -106,7 +106,7 @@ module ktms_fc_error#
    assign o_rd_dv  = rd2_dv;
 
    wire [0:ways-1] 	       s1_v, s1_r;
-   wire [0:tag_width_w_par*ways-1]   s1_tag;   // added w_par kch 
+   wire [0:tag_width_w_par*ways-1]   s1_tag;
    wire [0:width*ways-1]       s1_d;
    wire [0:ways-1] 	       s1_error;
    wire [0:ways-1] 	       s2a_v, s2a_r;

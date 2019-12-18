@@ -27,7 +27,7 @@ module ktms_afu_cmd#
    parameter dma_rc_width = 0,
    parameter afu_rc_width = 1,
    parameter afu_erc_width =1,
-   parameter ea_width = 65,   //changed  to 65 to add ea parity kch
+   parameter ea_width = 65,   
    parameter lba_width = 1,
    parameter rh_width = 1,
    parameter lunid_width = 64,
@@ -39,12 +39,12 @@ module ktms_afu_cmd#
    parameter msinum_width = 1,
    parameter rrqnum_width = 1,
    parameter cdb_width = 128,
-   parameter cdb_width_w_par  = 128 +2,   //added parity 
+   parameter cdb_width_w_par  = 128 +2,  
    parameter la_width = 1,
    parameter rrin_addr = 0,
    parameter flow_ctrl_addr = 0,
-   parameter tag_width = 1,      // this is changed to include parity kch 
-   parameter tstag_width=tag_width,   // this is changed to include parity kch 
+   parameter tag_width = 1,    
+   parameter tstag_width=tag_width, 
    parameter ssize_width=1,
    parameter ctxtcap_width=1,
    parameter flgs_width = 5, // vhr,sule,tmgmt,afu_cmd,wnr
@@ -68,7 +68,7 @@ module ktms_afu_cmd#
 
    // Update the readable copy of croom register
    output 					 o_croom_we,
-   output [0:ctxtid_width-2] 			 o_croom_wa,   // does not have parity kch   changed -1 to -2 cause no parity 
+   output [0:ctxtid_width-2] 			 o_croom_wa, 
    output [0:croom_width-1] 			 o_croom_wd,
    input [0:7]                                   i_croom_max,
 
@@ -104,8 +104,8 @@ module ktms_afu_cmd#
    // dma engine address interface for reading RCBs
    input 					 o_get_addr_r,
    output 					 o_get_addr_v,
-   output [0:ea_width-1] 			 o_get_addr_ea,  // parity added kch 
-   output [0:tstag_width-1] 			 o_get_addr_tstag, // parity added kch 
+   output [0:ea_width-1] 			 o_get_addr_ea,
+   output [0:tstag_width-1] 			 o_get_addr_tstag,
    output [0:ctxtid_width-1] 			 o_get_addr_ctxt,
    output [0:ssize_width-1] 			 o_get_addr_size,
 
@@ -113,7 +113,7 @@ module ktms_afu_cmd#
    output 					 i_get_data_r,
    input 					 i_get_data_v,
    input 					 i_get_data_e,
-   input [0:129] 				 i_get_data_d, // changed 127 to 129 to add parity kch
+   input [0:129] 				 i_get_data_d, 
    input [0:dma_rc_width-1] 			 i_get_data_rc, 
 
    // tag return syncid is no longer used for anything 
@@ -133,7 +133,7 @@ module ktms_afu_cmd#
    
    // note the arriaval of a command for debug and performance monitoring
    output 					 o_trk0_v,
-   output [0:tag_width-1] 			 o_trk0_tag,     // this has parity kch 
+   output [0:tag_width-1] 			 o_trk0_tag,   
    output [0:63] 				 o_trk0_timestamp,
 
    /* we inform the timeout unit of every command issued, unless the rrin timeout value has expired. 
@@ -142,7 +142,7 @@ module ktms_afu_cmd#
     */
    input 					 o_to_r,
    output 					 o_to_v,
-   output [0:tag_width-1] 			 o_to_tag, // parity added kch 
+   output [0:tag_width-1] 			 o_to_tag,
    output [0:15] 				 o_to_d, // timeout value
    output [0:1] 				 o_to_flg, // timeout flag
    output [0:63] 				 o_to_ts, // arrival timestamp (cycles)
@@ -154,7 +154,7 @@ module ktms_afu_cmd#
    // they will never be issued, so just complete them and return the tag
    input 					 o_abrt_r,
    output 					 o_abrt_v,
-   output [0:tag_width-1] 			 o_abrt_tag, // parity added kch 
+   output [0:tag_width-1] 			 o_abrt_tag,
    output [0:ctxtid_width-1] 			 o_abrt_ctxt,         
    output 					 o_abrt_ec, // endian control for this tag
    output [0:ea_width-1] 			 o_abrt_ea, // effective address of the RCB
@@ -177,7 +177,7 @@ module ktms_afu_cmd#
    output [0:flgs_width-1] 			 o_flgs, // various flags: see assignment to s1_flgs in ktms_sl_cmddec for definition of the bits
    output 					 o_nocmpl, // don't complete this command (eg sync)
    output [0:syncid_width-1] 			 o_syncid, // no longer used
-   output [0:tag_width-1] 			 o_tag, // afu tag for this command - unique per command in flight parity added kch 
+   output [0:tag_width-1] 			 o_tag, // afu tag for this command - unique per command in flight
    output [0:ctxtid_width-1]                     o_rcb_ctxt, // context for writing ioasa and rrq, and completion interupt
    output                                        o_rcb_ec, // endian control for rcb context
    output [0:ea_width-1]                         o_rcb_ea, // effective address of rcb
@@ -200,7 +200,7 @@ module ktms_afu_cmd#
 
    // note when commands are dropped b/c we ran out of room in the input buffer - for debug only, should never happen if sw is well behaved
    output 					 o_cmd_dropped,
-   output [0:3]                                  o_perror ,      // added o_perror kch  
+   output [0:3]                                  o_perror ,  
    output                                        o_cmpl_error_hld,
    output                                        o_tag_error_hld,
    output                                        o_allocate_afu_tag,
@@ -248,11 +248,11 @@ module ktms_afu_cmd#
    capi_mmio_mc_reg#(.addr(rrin_addr)) immio_cmd_addr(.clk(clk),.reset(reset),.i_mmiobus(i_mmiobus),.q(mmio_cmd_addr_ea),.trg(mmio_cmd_addr_v),.ctxt(mmio_cmd_addr_ctxt),.o_perror(o_perror[2]));
      
    wire 		      s0_addr_v, s0_addr_r;
-   wire [0:ea_width-1]                s0_addr_ea;    // change 63 to ea_width-1 kch 
+   wire [0:ea_width-1]                s0_addr_ea;  
    wire [0:ctxtid_width-1]    s0_addr_ctxt;
    wire [0:63]                s0_addr_timestamp;
 
-   wire [0:ea_width-1]        s0a_addr_ea;    // change 63 to ea_width-1 kch 
+   wire [0:ea_width-1]        s0a_addr_ea;  
    wire [0:ctxtid_width-1]    s0a_addr_ctxt;
    wire [0:63]                s0a_addr_timestamp;
    wire                       s0a_addr_hp;
@@ -273,7 +273,7 @@ module ktms_afu_cmd#
    base_vlat_sr#(.width(6)) iperror_lat(.clk(clk),.reset(reset),.set(s1_perror),.rst(6'd0),.q(hld_perror));
    base_vlat#(.width(1)) iperror_olat(.clk(clk),.reset(reset),.din(any_hld_perror),.q(o_perror[0]));
    
-   base_alatch#(.width(65+ctxtid_width)) ir0_lat    // changed 64 to 65 kch 
+   base_alatch#(.width(65+ctxtid_width)) ir0_lat 
      (.clk(clk),.reset(reset),
       .i_v(mmio_cmd_v),.i_d({mmio_cmd_addr_ctxt,mmio_cmd_addr_ea}),.i_r(mmio_cmd_addr_r),
       .o_r(r0a_r), .o_v(r0a_v),.o_d({r0_ctxt,r0_ea})
@@ -289,7 +289,7 @@ module ktms_afu_cmd#
    wire 		      r0b_v, r0b_r;
 `ifdef TIMEOUT_TEST   
    wire [0:tag_width-1] 	     r0_cnt;
-   base_vlat#(.width(tag_width-1)) ir0_cnt_lat(.clk(clk),.reset(reset),.din(r0_cnt[0:tag_width-2]+1),.q(r0_cnt[0:tag_width-2]));   // strip off parity kch 
+   base_vlat#(.width(tag_width-1)) ir0_cnt_lat(.clk(clk),.reset(reset),.din(r0_cnt[0:tag_width-2]+1),.q(r0_cnt[0:tag_width-2]));  
    wire 			     r0_en = r0_cnt == 9'd100;
 `else
    wire                              r0_en = 1'b1;
@@ -297,7 +297,7 @@ module ktms_afu_cmd#
 
    wire [0:1] r1a_v,r1a_r; 
    base_agate ir0_cmd_gt(.i_v(r0a_v),.i_r(r0a_r),.o_v(r0b_v),.o_r(r0b_r),.en(r0_en));
-   base_alatch#(.width(64+65+ctxtid_width)) ir1_lat  // changed 64 to 64 for ea parity kch 
+   base_alatch#(.width(64+65+ctxtid_width)) ir1_lat
      (.clk(clk),.reset(reset),
       .i_v(r0b_v),.i_d({i_timestamp,r0_ctxt,r0_ea}),.i_r(r0b_r),
       .o_r(r1a_r[0]), .o_v(r1a_v[0]),.o_d({r1_timestamp,r1_ctxt,r1_ea})
@@ -390,11 +390,11 @@ module ktms_afu_cmd#
                                                        .o_v(cmb_cmpl_v),.o_r(1'b1),.o_d(cmb_cmpl_tag),.o_sel());
 
 
-   capi_res_mgr#(.id_width(tag_width),.parity(1)) itag_mgr        // s1_tag has parity 
+   capi_res_mgr#(.id_width(tag_width),.parity(1)) itag_mgr   
      (.clk(clk),.reset(reset),
       .o_free_err(o_rm_err[1]),
       .i_free_v(cmb_cmpl_v),.i_free_id(cmb_cmpl_tag),
-      .o_avail_v(s1_tag_v),.o_avail_r(s1_tag_r),.o_avail_id(s1_tag),.o_cnt(),.o_perror(o_perror[1]));  // has parity kch 
+      .o_avail_v(s1_tag_v),.o_avail_r(s1_tag_r),.o_avail_id(s1_tag),.o_cnt(),.o_perror(o_perror[1])); 
 
     assign o_allocate_afu_tag = s1_tag_v & s1_tag_r;
     assign o_free_afu_tag = cmb_cmpl_v; 
@@ -405,10 +405,10 @@ module ktms_afu_cmd#
    wire s2_tag_check_v;
    base_vlat#(.width(1)) i_dlay_cmplt_tag(.clk(clk),.reset(reset),.din(cmb_cmpl_v),.q(s1_cmpl_tag_v));
    base_vlat#(.width(1)) i_dlay_tag(.clk(clk),.reset(reset),.din(s1_tag_v & s1_tag_r),.q(s2_tag_check_v));
-   base_vmem#(.a_width(tag_width-1),.rports(2)) ots_vmem  // added -1 kch 
+   base_vmem#(.a_width(tag_width-1),.rports(2)) ots_vmem
      (.clk(clk),.reset(reset),
-      .i_set_v(s1_tag_v & s1_tag_r),.i_set_a(s1_tag[0:tag_width-2]),  // added [0:tag_width-2] kch
-      .i_rst_v(cmb_cmpl_v),.i_rst_a(cmb_cmpl_tag[0:tag_width-2]),  // added 0:tag_width-2 kch
+      .i_set_v(s1_tag_v & s1_tag_r),.i_set_a(s1_tag[0:tag_width-2]),
+      .i_rst_v(cmb_cmpl_v),.i_rst_a(cmb_cmpl_tag[0:tag_width-2]),
       .i_rd_en(2'b11),.i_rd_a({cmb_cmpl_tag[0:tag_width-2],s1_tag[0:tag_width-2]}),.o_rd_d({s1_cmpl_outst,s2_tag_outst})
       );
    wire s1_cmpl_error = s1_cmpl_tag_v & ~(s1_cmpl_outst);
@@ -423,7 +423,7 @@ module ktms_afu_cmd#
    localparam [0:tag_width-1-1] tag_threshold = 2;  
    wire [0:tag_width-1-1] temp_tag_threshold = i_threshold_zero ? 0 : tag_threshold; 
    
-   base_incdec#(.width(tag_width+1-1),.rstv(1<<(tag_width-1))) itag_cnt   // added -1 to strip off parity kch 
+   base_incdec#(.width(tag_width+1-1),.rstv(1<<(tag_width-1))) itag_cnt  
      (.clk(clk),.reset(reset),
       .i_dec(s1_tag_v & s1_tag_r),
       .i_inc(cmb_cmpl_v),
@@ -460,9 +460,9 @@ module ktms_afu_cmd#
 
    wire [0:croom_width-1]     t1_croom_woutst;
 
-   ktms_mc_incdec#(.id_width(ctxtid_width-1),.width(croom_width),.maxv(croom)) ifc_incdec   // added -1 to ctxtid_width to strip of parity kch 
+   ktms_mc_incdec#(.id_width(ctxtid_width-1),.width(croom_width),.maxv(croom)) ifc_incdec 
      (.clk(clk),.reset(reset),
-      .i_rst_v(i_ctxt_add_v),.i_rst_id(i_ctxt_add_d[0:ctxtid_width-2]),.o_rst_ack(o_ctxt_add_ack_v),         // add ctxtid_width -2 to inputs kch  
+      .i_rst_v(i_ctxt_add_v),.i_rst_id(i_ctxt_add_d[0:ctxtid_width-2]),.o_rst_ack(o_ctxt_add_ack_v), 
       .i_inc_v(mmio_cmd_v),.i_inc_id(mmio_cmd_addr_ctxt[0:ctxtid_width-2]),.i_inc_frc_oflw(i_errinj_croom),
       .o_inc_v(r1a_v[1]),.o_inc_r(r1a_r[1]),.o_inc_err(r1_croom_err),
       .i_dec_v(s1a_v),.i_dec_r(s1a_r),.i_dec_id(s1_addr_ctxt[0:ctxtid_width-2]),
@@ -522,7 +522,7 @@ module ktms_afu_cmd#
 
    // get rcb endianness
    wire                       s3_rcb_ec;
-   base_vmem#(.a_width(ctxtid_width-1)) is3_vmem   // added -1 to strip of parity kch 
+   base_vmem#(.a_width(ctxtid_width-1)) is3_vmem  
      (.clk(clk),.reset(reset),
       .i_set_v(i_ec_set),.i_set_a(i_ec_id[0:ctxtid_width-2]),
       .i_rst_v(i_ec_rst),.i_rst_a(i_ec_id[0:ctxtid_width-2]),
@@ -602,7 +602,7 @@ module ktms_afu_cmd#
     .o_flgs(s4_flgs),
     .o_v(s4a_v),
     .o_r(s4a_r),
-    .o_perror(o_perror[3])   // added o_perror kch 
+    .o_perror(o_perror[3])
 );
    
    wire [0:1] 		      s4_v, s4_r;
@@ -700,17 +700,17 @@ module ktms_afu_cmd#
       .o_en(s4_re)
       );
    wire [0:ctxtcap_width-1]    s5_data_ctxtcap;
-   base_mem#(.addr_width(ctxtid_width-1),.width(ctxtcap_width)) is5_data_capmem   // added -1 to strip off parity kch 
+   base_mem#(.addr_width(ctxtid_width-1),.width(ctxtcap_width)) is5_data_capmem 
      (.clk(clk),
-      .re(s4_re),.ra(s4_data_ctxt[0:ctxtid_width-2]),.rd(s5_data_ctxtcap),   // added -2 to strip parity off kch 
-      .we(i_cap_wr_v),.wa(i_cap_wr_ctxt[0:ctxtid_width-2]),.wd(i_cap_wr_d)    // added -2 to strip parity off kch 
+      .re(s4_re),.ra(s4_data_ctxt[0:ctxtid_width-2]),.rd(s5_data_ctxtcap), 
+      .we(i_cap_wr_v),.wa(i_cap_wr_ctxt[0:ctxtid_width-2]),.wd(i_cap_wr_d)  
       );
 
    wire [0:ctxtcap_width-1]   s5_rcb_ctxtcap;
-   base_mem#(.addr_width(ctxtid_width-1),.width(ctxtcap_width)) is5_rcb_capmem    // added -1 to strip off parity kch 
+   base_mem#(.addr_width(ctxtid_width-1),.width(ctxtcap_width)) is5_rcb_capmem 
      (.clk(clk),
-      .re(s4_re),.ra(s4_rcb_ctxt[0:ctxtid_width-2]),.rd(s5_rcb_ctxtcap),    // added -2 to strip parity off kch 
-      .we(i_cap_wr_v),.wa(i_cap_wr_ctxt[0:ctxtid_width-2]),.wd(i_cap_wr_d)   // added -2 to strip parity off kch 
+      .re(s4_re),.ra(s4_rcb_ctxt[0:ctxtid_width-2]),.rd(s5_rcb_ctxtcap),   
+      .we(i_cap_wr_v),.wa(i_cap_wr_ctxt[0:ctxtid_width-2]),.wd(i_cap_wr_d) 
       );
    // error handling
    localparam ccap_proxy_src  = 0;

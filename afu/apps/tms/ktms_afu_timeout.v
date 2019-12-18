@@ -15,20 +15,6 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
 
 module ktms_afu_timeout#
   (parameter tag_width=1,
@@ -65,7 +51,7 @@ module ktms_afu_timeout#
 
     input 			   o_cmpl_r,
     output 			   o_cmpl_v,
-    output [0:tag_width-1] 	   o_cmpl_tag,    //has parity 
+    output [0:tag_width-1] 	   o_cmpl_tag, 
     output [0:rslt_width-1] 	   o_cmpl_rslt, 
     output [0:aux_width-1] 	   o_cmpl_aux,
     output 			   o_cmpl_tagret,
@@ -87,17 +73,17 @@ module ktms_afu_timeout#
     // prevents further dma activity
     input 			   o_abort_r,
     output 			   o_abort_v,
-    output [0:tag_width-1] 	   o_abort_tag,   //has parity 
+    output [0:tag_width-1] 	   o_abort_tag, 
 
     output 			   o_perfmon_v,
-    output [0:tag_width-1] 	   o_perfmon_tag,  //has parity kch 
+    output [0:tag_width-1] 	   o_perfmon_tag,
   
     // complete these commands either because they are syncs or
     // because they are timeouts that have not been issued to fc channel
     
 
     input 			   i_cr_v,
-    input [0:ctxtid_width-1] 	   i_cr_id,    //done kch
+    input [0:ctxtid_width-1] 	   i_cr_id,
 
     input 			   i_ctxt_add_v,
     input [0:ctxtid_width-1] 	   i_ctxt_add_d,
@@ -140,7 +126,7 @@ module ktms_afu_timeout#
    wire 		   t1_r;
    base_vlat_en#(.width(tag_width-1))it1_lat(.clk(clk),.reset(reset),.din(t1_tag_in),.q(t1_tag[0:tag_width-2]),.enable(t1_r));
   
-  capi_parity_gen#(.dwidth(tag_width-1),.width(1)) t1_tag_pgen(.i_d(t1_tag[0:tag_width-2]),.o_d(t1_tag[tag_width-1])); // added kch
+  capi_parity_gen#(.dwidth(tag_width-1),.width(1)) t1_tag_pgen(.i_d(t1_tag[0:tag_width-2]),.o_d(t1_tag[tag_width-1]));
 
    wire 		   s1a_cmpl_v, s1a_cmpl_r;
    wire [0:tag_width-1]    s1_cmpl_tag;
@@ -191,7 +177,7 @@ module ktms_afu_timeout#
    wire 		   t2_ok;
    base_mem#(.addr_width(tag_width-1),.width(64+1+2+16+1)) its_mem
      (.clk(clk),
-      .we(s1_cmd_v),.wa(s1_cmd_tag[0:tag_width-2]),.wd({s1_cmd_ts,s1_cmd_sync,s1_cmd_flg,s1_cmd_d,s1_cmd_ok}),  //added [0:tag_width-2] 
+      .we(s1_cmd_v),.wa(s1_cmd_tag[0:tag_width-2]),.wd({s1_cmd_ts,s1_cmd_sync,s1_cmd_flg,s1_cmd_d,s1_cmd_ok}), 
       .re(t1_en),.ra(t1_tag[0:tag_width-2]),.rd({t2_ts,t2_sync,t2_flg,t2_tod,t2_ok}) // can avoid the mux on read address by using t1_tag, not t1a_tag. The result won't be used for normal completion
       );
    wire 		   t2_tag_v;
@@ -208,10 +194,10 @@ module ktms_afu_timeout#
 
 
    // track whether each tag is valid
-   base_vmem#(.a_width(tag_width-1),.rst_ports(2)) its_vmem  // added -1 kch 
+   base_vmem#(.a_width(tag_width-1),.rst_ports(2)) its_vmem
      (.clk(clk),.reset(reset),
-      .i_set_v(s1_cmd_v),.i_set_a(s1_cmd_tag[0:tag_width-2]),  // added [0:tag_width-2] kch
-      .i_rst_v({tag_rst_v,(i_reset_afu_cmd_tag_v & i_reset_afu_cmd_tag_r)}),.i_rst_a({tag_rst_tag[0:tag_width-2],i_reset_afu_cmd_tag[0:tag_width-2]}),  // added 0:tag_width-2 kch
+      .i_set_v(s1_cmd_v),.i_set_a(s1_cmd_tag[0:tag_width-2]),
+      .i_rst_v({tag_rst_v,(i_reset_afu_cmd_tag_v & i_reset_afu_cmd_tag_r)}),.i_rst_a({tag_rst_tag[0:tag_width-2],i_reset_afu_cmd_tag[0:tag_width-2]}),
       .i_rd_en(t1_en),.i_rd_a(t1_tag[0:tag_width-2]),.o_rd_d(t2_tag_v)
       );
    
@@ -318,7 +304,7 @@ module ktms_afu_timeout#
 
    // don't allow back-to-back transactions with the same tag
    // this way we don't need bypass logic on the vmems
-   wire 		t4_gt_en = ~(t5_v & (t4_tag[0:tag_width-2] == t5_tag[0:tag_width-2]));   // strip off parity kch 
+   wire 		t4_gt_en = ~(t5_v & (t4_tag[0:tag_width-2] == t5_tag[0:tag_width-2]));  
    wire 		t4a_v, t4a_r;
    base_agate it4_gt(.i_v(t4_v),.i_r(t4_r),.o_v(t4a_v),.o_r(t4a_r),.en(t4_gt_en));
 
@@ -339,19 +325,19 @@ module ktms_afu_timeout#
    capi_parcheck#(.width(ctxtid_width-1)) t4_tag_pcheck(.clk(clk),.reset(reset),.i_v(t4_v),.i_d(t4_tag[0:tag_width-2]),.i_p(t4_tag[tag_width-1]),.o_error(s1_perror[2]));
  
    wire 		t5_nr_rst = t5d_v & t5d_r & t5_sel[channels];
-   base_vmem#(.a_width(tag_width-1)) its_nr_vmem    //added -1 kch
+   base_vmem#(.a_width(tag_width-1)) its_nr_vmem  
      (.clk(clk),.reset(reset),
-      .i_set_v(s1_cmd_v),.i_set_a(s1_cmd_tag[0:tag_width-2]),   // added 0:tag_width-2 kch
-      .i_rst_v(t5_nr_rst),.i_rst_a(t5_tag[0:tag_width-2]),  // added 0:tag_width-2 kch 
+      .i_set_v(s1_cmd_v),.i_set_a(s1_cmd_tag[0:tag_width-2]), 
+      .i_rst_v(t5_nr_rst),.i_rst_a(t5_tag[0:tag_width-2]),
       .i_rd_en(t4_en),.i_rd_a(t4_tag[0:tag_width-2]),.o_rd_d(t5_not_rsp)
       );
 
    wire 		t5_fc_sent; // this tag has been sent to the fc interface, cannot abort now
    wire 		t5_fcsent_set = t5_v & t5_r & ~t5_sel[channels];
-   base_vmem#(.a_width(tag_width-1)) ifc_sent_mem    //added -1 kch
+   base_vmem#(.a_width(tag_width-1)) ifc_sent_mem 
      (.clk(clk),.reset(reset),
-      .i_rst_v(tag_rst_v),.i_rst_a(tag_rst_tag[0:tag_width-2]), // added 0:tag_width-2 kch
-      .i_set_v(t5_fcsent_set),.i_set_a(t5_tag[0:tag_width-2]), // added 0:tag_width-2 kch
+      .i_rst_v(tag_rst_v),.i_rst_a(tag_rst_tag[0:tag_width-2]),
+      .i_set_v(t5_fcsent_set),.i_set_a(t5_tag[0:tag_width-2]), 
       .i_rd_en(t4_en),.i_rd_a(t4_tag[0:tag_width-2]),.o_rd_d(t5_fc_sent));
 
 
@@ -428,7 +414,7 @@ module ktms_afu_timeout#
    wire [0:ctxtid_width-1]    c2_id;
    base_alatch_oe#(.width(ctxtid_width)) ic2_lat(.clk(clk),.reset(reset),.i_v(c1a_v),.i_r(c1a_r),.i_d(c1_id),.o_v(c2_v),.o_r(c2_r),.o_d(c2_id),.o_en(c1_re));
 
-  capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) c1_id_pgen(.i_d(c1_id[0:ctxtid_width-2]),.o_d(c1_id[ctxtid_width-1])); // added kch
+  capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) c1_id_pgen(.i_d(c1_id[0:ctxtid_width-2]),.o_d(c1_id[ctxtid_width-1])); 
  
    wire [0:63] 		      c2_ts;
    capi_parcheck#(.width(ctxtid_width-1)) i_cr_id_pcheck(.clk(clk),.reset(reset),.i_v(i_cr_v),.i_d(i_cr_id[0:ctxtid_width-2]),.i_p(i_cr_id[ctxtid_width-1]),.o_error(s1_perror[3]));

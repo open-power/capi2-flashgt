@@ -47,11 +47,11 @@ module ktms_afu_errmon#
    wire 		       errmon_rnw;  // read not write
    wire 		       errmon_vld;  // valid 
    wire 		       errmon_dw;   // double word
-   wire [0:64] 		       errmon_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       errmon_data;
    wire [0:24]  	       errmon_addr;
    wire [0:4+24+64-1]          errmon_mmiobus;
-   assign {errmon_vld,errmon_cfg,errmon_rnw,errmon_dw,errmon_addr,errmon_data} = i_mmiobus; // omit any extra data bits
-   assign errmon_mmiobus = {errmon_vld,errmon_cfg,errmon_rnw,errmon_dw,errmon_addr[0:23],errmon_data[0:63]};  // created to strip of parity 
+   assign {errmon_vld,errmon_cfg,errmon_rnw,errmon_dw,errmon_addr,errmon_data} = i_mmiobus; 
+   assign errmon_mmiobus = {errmon_vld,errmon_cfg,errmon_rnw,errmon_dw,errmon_addr[0:23],errmon_data[0:63]}; 
    capi_mmio_reg#(.addr(mmio_addr)) immio_rst(.clk(clk),.reset(reset),.i_mmiobus(errmon_mmiobus-2),.q(),.trg(s1_rst));
    
    wire [0:width-1] s2_err_d;

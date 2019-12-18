@@ -36,7 +36,7 @@ module ktms_mmwr_mc_dec#
     input 		       o_wr_r, // limited backpressure
     output 		       o_wr_v,
     output [lcladdr_width-1:0] o_wr_addr, // ignore lsb
-    output [0:ctxtid_width-1]  o_wr_ctxt,  // done kch
+    output [0:ctxtid_width-1]  o_wr_ctxt,
     output [0:63] 	       o_wr_d
     );
 
@@ -51,12 +51,12 @@ module ktms_mmwr_mc_dec#
    assign {ha_vld,ha_cfg,ha_rnw,ha_dw,ha_addr,ha_data} = i_mmiobus; // omit any extra data bits
 
    wire 		       s0_addr_matchl = (ha_addr[ctxtid_start-1:lcladdr_width] == addr[ctxtid_start-1:lcladdr_width]);
-   wire 		       s0_addr_matchh = (ha_addr[addr_width-1:ctxtid_start+ctxtid_width-1] == addr[addr_width-1:ctxtid_start+ctxtid_width-1]); //added -1 kch
+   wire 		       s0_addr_matchh = (ha_addr[addr_width-1:ctxtid_start+ctxtid_width-1] == addr[addr_width-1:ctxtid_start+ctxtid_width-1]); 
 
    wire 		       s0_v = ~ha_addr[0] & s0_addr_matchl & s0_addr_matchh & ha_vld & ~ha_rnw & ~ha_cfg;
 
    wire                        s0_ctxt_par;
-   wire [0:ctxtid_width-1]     s0_ctxt = {ha_addr[ctxtid_start+ctxtid_width-2:ctxtid_start],s0_ctxt_par}; // changed -1 to -2 kch
+   wire [0:ctxtid_width-1]     s0_ctxt = {ha_addr[ctxtid_start+ctxtid_width-2:ctxtid_start],s0_ctxt_par};
    wire [0:lcladdr_width-1]    s0_lcladdr = ha_addr [lcladdr_width-1:0];
 
    wire [lcladdr_width-1:0]    s1_ra;
@@ -68,7 +68,7 @@ module ktms_mmwr_mc_dec#
    wire [0:63] 		       s1_wr_d;
 
 
-   capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) ipgen(.i_d(s0_ctxt[0:ctxtid_width-2]),.o_d(s0_ctxt_par)); // added kch
+   capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) ipgen(.i_d(s0_ctxt[0:ctxtid_width-2]),.o_d(s0_ctxt_par));
    
    base_arealign#(.adv_width(ctxtid_width+lcladdr_width+1),.del_width(64)) is1_lat
      (.clk(clk),.reset(reset),

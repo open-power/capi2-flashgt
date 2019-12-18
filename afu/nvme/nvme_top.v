@@ -22,7 +22,7 @@
 //  File : nvme_top.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SureLock Express NVMe top level
+//  Description : FlashGT+ NVMe top level
 //                Includes four NVMe port instances
 
 //  *************************************************************************
@@ -41,8 +41,8 @@ module nvme_top#
     parameter fcstat_width    = 8, 
     parameter fcxstat_width   = 8, 
     parameter rsp_info_width  = 160,
-    parameter tag_par_width   = (tag_width + 63)/64,    // change 7/8 to 63/64 kch 
-    parameter lunid_par_width = (lunid_width + 63)/64,  // change 7/8 to 63/64 kch 
+    parameter tag_par_width   = (tag_width + 63)/64,  
+    parameter lunid_par_width = (lunid_width + 63)/64, 
     parameter data_par_width  = (data_width + 7)/8 ,  
     parameter data_fc_par_width = data_par_width/8,
     parameter status_width    = 8, // event status

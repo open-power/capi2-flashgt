@@ -583,7 +583,7 @@ begin
 ---- Misc. Logic
 --==============================================================================================--
  -- ----------------------------------- --
- -- Input latches                       --
+ -- Input latches (really flipflops but latch is IBM terminology) --
  -- ----------------------------------- --
 
     dff_fdatain_first: psl_rise_vdff GENERIC MAP ( width => 16 ) PORT MAP (

@@ -51,7 +51,7 @@ module ktms_debug_cnt#
    wire 		       debug_cnt_rnw;  // read not write
    wire 		       debug_cnt_vld;  // valid 
    wire 		       debug_cnt_dw;   // double word
-   wire [0:64] 		       debug_cnt_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       debug_cnt_data;
    wire [0:24]  	       debug_cnt_addr;
    wire [0:4+24+64-1]         debug_cnt_mmiobus;
    assign {debug_cnt_vld,debug_cnt_cfg,debug_cnt_rnw,debug_cnt_dw,debug_cnt_addr,debug_cnt_data} = i_mmiobus; // omit any extra data bits

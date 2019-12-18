@@ -18,7 +18,7 @@
 
 `timescale 1ns/1ns
 
-// Surelock NVMe
+// FlashGT+
 // PCIe debug
 //
 // - includes async crossing between PSL 250Mhz clock and
@@ -84,7 +84,7 @@ module nvme_pcie_dbg
    //----------------------------------------------------------
    // control signals 
     input             regs_wdata_pe_errinj_valid,
-    output reg        user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain kch 
+    output reg        user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain
   
     input       [1:0] user_rxcq_perror_ind,
     input             user_rxrc_perror_ind,
@@ -116,7 +116,7 @@ module nvme_pcie_dbg
     input      [15:0] txcc_dbg_events,
     input      [15:0] txcc_dbg_user_events,
 
-//    input      [2:0]  rxcq_dbg_perr   // comment out for now kch 
+//    input      [2:0]  rxcq_dbg_perr  
     input     [143:0] txcc_dbg_user_tracedata,
     input             txcc_dbg_user_tracevalid,
 

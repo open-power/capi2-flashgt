@@ -22,7 +22,7 @@
 //  File : nvme_adq_sq.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe microcode queue
+//  Description : FlashGT+ NVMe microcode queue
 //
 //  NVMe Submission Queue
 //  *************************************************************************
@@ -58,7 +58,7 @@ module nvme_ucq_sq#
     //-------------------------------------------------------
     input                                [31:0] ctl_sq_ioaddress,
     input                                       ctl_sq_ioread_strobe, 
-    input                                [35:0] ctl_sq_iowrite_data, // change 31 to 35 kch 
+    input                                [35:0] ctl_sq_iowrite_data,
     input                                       ctl_sq_iowrite_strobe,
     output reg                           [35:0] sq_ctl_ioread_data, // read_data is sampled when ioack=1
     output reg                                  sq_ctl_ioack,
@@ -138,15 +138,13 @@ module nvme_ucq_sq#
            begin
               if (rmw_sq_wren_q[i])
                 begin
-                   // sq_mem[sq_wraddr][(i+1)*sq_wrwidth-1:i*sq_wrwidth] <= sq_wrdata[sq_wrwidth-1:0];
-                   // sq_mem[sq_wraddr][(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth] <= sq_wrdata[sq_wrwidth+sq_par_wrwidth-1:sq_wrwidth];  // kch 
                    rmw_sq_wrdata[(i+1)*sq_wrwidth-1:i*sq_wrwidth] <= sq_wrdata_q[sq_wrwidth-1:0];
-                   rmw_sq_wrdata[(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth] <= sq_wrdata_q[sq_wrwidth+sq_par_wrwidth-1:sq_wrwidth];  // kch 
+                   rmw_sq_wrdata[(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth] <= sq_wrdata_q[sq_wrwidth+sq_par_wrwidth-1:sq_wrwidth]; 
                 end 
               else 
                 begin
                    rmw_sq_wrdata[(i+1)*sq_wrwidth-1:i*sq_wrwidth] <= sq_rddata[(i+1)*sq_wrwidth-1:i*sq_wrwidth];
-                   rmw_sq_wrdata[(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth] <= sq_rddata[(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth];  // kch 
+                   rmw_sq_wrdata[(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth] <= sq_rddata[(128+(i+1)*sq_par_wrwidth)-1:128+i*sq_par_wrwidth];
                 end
            end
       end
@@ -185,7 +183,7 @@ module nvme_ucq_sq#
    reg                     sq_wrack;
    reg                     sq_rdack;
    
-   // pgen sq data kch
+   // pgen sq data
    wire                    sq_cntl_par;
    nvme_pgen#
      (

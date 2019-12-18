@@ -37,7 +37,7 @@ module capi_mmio_timeout#
    wire 		       ha_vld;  // valid 
    wire 		       ha_dw;   // double word
    wire [0:mmio_addr_width-1]  ha_addr;
-   wire [0:64] 		       ha_wd;   // changed 63 to 64 kch 
+   wire [0:64] 		       ha_wd;   
 
    
    

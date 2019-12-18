@@ -16,7 +16,7 @@
 // *! limitations under the License.
 // *!***************************************************************************
  module capi_dma_read_plus#
-   (parameter ea_width = 65, // changed 64 to 65 to add parity kch 
+   (parameter ea_width = 65,
     parameter ctxtid_width = 16,
     parameter tstag_width = 1,
     parameter tsize_width=12, // transaction size field
@@ -53,7 +53,7 @@
     
     output [0:gets-1]			  o_rdata_v,
     output [0:gets*wdata_addr_width-1] o_rdata_a,
-    output [0:gets*130-1] 		  o_rdata_d,   //  kch changed 127 to 129
+    output [0:gets*130-1] 		  o_rdata_d,
 
     input                         i_tag_plus_v ,
     input [0:7]                   i_rtag_plus,
@@ -75,7 +75,7 @@
       output o_cmplt_utag_error_hld,
 
 
-    output [0:1]        	  o_perror,   // added o_perror kch 
+    output [0:1]        	  o_perror,  
     output [0:1]                  o_tag_error,
     output [0:8*3*64-1]           o_latency_d,
     input                         i_reset_lat_cntrs
@@ -87,7 +87,7 @@
    wire               size_eq_80 = (s1_hd0_cpl_size == 9'h080);
 
 
-// init quad array kchhh
+
    wire quad_init_v;
    wire [0:5] quad_init_adr;
    wire [0:1] quad_rd;
@@ -151,7 +151,7 @@
    wire 			   r1_v, r1_r;
 //   wire [0:5]                      r1_ctag_free_id;
 
-// create a ctag and utag for a command kchh
+// create a ctag and utag for a command
    wire [0:gets-1]        r3_e;
    wire [0:gets*6-1]      r3_ltag;
    wire 		   r3_e_total = |(r3_e);
@@ -163,8 +163,7 @@
 
    capi_res_mgr#(.id_width(6)) irmgr
      (.clk(clk),.reset(reset),.o_avail_v(tag_v),.o_avail_r(tag_r),.o_avail_id(s1_ltag),
-//      .i_free_v(r3_e_total),.i_free_id(r3_ltag_total),.o_free_err(o_rm_err),.o_cnt(),.o_perror(o_perror[1])   // added o_perror kch 
-      .i_free_v(r3_e_total),.i_free_id(r3_ltag_total),.o_free_err(o_rm_err),.o_cnt(),.o_perror(o_perror[1])   // added o_perror kch 
+      .i_free_v(r3_e_total),.i_free_id(r3_ltag_total),.o_free_err(o_rm_err),.o_cnt(),.o_perror(o_perror[1])   
       );
 
    wire tag_allocate = tag_v & tag_r;
@@ -291,17 +290,14 @@
    base_vlat#(.width(1)) iperror_olat(.clk(clk),.reset(reset),.din(| hld_perror),.q(o_perror[0]));
 
    capi_parcheck#(.width(ea_width-1)) s1_ea_pcheck(.clk(clk),.reset(reset),.i_v(i_req_v),.i_d(s1_ea[0:ea_width-2]),.i_p(s1_ea[ea_width-1]),.o_error(s1_perror));
-//   wire [0:beat_width-1] 	   s1_beat_st = s1_ea[ea_width-4-beat_width:ea_width-4-1];  original kch 
-   wire [0:beat_width-1] 	   s1_beat_st = s1_ea[ea_width-1-4-beat_512_width:ea_width-1-4-1];   // subtracted off parity by adding -1's kch 
+   wire [0:beat_width-1] 	   s1_beat_st = s1_ea[ea_width-1-4-beat_512_width:ea_width-1-4-1];  
  
    wire                            s1_ea_clapar;
    wire                            s1_size_is_128 = (s1_size == 8'h80);
    
    wire [0:ea_width-1] 		   s1_ea_cla;
-//   wire [0:ea_width-1] 		   s1_ea_cla_128 = {s1_ea[0:ea_width-(beat_width+4)-1],{beat_width+4{1'b0}},s1_ea_clapar};  // original kch 
-//   wire [0:ea_width-1] 		   s1_ea_cla_128 = {s1_ea[0:ea_width-(beat_width+4)-1],{beat_width+4{1'b0}}};  // original kch 
-   wire [0:ea_width-1] 		   s1_ea_cla_128 = {s1_ea[0:ea_width-1-(beat_width+4)-1],{beat_width+4{1'b0}},s1_ea_clapar};  // added -1 to strip off parity kch added pgen  512 aligned address 
-   wire [0:ea_width-1] 		   s1_ea_cla_512 = {s1_ea[0:ea_width-1-(beat_512_width+4)-1],{beat_512_width+4{1'b0}},s1_ea_clapar};  // added -1 to strip off parity kch added pgen  512 aligned address 
+   wire [0:ea_width-1] 		   s1_ea_cla_128 = {s1_ea[0:ea_width-1-(beat_width+4)-1],{beat_width+4{1'b0}},s1_ea_clapar};
+   wire [0:ea_width-1] 		   s1_ea_cla_512 = {s1_ea[0:ea_width-1-(beat_512_width+4)-1],{beat_512_width+4{1'b0}},s1_ea_clapar}; 
 
    assign s1_ea_cla = s1_size_is_128 ? s1_ea_cla_128 : s1_ea_cla_512;
    capi_parity_gen#(.dwidth(ea_width-1),.width(1)) s1_ea_cla_pgen(.i_d(s1_ea_cla[0:63]),.o_d(s1_ea_clapar));
@@ -309,8 +305,6 @@
    wire 			   s1_v = i_req_v;
    wire 			   s1_r;
    assign i_req_r = s1_r;
-//   base_acombine#(.ni(3),.no(1)) is1_cmb
-//     (.i_v({s1_v,tag_v,read_utag_v}),.i_r({s1_r,tag_r,read_utag_r}),.o_v(o_req_v),.o_r(o_req_r));   // added utag_v kch 
    base_acombine#(.ni(2),.no(1)) is1_cmb
      (.i_v({s1_v,tag_v}),.i_r({s1_r,tag_r}),.o_v(o_req_v),.o_r(o_req_r));  
    
@@ -326,7 +320,6 @@
 
    assign o_req_d = {s1_ctag, s1_tag[0:uid_width-1], s1_sid, s1_f,s1_aux, s1_size, s1_ea_cla};
 
-//   wire 		  r0_ok = ~(| i_rsp_rc);
    wire 		  i_cmplt_ok = read_cmplt_ok; // repsonse errors reported elsewhere
    wire [0:5]             i_cmplt_ltag = read_cmplt_utag;
    wire [0:rc_width-1] 	  i_cmplt_rc = read_cmplt_rc;
@@ -404,18 +397,9 @@
    base_mem#(.addr_width(6),.width(tag_width+tsize_width+beat_512_width+sid_width+tstag_width)) utag_mem
      (.clk(clk),
       .re(1'b1),.ra(r0_ltag), .rd({r1_tag,r1_size,r1_bt,r1_sid,r1_tstag}),
-//      .we(tag_v & read_utag_v  & tag_r),.wa(s1_read_utag),.wd({s1_tag,s1_size,s1_ea[ea_width-1-4-beat_512_width:ea_width-1-4-1],s1_sid,s1_tstag,s1_ctag}) 
       .we(tag_v & tag_r),.wa(s1_ltag),.wd({s1_tag,s1_size,s1_ea[ea_width-1-4-beat_512_width:ea_width-1-4-1],s1_sid,s1_tstag}) 
       );
 
-
-//   base_mem#(.addr_width(ltag_width),.width(7)) ctag_mem
-//     (.clk(clk),
-//      .re(i_rsp_ctag_v),.ra(i_rsp_ctag), .rd(s2_read_utag),
-//      .we(tag_v & read_utag_v & tag_r),.wa(s1_ltag),.wd(s1_read_utag) 
-//      );
-
-//   assign o_rsp_utag = {2'b00,s2_read_utag};
 
    //   bypass for non-zero returns do that they don't get overtaken by ctxt terminate or timeouts
    wire [0:1] 			   r1a_v, r1a_r;
@@ -437,20 +421,19 @@
 		  .beat_width(beat_width),.ctag_width(ctag_width-2),.rc_width(rc_width)) idma_read_data
 	    (
              .clk(clk),.reset(reset),
-//             .i_v(r1a_v & {r1_dr_v[i],r1_dr_v[i]} ),.i_r(r1a_r),.i_rc(r1_rc),.i_ltag(r1_ltag),.i_tag(r1_tag),.i_size(r1_size),.i_bt(r1_bt),.i_sid(r1_sid),.i_tstag(r1_tstag),.i_d(data_rd),.i_sync(shift_reg[i]),
-// let all good and bad response go through good machine path logic 
+              // let all good and bad response go through good machine path logic 
              .i_v({1'b0,(r1_v & r1_dr_v[i])} ),.i_r(r1a_r),.i_rc(r1_rc),.i_ltag(r1_ltag),.i_tag(r1_tag),.i_size(r1_size),.i_bt(r1_bt),.i_sid(r1_sid),.i_tstag(r1_tstag),.i_d(data_rd),.i_sync(shift_reg[i]),
              .o_rsp_v(o_rsp_v[i]),.o_rsp_d(o_rsp_d[rsp_width*i:((i+1)*rsp_width)-1]),
              .o_rdata_v(o_rdata_v[i]),.o_rdata_a(o_rdata_a[wdata_addr_width*i:((i+1)*wdata_addr_width)-1]),.o_rdata_d(o_rdata_d[130*i:((i+1)*130)-1]),.o_data_ra(data_ra[8*i:((i+1)*8)-1]),
              .o_free_tag_v(r3_e[i]),.o_free_ltag(r3_ltag[6*i:((i+1)*6)-1])
              );
 
-	end // block: get
+	end 
   endgenerate
 
 
 
-endmodule // capi_dma_read
+endmodule
 
 
 

@@ -15,34 +15,10 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
 
 
 `timescale 1 ns / 10 ps
 
-//  *************************************************************************
-//  File : nvme_sntl_cmd.v
-//  *************************************************************************
-//  KC Hinz
-//  IBM
-//  kchinz@us.ibm.com
-//  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer command processing
-//                
-//  *************************************************************************
 
 module capi_dma_itag#
   (// afu/psl   interface parameters
@@ -76,10 +52,6 @@ module capi_dma_itag#
     input [0:8] 			r2_ritag_plus, 
     input        			r2_ritagpar_plus, 
 
-// read data for take complete
-//    output 		        	o_rsp_rd_ctag_v,
-//    output [0:5] 	                o_rsp_rd_ctag,    
-//    input [0:8] 	                i_rsp_utag, 
 
     input  				i_v, 
     input [0:7] 			i_ctag, 
@@ -88,8 +60,6 @@ module capi_dma_itag#
     output                              o_dvalid,
     output [0:7]                        o_dwad, 
 
-// write u tag for write dma ordering
-//    output [0:9]                        o_r1_rutag_plus,
     output                              itag_dma_perror,
     output [0:3]                        o_tag_error,
     output                              o_rcb_req_sent,
@@ -321,11 +291,6 @@ module capi_dma_itag#
   wire       s4_write_dvalid = s4_dvalid_q & s4_req_utag_q[0] & (s4_dtype_q == 3'd1);  // only check first cycle of dma write 
   
 
-//   capi_res_mgr#(.id_width(utag_width-1)) i_write_utag
-//     (.clk(clk),.reset(reset),.o_avail_v(write_utag_v),.o_avail_r(write_utag_r),.o_avail_id(write_utag),
-//      .i_free_v(write_sent_utag_v),.i_free_id(write_sent_utag),.o_free_err(o_rm_err_write),.o_cnt(),.o_perror()  
-//      );
-
 // check for valid write utag 
 
    base_vmem#(.a_width(utag_width-1),.rports(2)) utag_vmem_plus  
@@ -395,7 +360,6 @@ module capi_dma_itag#
       .din(         {r2_rditag_plus_q,r2_rditagpar_plus_q,1'b0,s1_write_utag_q,o_size,o_cmd,num_cycles,r2_rtag_plus_q[2:7],o_usource} ),
       .dval(        s2_write_val ), 
       .pop(         write_complete),
-//      .pop(         itag_write_taken_q ),
       .dout(        {s2_write_rditag,s2_write_rditagpar,s2_write_utag,s2_write_size,s2_write_cmd,s2_num_cycles,s2_rtag_plus,wrt_usource} ),
       .full(write_fifo_full         ), 
       .almost_full( ), 
@@ -413,7 +377,6 @@ module capi_dma_itag#
       .din(         {r2_rditag_plus_q,r2_rditagpar_plus_q,2'b00,r2_rtag_plus_q,o_size,o_cmd,o_usource} ),
       .dval(        s2_read_val ), 
       .pop(         read_active ),
-//      .pop(         itag_read_taken_q ),
       .dout(        {s2_read_rditag,s2_read_rditagpar,s2_read_utag,s2_read_size,s2_read_cmd,rd_usource} ),
       .full(read_fifo_full        ), 
       .almost_full( ), 
@@ -459,23 +422,18 @@ module capi_dma_itag#
        read_empty  = ~|(read_active_q);
        itag_write_valid = r2_tag_plus_v_q & (r2_rtag_plus_q[0:1] == 2'b10); 
        itag_read_valid = r2_tag_plus_v_q & (r2_rtag_plus_q[0:1] == 2'b01);
-//       rdnwrt_pri_d = rdnwrt_pri_q ? ~(~s2_read_val | read_full) & itag_write_taken_q : (~s2_write_val | write_full | ~itag_read_taken_q);
-//       read_active =  rdnwrt_pri_q & s2_read_val & s3_read_val_q  & ~itag_write_taken_q & ~read_full;
-//       =  rdnwrt_pri_q & s2_read_val  & ~itag_write_taken_q;
        read_active =  rdnwrt_pri_q & s2_read_val & ~read_full & ~itag_read_taken_q;
-//       read_active =  rdnwrt_pri_q & s2_read_val  & ~itag_read_taken_q;
        dec_read_dma = 1'b0;
        dec_write_dma = 1'b0;
        write_active = ~rdnwrt_pri_q & s2_write_val & ~write_full & ~itag_write_taken_q;
-//       write_active = ~rdnwrt_pri_q & s2_write_val & ~itag_write_taken_q;
        gate_write_valid = i_drop_wrt_pckts & (s2_write_size[3:9] == 7'b0000000) & ((wrt_usource == 5'b00111) | (wrt_usource == 5'b01000) | (wrt_usource == 5'b01001) | (wrt_usource == 5'b01010));
        s1_dvalid_d = (write_active & ~gate_write_valid) | read_active;
        s2_dvalid_d = s1_dvalid_q; 
        s3_dvalid_d = s2_dvalid_q; 
-       s4_dvalid_d = s3_dvalid_q & ~i_error_status_hld;  /// temp need to remove kchh
+       s4_dvalid_d = s3_dvalid_q & ~i_error_status_hld;
        num_cycles_xferd_d = num_cycles_xferd_q; 
        num_cycles_left = (s2_num_cycles - num_cycles_xferd_q);
-       rdnwrt_pri_d = rdnwrt_pri_q ? (~s2_write_val | write_full) : ~(~s2_read_val | read_full | (write_active & (num_cycles_left != 2'b00)))  ;  // keep write pri if no read_valid, Read_full or multicycle write)
+       rdnwrt_pri_d = rdnwrt_pri_q ? (~s2_write_val | write_full) : ~(~s2_read_val | read_full | (write_active & (num_cycles_left != 2'b00)))  ; 
        itag_write_taken_d = write_complete;
        itag_read_taken_d = read_active;
        s1_dtype_d = s1_dtype_q; 
@@ -484,7 +442,6 @@ module capi_dma_itag#
        s4_dtype_d = s3_dtype_q; 
        s1_req_itag_d = rdnwrt_pri_q ? s2_read_rditag : s2_write_rditag;
        s1_req_itagpar_d = rdnwrt_pri_q ? s2_read_rditagpar : s2_write_rditagpar;
-//       s1_req_itag_d = s0_req_itag_q;
        s2_req_itag_d = s1_req_itag_q;
        s2_req_itagpar_d <= s1_req_itagpar_q; 
        s3_req_itag_d = s2_req_itag_q;
@@ -492,13 +449,11 @@ module capi_dma_itag#
        s4_req_itag_d = s3_req_itag_q;
        s4_req_itagpar_d <= s3_req_itagpar_q; 
        s1_req_utag_d = rdnwrt_pri_q ? s2_read_utag : s2_write_utag;
-//       s1_req_utag_d = s0_req_utag_q;
        s2_req_utag_d = s1_req_utag_q;
        s3_req_utag_d = s2_req_utag_q;
        s4_req_utag_d = s3_req_utag_q;
        s1_dsize_d = rdnwrt_pri_q ? s2_read_size : s2_write_size;
        s1_usource_d = rdnwrt_pri_q ? rd_usource : wrt_usource;
-//       s1_dsize_d = s0_dsize_q;
        s2_dsize_d = s1_dsize_q;
        s3_dsize_d = s2_dsize_q;
        s4_dsize_d = s3_dsize_q;
@@ -752,13 +707,6 @@ module capi_dma_itag#
        
      end 
  
-   // check parity kch 
-//   nvme_pcheck#
-//     (
-//      .bits_per_parity_bit(64),
-//      .width(9)
-//      ) ipcheck_rditag
-//       (.oddpar(1'b1),.data(s4_req_itag_q),.datap(s4_req_itagpar_q),.check(s4_dvalid_q),.parerr(s1_perror[0]));
  
 
    wire inc_write_dma = d0h_dvalid & (s4_dtype_q == 3'b001);
@@ -790,7 +738,6 @@ module capi_dma_itag#
    assign o_rsp_rd_ctag_v = r2_tag_plus_v  & (r2_rtag_plus[0:1] == 2'b01);  // read tag 
    assign o_rsp_rd_ctag = r2_rtag_plus[2:7];
 
-//   assign o_r1_rutag_plus = {1'b1,write_utag};
 
    assign o_s0_sent_utag_valid = s0_sent_utag_valid_q && (s0_sent_utag_sts_q == 3'd1);
    assign o_s0_sent_utag       = s0_sent_utag_q ;

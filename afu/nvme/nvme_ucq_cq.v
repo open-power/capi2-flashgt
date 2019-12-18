@@ -22,7 +22,7 @@
 //  File : nvme_adq_cq.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe Admin Q
+//  Description : FlashGT+ NVMe Admin Q
 //
 //  Admin Completion Queue
 //  *************************************************************************
@@ -55,7 +55,7 @@ module nvme_ucq_cq#
     //-------------------------------------------------------
     input                           [31:0] ctl_cq_ioaddress,
     input                                  ctl_cq_ioread_strobe, 
-    input                           [35:0] ctl_cq_iowrite_data, // change 31 to 35 kch 
+    input                           [35:0] ctl_cq_iowrite_data, 
     input                                  ctl_cq_iowrite_strobe,
     output reg                      [35:0] cq_ctl_ioread_data, // read_data is sampled when ioack=1
     output reg                             cq_ctl_ioack,

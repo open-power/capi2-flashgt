@@ -24,7 +24,7 @@ module capi_get_retry#
    parameter tsize_width=1,
    parameter req_width = aux_width+ctxtid_width+ea_width+tsize_width,  
    parameter rc_width=8,
-   parameter pea_width=ea_width-12-1,   // added -1 to strip of ea parity kch 
+   parameter pea_width=ea_width-12-1,
    parameter ctag_width=8,
    parameter tstag_width=1,
    parameter cnt_rsp_width = pea_width*2+ctxtid_width+ctag_width+4,
@@ -60,7 +60,7 @@ module capi_get_retry#
    input [0:tag_width-1]     i_req_tag,
    input [0:sid_width-1]     i_req_sid,
    input 		     i_req_f, // first request in this stream - clear the failed bits.
-   input [0:req_width-1]     i_req_d,  // has parity kch in ctxtid and ea 
+   input [0:req_width-1]     i_req_d, 
 
    input 		     i_rsp_v,
    input [0:tag_width-1]     i_rsp_tag,
@@ -73,7 +73,7 @@ module capi_get_retry#
    output [0:tag_width-1]    o_req_tag,
    output [0:sid_width-1]    o_req_sid,
    output 		     o_req_f, 
-   output [0:req_width-1]    o_req_d,  // has ctxt and ea parity  
+   output [0:req_width-1]    o_req_d, 
 
    output 		     o_rsp_v,
    output [0:tag_width-1]    o_rsp_tag,
@@ -83,14 +83,13 @@ module capi_get_retry#
    // continue response received via mmio
 
    input 		     i_cnt_rsp_v,
-   input [0:cnt_rsp_width-1] i_cnt_rsp_d,    //
+   input [0:cnt_rsp_width-1] i_cnt_rsp_d,   
    output 		     o_cnt_rsp_miss,
-//   output [63:0] 	     o_cnt_pend_d,
-   output [0:63] 	     o_cnt_pend_d,   // changed 63:0 to 0:63 to be consistent and it needs to be this way with parity on ctxid kch 
+   output [0:63] 	     o_cnt_pend_d,  
    output 		     o_cnt_pend_dropped,
    output [0:3] 	     o_dbg_cnt_inc,
    output [0:2]              o_s1_perror,
-   output                    o_perror   // added o_perror kch 
+   output                    o_perror
    );
    
 
@@ -198,9 +197,8 @@ module capi_get_retry#
      (.clk(clk),.reset(1'b0),.din({s1_rsp_tstag,s1_rsp_sid,s1_rsp_req_ctxt,s1_rsp_req_ea[0:pea_width-1]}),.q({cnt_pend_tstag,cnt_pend_sid,cnt_pend_ctxt,cnt_pend_pea}),.enable(cnt_pend_set));  
 
 //   base_vlat#(.width(pea_width+ctxtid_width+1)) icnt_pend_olat(.clk(clk),.reset(1'b0),.din({cnt_pend_pea,cnt_pend_ctxt,cnt_pend_v}),.q(o_cnt_pend_d[pea_width+ctxtid_width:0]));  original 
-     base_vlat#(.width(pea_width+ctxtid_width+1)) icnt_pend_olat(.clk(clk),.reset(1'b0),.din({cnt_pend_pea,cnt_pend_ctxt,cnt_pend_v}),.q(o_cnt_pend_d[63-(pea_width+ctxtid_width):63-0]));  // bit swapped  by doing 63- kch 
-//   assign o_cnt_pend_d[63:pea_width+ctxtid_width+1] = {64-(pea_width+ctxtid_width+1){1'b0}}; // original 
-   assign o_cnt_pend_d[63-63:63-(pea_width+ctxtid_width+1)] = {64-(pea_width+ctxtid_width+1){1'b0}};  // bit swapeed by doing 63- original 
+     base_vlat#(.width(pea_width+ctxtid_width+1)) icnt_pend_olat(.clk(clk),.reset(1'b0),.din({cnt_pend_pea,cnt_pend_ctxt,cnt_pend_v}),.q(o_cnt_pend_d[63-(pea_width+ctxtid_width):63-0])); 
+   assign o_cnt_pend_d[63-63:63-(pea_width+ctxtid_width+1)] = {64-(pea_width+ctxtid_width+1){1'b0}};
 
    // handle mmio response to continue
    wire [0:pea_width-1]    s0_cnt_rsp_pea;
@@ -235,12 +233,11 @@ module capi_get_retry#
    base_vlat#(.width(1)) iperror_olat(.clk(clk),.reset(reset),.din(| s1_perror),.q(o_perror));
    assign o_s1_perror = hld_perror;
 
-   wire 		   s0_ctrm_v = (i_ctxt_trm_id[0:ctxtid_width-2] == cnt_pend_ctxt[0:ctxtid_width-2]) & cnt_pend_v & i_ctxt_trm_v;  // added -2 kch
+   wire 		   s0_ctrm_v = (i_ctxt_trm_id[0:ctxtid_width-2] == cnt_pend_ctxt[0:ctxtid_width-2]) & cnt_pend_v & i_ctxt_trm_v;
    base_vlat#(.width(1)) is1_ctrm_lat(.clk(clk),.reset(reset),.din(s0_ctrm_v),.q(s1_ctrm_v));
 
    wire 		   s0_tstag_inv_v = (i_tstag_inv_id == cnt_pend_tstag) & cnt_pend_v & i_tstag_inv_v;
    base_vlat#(.width(1)) is1_tstag_inv_lat(.clk(clk),.reset(reset),.din(s0_tstag_inv_v),.q(s1_tstag_inv_v));
-//   assign o_dbg_cnt_inc = s1_tstag_inv_v;
    
    
    // stop when we get to paged response if paged is pending

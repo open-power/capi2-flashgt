@@ -261,7 +261,7 @@ module psl_hdk_vpd#
                     i2csm_d = SM_READY;
                  end
             end          
-          // todo: check vpd checksum and reread if mismatch
+          // could check vpd checksum and reread if mismatch
           
           SM_READY:
             begin

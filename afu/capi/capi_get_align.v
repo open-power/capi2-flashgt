@@ -20,7 +20,7 @@ module capi_get_align#(parameter rc_width=1, parameter bcnt_width=1)
    input 		 reset,
    output 		 i_r,
    input 		 i_v,
-   input [0:129] 	 i_d,   // changed from 127 to 129 for parity kch
+   input [0:129] 	 i_d, 
    input [0:3] 		 i_s,
    input [0:3] 		 i_c,
    input 		 i_e,
@@ -28,13 +28,13 @@ module capi_get_align#(parameter rc_width=1, parameter bcnt_width=1)
    
    input 		 o_r,
    output 		 o_v,
-   output [0:129] 	 o_d,  // changed 127 to 129 to add parity kch 
+   output [0:129] 	 o_d,
    output [0:3] 	 o_c,
    output 		 o_e,
    output [0:bcnt_width-1] o_bcnt,
    output [0:rc_width-1] o_rc,
    output [0:1]          o_s1_perror,
-   output                o_perror   // added o_peror kch 
+   output                o_perror 
 );
 
 
@@ -60,13 +60,13 @@ module capi_get_align#(parameter rc_width=1, parameter bcnt_width=1)
    wire 	       s0_rc_zero = ~(|i_rc);
 
    wire 	       s1_v, s1_r, s1_e, s1_f;
-   wire [0:129]   s1_d;   // changed 127 to 129 to add parity kch
+   wire [0:129]   s1_d;  
    wire [0:3] 	  s1_c;
    wire [0:5] 	  s1_c_diff;
    wire [0:rc_width-1] s1_rc;
    wire 	       s1_rc_zero;
    
-   base_alatch#(.width(130+4+1+1+1+rc_width)) is1_lat        //changed 128 to 130 to add parity kch 
+   base_alatch#(.width(130+4+1+1+1+rc_width)) is1_lat       
      (.clk(clk),.reset(reset),
       .i_v(i_v), .i_r(i_r),. i_d({ i_d,s1_c_diff[2:5],s0_f,i_e,s0_rc_zero,i_rc}),
       .o_v(s1_v),.o_r(s1_r),.o_d({s1_d,s1_c,s1_f,s1_e,s1_rc_zero,s1_rc}));
@@ -127,14 +127,14 @@ module capi_get_align#(parameter rc_width=1, parameter bcnt_width=1)
    // choose s1 rc if it is non zero, or if the select is zero
    wire [0:rc_width-1] s1b_rc = (~s1_rc_zero | s1_s_zero) ? s1_rc : s0_rc;
 
-   wire [0:129] s1b_d;    // changed 127 to 129 to add parity kch
+   wire [0:129] s1b_d;  
    base_emux#(.ways(16),.width(128)) is1_mux 
      (.sel(s1_s),
       .din(s1_mux_in),
       .dout(s1b_d[0:127])
       );
 
-   capi_parity_gen#(.dwidth(64),.width(1)) s1b_d_pgen0(.i_d(s1b_d[0:63]),.o_d(s1b_d[128]));     // gen parity for byte alligned data kch
+   capi_parity_gen#(.dwidth(64),.width(1)) s1b_d_pgen0(.i_d(s1b_d[0:63]),.o_d(s1b_d[128]));   
    capi_parity_gen#(.dwidth(64),.width(1)) s1b_d_pgen1(.i_d(s1b_d[64:127]),.o_d(s1b_d[129]));
 
 
@@ -150,7 +150,7 @@ module capi_get_align#(parameter rc_width=1, parameter bcnt_width=1)
    base_vlat_en#(.width(bcnt_width)) is1_bcnt(.clk(clk),.reset(reset),.din(s1_bcnt_in),.q(s1_bcnt),.enable(s1_v & s1_r));
    
    
-   base_alatch_burp#(.width(130+4+1+rc_width+bcnt_width)) is2_lat  // changed 128 to 130 to add parity kch 
+   base_alatch_burp#(.width(130+4+1+rc_width+bcnt_width)) is2_lat 
      (.clk(clk),.reset(reset),
       .i_v(s1c_v),.i_r(s1c_r),.i_d({s1b_d,s1b_c,s1b_e,s1b_rc,s1_bcnt_in}),
       .o_v(o_v),.o_r(o_r),.o_d({o_d,o_c,o_e,o_rc,o_bcnt})

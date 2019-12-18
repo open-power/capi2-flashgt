@@ -49,7 +49,7 @@ module capi_dma_retry_plus#
     input 		      i_req_v,
     input [0:tag_width-1]     i_req_tag,
     input [0:dat_width-1]     i_req_dat,
-    input [0:ctxtid_width-1]  i_req_ctxt,  // done kch 
+    input [0:ctxtid_width-1]  i_req_ctxt,
     input [0:tstag_width-1]   i_req_tstag,
     input 		      i_req_tstag_v,
     input 		      i_req_itst_inv, // ignore timestamp invalid and proceed with request
@@ -61,10 +61,10 @@ module capi_dma_retry_plus#
     output [0:tag_width-1]    o_req_tag,
     output [0:4]              o_req_uid,
     output [0:dat_width-1]    o_req_dat,
-    output [0:ctxtid_width-1] o_req_ctxt,  //done kch
+    output [0:ctxtid_width-1] o_req_ctxt,
 
     input [0:dat_width-1]     i_restart_dat,
-    input [0:ctxtid_width-1]  i_restart_ctxt,  // done kch 
+    input [0:ctxtid_width-1]  i_restart_ctxt, 
     input [0:tstag_width-1]   i_restart_tstag,
 
     input 		      i_rsp_v,
@@ -82,11 +82,11 @@ module capi_dma_retry_plus#
     input 		      i_ctxt_add_v,
     input 		      i_ctxt_rmv_v,
     input 		      i_ctxt_trm_v,
-    input [0:ctxtid_width-1]  i_ctxt_ctrl_id,    // done kch
+    input [0:ctxtid_width-1]  i_ctxt_ctrl_id,  
 
     output 		      i_ctxt_rst_r,
     input 		      i_ctxt_rst_v,
-    input [0:ctxtid_width-1]  i_ctxt_rst_id,    // done kch 
+    input [0:ctxtid_width-1]  i_ctxt_rst_id, 
 
     output 		      o_ctxt_rst_v,
     output [0:ctxtid_width-1] o_ctxt_rst_id,  
@@ -119,7 +119,7 @@ module capi_dma_retry_plus#
     output 		      o_pipemon_r,
     output [0:5]              o_s1_perror,
     output [0:ctxtid_width+7]   o_dbg_dma_retry_s0,  
-    output [0:1]              o_perror,    // added o_perror kch 
+    output [0:1]              o_perror,   
     input                     i_dma_retry_msk_pe025,
     input                     i_dma_retry_msk_pe34
     );
@@ -222,7 +222,7 @@ module capi_dma_retry_plus#
    capi_res_mgr#(.id_width(rst_tag_width)) ires_mgr
      (.clk(clk),.reset(reset),
       .i_free_v(s0_rsp_v & ~s0_rsp_cred & s0_rsp_for_restart),.i_free_id(i_rsp_tag[tag_prefix_width:tag_width-1]),
-      .o_avail_v(s1a_rst_tag_v),.o_avail_r(s1a_rst_tag_r),.o_avail_id(s1a_rst_tag),.o_free_err(o_rm_err),.o_cnt(),.o_perror(o_perror[1])  // added o_perror kch 
+      .o_avail_v(s1a_rst_tag_v),.o_avail_r(s1a_rst_tag_r),.o_avail_id(s1a_rst_tag),.o_free_err(o_rm_err),.o_cnt(),.o_perror(o_perror[1]) 
       );
 
    // use the tag from the tag manager iff this is a restart
@@ -498,7 +498,6 @@ module capi_dma_retry_plus#
       .o_en(s6_req_re)
       );
 
-// check parity for s6_req_ctxt kch
    capi_parcheck#(.width(ctxtid_width-1)) s6_req_ctxt_pcheck(.clk(clk),.reset(reset),.i_v(s6_req_v),.i_d(s6_req_ctxt[0:ctxtid_width-2]),.i_p(s6_req_ctxt[ctxtid_width-1]),.o_error(s1_perror[2]));
    wire 		   s7_req_ctxt_vld;
    base_vmem#(.a_width(ctxtid_width-1),.rports(1)) ictxt_vmem
@@ -642,7 +641,7 @@ module capi_dma_retry_plus#
       .o_v(s12_ctxt_ctrl_v),.o_r(s12_ctxt_ctrl_r),.o_a(s12_ctxt_ctrl_id),.o_d(s12_ctxt_ctrl_sel)
       );
 
-//  kch check aprity for t1_rsp_ctxt, s8_req_ctxt, s12_ctxt_ctrl_id 
+//  check aprity for t1_rsp_ctxt, s8_req_ctxt, s12_ctxt_ctrl_id 
    capi_parcheck#(.width(ctxtid_width-1)) t1_rsp_ctxt_pcheck(.clk(clk),.reset(reset),.i_v(t1_rsp_v),.i_d(t1_rsp_ctxt[0:ctxtid_width-2]),.i_p(t1_rsp_ctxt[ctxtid_width-1]),.o_error(s1_perror[3]));
    capi_parcheck#(.width(ctxtid_width-1)) s8_req_ctxt_pcheck(.clk(clk),.reset(reset),.i_v(s8d_req_v),.i_d(s8_req_ctxt[0:ctxtid_width-2]),.i_p(s8_req_ctxt[ctxtid_width-1]),.o_error(s1_perror[4]));
    capi_parcheck#(.width(ctxtid_width-1)) s12_ctxt_ctrl_id_pcheck(.clk(clk),.reset(reset),.i_v(s12_ctxt_ctrl_v),.i_d(s12_ctxt_ctrl_id[0:ctxtid_width-2]),.i_p(s12_ctxt_ctrl_id[ctxtid_width-1]),.o_error(s1_perror[5]));

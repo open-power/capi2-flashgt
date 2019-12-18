@@ -38,14 +38,14 @@ module capi_get_data_plus#
     input 			 get_data_r, //  valid same cycle as get_data_valid
     output 			 get_data_e, // aligned with get_data_valid
     output [0:3] 		 get_data_c, // which byte ends the packet 
-    output [0:129] 		 get_data_d, // follows get_data_valid by one cycle changed 127 to 129 to add parity kch
+    output [0:129] 		 get_data_d, // follows get_data_valid by one cycle
     output [0:rc_width-1] 	 get_data_rc,
     output [0:bcnt_width-1] 	 get_data_bcnt,
 
     /* gx data interface */
     input 			 i_rdata_v, 
     input [0:rdata_addr_width-1] i_rdata_a,
-    input [0:129] 		 i_rdata_d,    // changed from 127 to 129 to add parity kch 
+    input [0:129] 		 i_rdata_d, 
 
     /* capi response */
     input 			 i_rsp_v,
@@ -179,8 +179,6 @@ module capi_get_data_plus#
    /*  Data Buffer */
    wire [0:lcl_tag_width+beat_512_width-1]     wa_d;
    wire 				   we_d;
- //  wire [0:127] 	us2d_data;  // commented out. not used kch 
-// added pipeline for timing kch 
    wire [0:lcl_tag_width+beat_512_width-1]     wa_d1;
    wire 				   we_d1;
    wire [0:129]                            wd_d1;
@@ -190,13 +188,12 @@ module capi_get_data_plus#
    
    base_vlat#(.width(1)) iwe(.clk(clk), .reset(reset), .din(lcl_data_v), .q(we_d));
    base_vlat#(.width(lcl_tag_width+beat_512_width)) iwa(.clk(clk), .reset(reset), .din({lcl_data_addr_tag,lcl_data_addr_beat}), .q(wa_d));
-// added pipeline for timing kch 
    base_vlat#(.width(1)) iwed(.clk(clk), .reset(reset), .din(we_d), .q(we_d1));
    base_vlat#(.width(lcl_tag_width+beat_512_width)) iwad(.clk(clk), .reset(reset), .din(wa_d), .q(wa_d1));
    base_vlat#(.width(130)) iwdd(.clk(clk), .reset(reset), .din(i_rdata_d), .q(wd_d1));
 
    wire 		us4_r, us4_v;
-   wire [0:129] 	us4_data_d;  // changed from 127 to 129 for parity kch
+   wire [0:129] 	us4_data_d; 
    base_mem#(.width(130), .addr_width(lcl_tag_width+beat_512_width)) idbuf(.clk(clk), .we(we_d1), .wa(wa_d1), .wd(wd_d1),  .re(us4_r| ~us4_v), .ra({us3_tag,us3_d_beat}), .rd(us4_data_d));
 
    // end on last beat of last tag
@@ -215,12 +212,11 @@ module capi_get_data_plus#
       /* Latch data outputs */
    base_alatch#(.width(1+rc_width+9)) ius1c(.clk(clk), .reset(reset), .i_v(us3a_v), .i_d({us3_badrc,us3_rc,us3_e,us3_s,us3_c}), .i_r(us3a_r), .o_v(us4_v), .o_d({us4_err,us4_rc,us4_e,us4_s,us4_c}),.o_r(us4_r));
 
-//   wire [0:127] us4_d =  us4_err ? (128'd0):us4_data_d;  // changed from 127 to 129 added chaged 2'd1 to 2'b11 to fix false parity detect 11/4/16 kch  
-   wire [0:129] us4_d =  us4_err ? ({128'd0,2'b11}):us4_data_d;  // changed from 127 to 129 added chaged 2'd1 to 2'b11 to fix false parity detect 11/4/16 kch  
+   wire [0:129] us4_d =  us4_err ? ({128'd0,2'b11}):us4_data_d; 
 
       /* pipeline for timing */
    wire 		us5_r, us5_v;
-   wire [0:129] 	us5_d;  // changed from 127 to 129 for parity kch
+   wire [0:129] 	us5_d;
    wire 		us5_err;
    wire [0:rc_width-1] 	us5_rc;
    wire 		us5_e;

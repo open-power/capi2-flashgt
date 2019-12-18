@@ -27,11 +27,9 @@ END psl_reversebus16;
 
 ARCHITECTURE psl_reversebus16 OF psl_reversebus16 IS
 
---Signal version: std_logic_vector(0 to 31);  -- int
 
 begin
 
---    version <= "00000000000000000000000000000010" ;
-    dest <= ( din(15) & din(14) & din(13) & din(12) & din(11) & din(10) & din(9) & din(8) & din(7) & din(6) & din(5) & din(4) & din(3) & din(2) & din(1) & din(0) );
+  dest <= ( din(15) & din(14) & din(13) & din(12) & din(11) & din(10) & din(9) & din(8) & din(7) & din(6) & din(5) & din(4) & din(3) & din(2) & din(1) & din(0) );
 
 END psl_reversebus16;

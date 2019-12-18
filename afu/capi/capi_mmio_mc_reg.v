@@ -19,22 +19,21 @@
 // ha_wd: COMES ONE CYCLE LATE
 // no sw access to upper 32 bits is allowed
 // sw access to lower 32 bits clears upper 32 bits
-// added parity checking and gen for mmio interface
 module capi_mmio_mc_reg#
   (
-   parameter addr_width = 25,  // changed from 24 to 25 to add parity kch 
+   parameter addr_width = 25,
    parameter addr = 0,
-   parameter ctxtid_width=10,    // changed from 9 to 10 to add parity kch
+   parameter ctxtid_width=10,  
    parameter ctxtid_start=14,
-   parameter addr_mask = ((1<<ctxtid_width-1)-1) << ctxtid_start,   // changed from ctxtid_width ctxtid_width-1  kch 
-   parameter mmiobus_width=4+addr_width+65      // changed from 64 to 65 kch 
+   parameter addr_mask = ((1<<ctxtid_width-1)-1) << ctxtid_start,  
+   parameter mmiobus_width=4+addr_width+65 
    )
   (
    input 		     clk,
    input 		     reset,
    input [0:mmiobus_width-1] i_mmiobus,
    
-   output [0:64] 	     q,    //includes parity kch 05/23/16
+   output [0:64] 	     q,
 
    output [0:ctxtid_width-1] ctxt, 
    output 		     trg,
@@ -67,8 +66,8 @@ module capi_mmio_mc_reg#
    base_vlat_en#(.width(width+1)) idta(.clk(clk), .reset(reset), .enable(enable), .din({s1_wd,ha_wd[32:63],s1_wd_par}), .q(q));
    base_vlat#(.width(1)) itrg(.clk(clk),.reset(reset),.din(enable), .q(trg));
    
-   localparam ctxt_lsb = (addr_width-1)-ctxtid_start-1;    // added -1 to strip of parity kch         
-   localparam ctxt_msb = (addr_width-1)-ctxtid_start-(ctxtid_width-1);  // added -1 to subtract parity out of the ctxt width and address width kch
+   localparam ctxt_lsb = (addr_width-1)-ctxtid_start-1;  
+   localparam ctxt_msb = (addr_width-1)-ctxtid_start-(ctxtid_width-1);
    capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) icpgen(.i_d(wa[ctxt_msb:ctxt_lsb]),.o_d(ctxtpar));
    wire  				s1_perror;
    wire                                 ctxt_val;

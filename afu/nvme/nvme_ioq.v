@@ -23,7 +23,7 @@
 //  File : nvme_ioq.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe I/O Q
+//  Description : FlashGT+ NVMe I/O Q
 //
 //  Implements I/O Submission Queue (ISQ) and I/O Completion Queue (ICQ)
 //
@@ -126,7 +126,7 @@ module nvme_ioq#
     //-------------------------------------------------------
   
     input                     pcie_ioq_valid,
-    input             [144:0] pcie_ioq_data, // changed from127 to 144 for parity kch 
+    input             [144:0] pcie_ioq_data, 
     input                     pcie_ioq_first, 
     input                     pcie_ioq_last, 
     input                     pcie_ioq_discard, 
@@ -136,7 +136,7 @@ module nvme_ioq#
     // DMA response from I/O Q
     //-------------------------------------------------------        
  
-    output            [144:0] ioq_pcie_cc_data, // changed 127 to 144 kch 
+    output            [144:0] ioq_pcie_cc_data,
     output                    ioq_pcie_cc_first,
     output                    ioq_pcie_cc_last,
     output                    ioq_pcie_cc_discard,
@@ -196,7 +196,7 @@ module nvme_ioq#
    wire     [1:0] ioq_perror_int;  
 
 
-// set/reset/ latch for parity errors kch 
+// set/reset/ latch for parity errors
     nvme_srlat#
     (.width(1))  iioq_sr   
     (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(ioq_perror_int[1]));
@@ -239,7 +239,7 @@ module nvme_ioq#
    wire                                      isq_rdval;
    wire                 [isq_addr_width-1:0] isq_rdoffset;
 
-   // generate isq_wrdata parity kch 
+   // generate isq_wrdata parity
    wire                [isq_par_wrwidth-1:0] isq_wrdata_par;
 
    nvme_pgen#
@@ -847,12 +847,12 @@ module nvme_ioq#
    localparam icq_addr_width = clogb2(icq_num_words);
    localparam icq_last_entry = icq_num_entries-1;
 
-   reg [ icq_wrwidth+16-1:0] icq_mem[icq_num_words-1:0];  // added +17 for parity kch 
+   reg [ icq_wrwidth+16-1:0] icq_mem[icq_num_words-1:0]; 
    
-   wire [icq_wrwidth+16-1:0] icq_wrdata;   // added +17 for cid parity kch 
+   wire [icq_wrwidth+16-1:0] icq_wrdata;  
    wire                      icq_wren;
    wire [icq_addr_width-1:0] icq_wraddr;
-   reg  [icq_wrwidth+16-1:0] icq_rddata;   // added +17 for cid parity kch 
+   reg  [icq_wrwidth+16-1:0] icq_rddata;  
    reg  [icq_addr_width-1:0] icq_rdaddr;
 
    always @(posedge clk)   

@@ -15,20 +15,6 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
 
 module ktms_afu_ioasa
   #(
@@ -73,14 +59,14 @@ module ktms_afu_ioasa
     
     input 		       o_put_data_r,
     output 		       o_put_data_v,
-    output [0:129] 	       o_put_data_d,   // changed 127 to 129 to add parity kch 
+    output [0:129] 	       o_put_data_d,
     output [0:3] 	       o_put_data_c,
     output 		       o_put_data_f,
     output 		       o_put_data_e,
 			      
     output 		       i_rsp_r,
     input 		       i_rsp_v,
-    input [0:chnlid_width-1]   i_rsp_chnl,    // kch fix this  added //
+    input [0:chnlid_width-1]   i_rsp_chnl,  
     input [0:ctxtid_width-1]   i_rsp_ctxt,  
     input 		       i_rsp_ec,
     input 		       i_rsp_nocmpl,
@@ -151,7 +137,6 @@ module ktms_afu_ioasa
    wire 		      s1_afu_rcb_inv = (s1_afu_rc == 8'h40) & (s1_afu_erc == psl_rsp_cinv);
 
    // count when we tried to get an rcb but the context was no longer valid
- //  assign o_dbg_cnt_inc[0] = s1a_v & s1a_r & s1_afu_rcb_inv;
      assign o_dbg_cnt_inc[0] = s1a_v & s1a_r & (s1_afu_rc == 8'h13);
      assign o_dbg_cnt_inc[1] = s1a_v & s1a_r & (s1_afu_rc == 8'h21);
    
@@ -221,7 +206,7 @@ module ktms_afu_ioasa
    wire [0:31] 		   s1_szl_rlen;
    wire [0:15] 		   s1_szl_asc;
 
-   wire [0:3]              s1_put_data_dpar; // added parity kch 
+   wire [0:3]              s1_put_data_dpar;
    capi_parity_gen#(.dwidth(64),.width(1)) s1_put_data_d_pgen0(.i_d({s1_flags, s1_afu_rc, s1_sc_rc, s1_fc_rc, s1_szl_rlen}),.o_d(s1_put_data_dpar[0]));   
    capi_parity_gen#(.dwidth(64),.width(1)) s1_put_data_d_pgen1(.i_d({s1_port, s1_afu_erc,s1_scsi_extra,s1_fc_extra,s1_fc_info[0:31]}),.o_d(s1_put_data_dpar[1]));
    capi_parity_gen#(.dwidth(64),.width(1)) s1_put_data_d_pgen2(.i_d({s1_fc_info[32:95]}),.o_d(s1_put_data_dpar[2]));
@@ -285,7 +270,6 @@ module ktms_afu_ioasa
    wire 		      sl_rsp_error = (| sl_put_done_rc) & ~sl_rsp_paged;
    wire 		      sl_sintr_v = sl_rsp_error;
    wire [0:sintrid_width-1]   sl_sintr_id = sl_rsp_paged ? sintr_paged : sintr_asa;
-//   assign o_dbg_cnt_inc[1]  = sl_v[1] & sl_r[1] & sl_rsp_cinv;
    
    wire 		      t2_v, t2_r;
    wire [0:owidth-1] 	      t2_d;

@@ -19,7 +19,7 @@ module capi_res_mgr#
   (
    parameter parity = 0,
    parameter id_width = 4,
-   parameter num_res = 2 ** (id_width-parity) ,  // added -parity kch for parity changes
+   parameter num_res = 2 ** (id_width-parity) ,
    parameter tag_check = 1
    )
    (
@@ -32,7 +32,7 @@ module capi_res_mgr#
     input 		  o_avail_r,
     output 		  o_free_err,
     output [0:id_width-parity] o_cnt,
-    output              o_perror     // added o_perror kch 
+    output              o_perror    
     );
 
    
@@ -60,15 +60,15 @@ module capi_res_mgr#
    wire 		  s2_free_act = s2_free_v & s2_free_ok;
 
    // track  how many issued for debug
-   base_incdec#(.width(id_width+1-parity)) icnt(.clk(clk),.reset(reset),.i_inc(o_avail_v & o_avail_r),.i_dec(s2_free_act),.o_cnt(o_cnt),.o_zero()); // added -parity kch 
-
+   base_incdec#(.width(id_width+1-parity)) icnt(.clk(clk),.reset(reset),.i_inc(o_avail_v & o_avail_r),.i_dec(s2_free_act),.o_cnt(o_cnt),.o_zero());
+   
    wire 		  queue_init_v, queue_init_r;
    wire [0:id_width-1] 	 queue_init_id;
-   base_initsm#(.COUNT(num_res), .LOG_COUNT(id_width-parity)) ism(.clk(clk),.reset(reset),.dout_r(queue_init_r),.dout_v(queue_init_v),.dout_d(queue_init_id[0:id_width-1-parity])); // strip off parity kch 
+   base_initsm#(.COUNT(num_res), .LOG_COUNT(id_width-parity)) ism(.clk(clk),.reset(reset),.dout_r(queue_init_r),.dout_v(queue_init_v),.dout_d(queue_init_id[0:id_width-1-parity]));
 
 
    if (parity == 1) 
-      capi_parity_gen#(.dwidth(id_width-1),.width(1)) queue_init_id_pgen(.i_d(queue_init_id[0:id_width-2]),.o_d(queue_init_id[id_width-1])); // kch
+      capi_parity_gen#(.dwidth(id_width-1),.width(1)) queue_init_id_pgen(.i_d(queue_init_id[0:id_width-2]),.o_d(queue_init_id[id_width-1]));
 
    wire 		 s2_free_r;
    wire 		 s1_v, s1_r;
@@ -78,7 +78,7 @@ module capi_res_mgr#
    
    wire 		 s2_avail_v, s2_avail_r;
    wire [0:id_width-1] 	 s2_avail_id;
-   base_fifo#(.DEPTH(num_res), .LOG_DEPTH(id_width-parity), .width(id_width)) ififo(.clk(clk),.reset(reset),.i_r(s1_r),.i_v(s1_v),.i_d(s1_d),.o_v(s2_avail_v),.o_d(s2_avail_id),.o_r(s2_avail_r)); // added -parity  kch
+   base_fifo#(.DEPTH(num_res), .LOG_DEPTH(id_width-parity), .width(id_width)) ififo(.clk(clk),.reset(reset),.i_r(s1_r),.i_v(s1_v),.i_d(s1_d),.o_v(s2_avail_v),.o_d(s2_avail_id),.o_r(s2_avail_r)); 
    base_alatch_burp#(.width(id_width)) is2_lat
      (.clk(clk),.reset(reset),
       .i_v(s2_avail_v),.i_r(s2_avail_r),.i_d(s2_avail_id),
@@ -107,7 +107,7 @@ module capi_res_mgr#
 	begin :gen_1
 	  base_vmem#(.a_width(id_width-parity)) ivmem
 	    (.clk(clk),.reset(reset),
-	     .i_set_v(s3_avail_v),.i_set_a(s3_avail_id[0:id_width-1-parity]),     // strip of parity kch 
+	     .i_set_v(s3_avail_v),.i_set_a(s3_avail_id[0:id_width-1-parity]),  
 	     .i_rst_v(s1_free_v),         .i_rst_a(s1_free_id[0:id_width-1-parity]),
 	     .i_rd_en(i_free_v),         .i_rd_a(i_free_id[0:id_width-1-parity]),
 	     .o_rd_d(s1_free_ok)
@@ -119,5 +119,5 @@ module capi_res_mgr#
 	end
    endgenerate
 	   
-endmodule // gx_res_mgr
+endmodule // capi_res_mgr
    

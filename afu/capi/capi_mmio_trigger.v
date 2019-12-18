@@ -18,7 +18,7 @@
 module capi_mmio_trigger #
   (
    parameter addr_mask = 0,
-   parameter addr_width = 25,   // changed to 25 to add aprity kch 
+   parameter addr_width = 25, 
    parameter addr = 0
    )
    (
@@ -28,15 +28,15 @@ module capi_mmio_trigger #
     input 		   we,
     output 		   trigger
     );
-   localparam [0:addr_width-2]   our_addr = addr;    // -2 to not compare parity bit kch 
-   localparam [0:addr_width-2]   our_mask = addr_mask;   // -2 to not compare parity bit kch 
+   localparam [0:addr_width-2]   our_addr = addr;   
+   localparam [0:addr_width-2]   our_mask = addr_mask;  
 
-   wire [0:addr_width-2]   mskd_addr = ~our_mask & wa[0:addr_width-2];  // -2 to not compare parity bit kch 
+   wire [0:addr_width-2]   mskd_addr = ~our_mask & wa[0:addr_width-2]; 
    
    wire 		   addr_match = (our_addr == mskd_addr);
    wire 		   trigger_in = we & addr_match;
    base_vlat#(.width(1)) itrg(.clk(clk), .reset(reset), .din(trigger_in), .q(trigger));
-endmodule // mmio_reg
+endmodule
 
   
    

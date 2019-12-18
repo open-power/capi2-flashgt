@@ -30,10 +30,10 @@ module ktms_afu_cpc#
 
     input 		       i_ctxt_add_v,
     input 		       i_ctxt_rmv_v, 
-    input [0:ctxtid_width-1]   i_ctxt_upd_d,    // parity checked at this level kch 
+    input [0:ctxtid_width-1]   i_ctxt_upd_d,
 
     output 		       o_cap_wr_v,
-    output [0:ctxtid_width-1]  o_cap_wr_ctxt,   // parity checked at this level kch 
+    output [0:ctxtid_width-1]  o_cap_wr_ctxt,
     output [0:ctxtcap_width-1] o_cap_wr_d,
  
     output 		       o_mmio_rd_v,
@@ -65,11 +65,11 @@ module ktms_afu_cpc#
    wire 		       cpc_rnw;  // read not write
    wire 		       cpc_vld;  // valid 
    wire 		       cpc_dw;   // double word
-   wire [0:64] 		       cpc_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       cpc_data;
    wire [0:24]  	       cpc_addr;
    wire [0:4+24+64-1]          cpc_mmiobus;
-   assign {cpc_vld,cpc_cfg,cpc_rnw,cpc_dw,cpc_addr,cpc_data} = i_mmiobus; // omit any extra data bits
-   assign cpc_mmiobus = {cpc_vld,cpc_cfg,cpc_rnw,cpc_dw,cpc_addr[0:23],cpc_data[0:63]};  // created to strip of parity 
+   assign {cpc_vld,cpc_cfg,cpc_rnw,cpc_dw,cpc_addr,cpc_data} = i_mmiobus;
+   assign cpc_mmiobus = {cpc_vld,cpc_cfg,cpc_rnw,cpc_dw,cpc_addr[0:23],cpc_data[0:63]};
    ktms_mmwr_mc_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmioaddr_cpc),.lcladdr_width(lcladdr_width+1),.ctxtid_start(ctxtid_start)) immwr_dec
      (.clk(clk),.reset(reset),
       .i_mmiobus(cpc_mmiobus),
@@ -131,7 +131,7 @@ module ktms_afu_cpc#
 
    // MMIO READS
    wire 		      s1_rd_v, s1_rd_r;
-   wire [0:lcladdr_width-1]     s1_rd_addr; // purposely one extra
+   wire [0:lcladdr_width-1]     s1_rd_addr;
    wire 			s1_rd_addr_lsb;
    wire [0:ctxtid_width-1]    s1_rd_ctxt;
 
@@ -145,11 +145,11 @@ module ktms_afu_cpc#
       .i_mmiobus(i_mmiobus),
       .o_rd_v(s1_rd_v),.o_rd_r(s1_rd_r),.o_rd_addr({s1_rd_addr,s1_rd_addr_lsb}),.o_rd_ctxt(s1_rd_ctxt),
       .i_rd_v(s2_rd_v),.i_rd_r(s2_rd_r),.i_rd_d(~s2_rd_qd_b),.i_rd_cancel(1'b0),
-      .o_mmio_rd_v(o_mmio_rd_v),.o_mmio_rd_d(o_mmio_rd_d),.o_perror(o_perror[1])   //added o_perror kch 
+      .o_mmio_rd_v(o_mmio_rd_v),.o_mmio_rd_d(o_mmio_rd_d),.o_perror(o_perror[1]) 
       );
 
-   wire [0:ctxtid_width-1+lcladdr_width-1] s1_rd_a = {s1_rd_ctxt[0:ctxtid_width-2],s1_rd_addr};   // added -1 and 0:ctxtid_width-2
-   wire [0:ctxtid_width-1+lcladdr_width-1] s2_wr_a = {s2_wr_ctxt[0:ctxtid_width-2],s2_wr_addr};   // added -1 and 0:ctxtid_width-2
+   wire [0:ctxtid_width-1+lcladdr_width-1] s1_rd_a = {s1_rd_ctxt[0:ctxtid_width-2],s1_rd_addr}; 
+   wire [0:ctxtid_width-1+lcladdr_width-1] s2_wr_a = {s2_wr_ctxt[0:ctxtid_width-2],s2_wr_addr}; 
 
    wire 				 s1_rd_mbox = s1_rd_addr == mbox_lcladdr;
    
@@ -167,7 +167,7 @@ module ktms_afu_cpc#
 
    wire [0:64] 				 s2_rd_d;
    assign s2_wr_r = 1'b1;
-   base_mem#(.width(65),.addr_width(ctxtid_width-1+lcladdr_width)) imem  // added -1 to strip of ctxt parity kch 
+   base_mem#(.width(65),.addr_width(ctxtid_width-1+lcladdr_width)) imem 
      (.clk(clk),
       .re(s1_rd_en),.ra(s1_rd_a[0:ctxtid_width-2+lcladdr_width]),.rd(s2_rd_d),
       .we(s2_wr_en),.wa(s2_wr_a[0:ctxtid_width-2+lcladdr_width]),.wd(s2_wr_d)
@@ -178,7 +178,7 @@ module ktms_afu_cpc#
    wire 				 s2_rd_clr = s2_rd_act & s2_rd_mbox & i_cfg_mbxclr;
 
    wire 				 s0_ctxt_upd_v = i_ctxt_add_v | i_ctxt_rmv_v;
-   base_vmem#(.a_width(ctxtid_width-1),.rst_ports(2)) imbox_vmem    // added -1 kch 
+   base_vmem#(.a_width(ctxtid_width-1),.rst_ports(2)) imbox_vmem 
      (.clk(clk),.reset(reset),
       .i_set_v(s2_wr_v & s2_wr_mbox),              .i_set_a(s2_wr_ctxt[0:ctxtid_width-2]),
       .i_rst_v({s0_ctxt_upd_v,s2_rd_clr}),.i_rst_a({i_ctxt_upd_d[0:ctxtid_width-2],s2_rd_ctxt[0:ctxtid_width-2]}),
@@ -186,7 +186,7 @@ module ktms_afu_cpc#
       .o_rd_d(s2_rd_mbox_valid)
       );
 
-   base_vmem#(.a_width(ctxtid_width-1),.rst_ports(1)) imbox_read_vmem  //added -1 kch 
+   base_vmem#(.a_width(ctxtid_width-1),.rst_ports(1)) imbox_read_vmem 
      (.clk(clk),.reset(reset),
       .i_set_v(s1_rd_v & s1_rd_r & s1_rd_mbox), .i_set_a(s1_rd_ctxt[0:ctxtid_width-2]),
       .i_rst_v(s0_ctxt_upd_v),.i_rst_a(i_ctxt_upd_d[0:ctxtid_width-2]),
@@ -197,7 +197,7 @@ module ktms_afu_cpc#
 
 
    wire 				 s2_rd_zero = (s2_rd_mbox & ~s2_rd_mbox_valid);
-   assign s2_rd_qd_b = ~(s2_rd_zero ? 64'h0 : s2_rd_d[0:63]);   // todoi check parity ??? flow parity ?
+   assign s2_rd_qd_b = ~(s2_rd_zero ? 64'h0 : s2_rd_d[0:63]); 
 
    // let remote know about cap update
    assign o_cap_wr_v = (s2_wr_v & s2_wr_cap & ~s2_cap_write_abort);

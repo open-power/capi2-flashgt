@@ -24,8 +24,8 @@ ENTITY psl_rise_vdff IS
   PORT (clk   : in std_logic;
         dout  : out std_logic_vector(0 to width-1);
         din   : in std_logic_vector(0 to width-1));
-attribute latch_type : string;
-attribute latch_type of dout : signal is "master_latch";
+  attribute latch_type : string;
+  attribute latch_type of dout : signal is "master_latch";
 
 END psl_rise_vdff;
 
@@ -35,13 +35,13 @@ ARCHITECTURE psl_rise_vdff OF psl_rise_vdff IS
 
 begin
 
-    process(clk)
-    begin
-      if rising_edge(clk) then
-        dout_int <= din;
-      end if;
-    end process;
+  process(clk)
+  begin
+    if rising_edge(clk) then
+      dout_int <= din;
+    end if;
+  end process;
 
-    dout <= dout_int;
+  dout <= dout_int;
 
 END psl_rise_vdff;

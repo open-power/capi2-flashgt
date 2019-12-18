@@ -33,23 +33,23 @@ END psl_ram32x8;
 
 ARCHITECTURE psl_ram32x8 OF psl_ram32x8 IS
 
-type storage IS ARRAY(natural range <>) OF std_logic_vector(0 TO 7);
-signal r : storage (0 TO 31);
-attribute ram_style : string;
-attribute ram_style of r : signal is "distributed";
+  type storage IS ARRAY(natural range <>) OF std_logic_vector(0 TO 7);
+  signal r : storage (0 TO 31);
+  attribute ram_style : string;
+  attribute ram_style of r : signal is "distributed";
 
 begin
 
-    process(clk)
-    begin -- Width < 32
-      if rising_edge(clk) then
-        if (wren = '1') then
-          r(to_integer(unsigned(wrad))) <= data;
-        end if;
-
-        if (rden = '1') then
-          q <= r(to_integer(unsigned(rdad)));
-        end if;
+  process(clk)
+  begin -- Width < 32
+    if rising_edge(clk) then
+      if (wren = '1') then
+        r(to_integer(unsigned(wrad))) <= data;
       end if;
-    end process;
+
+      if (rden = '1') then
+        q <= r(to_integer(unsigned(rdad)));
+      end if;
+    end if;
+  end process;
 END psl_ram32x8;

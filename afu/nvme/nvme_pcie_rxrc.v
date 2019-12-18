@@ -64,7 +64,7 @@ module nvme_pcie_rxrc
     output             user_rxrc_perror_ind,
     input              regs_pcie_pe_errinj_valid,
     input       [15:0] regs_xxx_pe_errinj_decode, 
-    input              user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain kch 
+    input              user_regs_wdata_pe_errinj_valid,
 
     output reg [143:0] rxrc_dbg_user_tracedata,
     output reg         rxrc_dbg_user_tracevalid
@@ -158,9 +158,9 @@ module nvme_pcie_rxrc
                            end
                          // lower address          = m_axis_rc_tdata[11:0];
                          errcode_d                 = m_axis_rc_tdata[15:12];
-                         // byte_count             = m_axis_rc_tdata[28:16];  // todo: should be 0, 4, or 8
+                         // byte_count             = m_axis_rc_tdata[28:16];  // should be 0, 4, or 8
                          // locked read completion = m_axis_rc_tdata[29];                         
-                         // dword_count            = m_axis_rc_tdata[42:32];  // todo: should be 0 or 1
+                         // dword_count            = m_axis_rc_tdata[42:32];  // should be 0 or 1
                          status_d                  = m_axis_rc_tdata[45:43];
                          poison_d                  = m_axis_rc_tdata[46];
                          // requester_id           = m_axis_rc_tdata[63:48];
@@ -177,7 +177,7 @@ module nvme_pcie_rxrc
                          // parity[15:0]           = m_axis_rc_tuser[58:43]; 
 
                          // internal error - bad length or something else unexpected
-                         int_error_d               = 1'b0; // todo
+                         int_error_d               = 1'b0;
 
                          // m_axis_rc_tkeep - not used
                       end
@@ -206,11 +206,10 @@ module nvme_pcie_rxrc
                          datap_d        = datap;
                          data_d[63:32]  = m_axis_rc_tdata[31:0];  // DW1, dword aligned mode
                          be_d[7:4]      = m_axis_rc_tuser[3:0];
-                         // todo: parity check
                          if( m_axis_rc_tuser[42] )
                            begin
                               // discontinue bit - core error detected reading payload
-                              // todo: ignore entire TLP or just mark payload invalid?
+                              // ignore entire TLP or just mark payload invalid
                               int_error_d = 1'b1;
                            end
                       end
@@ -275,7 +274,7 @@ module nvme_pcie_rxrc
       .parerr(s1_uperror)
       );
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors
    wire rxrc_uperror_int;
 
    nvme_srlat#

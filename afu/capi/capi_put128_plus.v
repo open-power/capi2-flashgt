@@ -66,14 +66,11 @@ module capi_put128_plus #  (
     input 			 put_data_v,
     input 			 put_data_e,
     input [0:3] 		 put_data_c, // count - valid only with _e, zero = 16 
-    input [0:129] 		 put_data_d, /* follows put_data_valid etc by one cycle */ // change 127 to 129 kch
+    input [0:129] 		 put_data_d, /* follows put_data_valid etc by one cycle */ 
     output 			 put_done_v,
     input 			 put_done_r,
     output [0:rc_width-1] 	 put_done_rc,
     output [0:bcnt_width-1] 	 put_done_bcnt, // number of bytes successfully transfered
-
-// temp changes to run co-sim with iput 3/22/17 kch 
-//    input 			 put_data_r_temp,
 
    // gx address interface
     output 			 o_req_v,
@@ -94,11 +91,11 @@ module capi_put128_plus #  (
    
    // gx data interface
     input 			 i_wdata_req_v,
-    input [0:wdata_addr_width-1-3] i_wdata_req_a,   // need to add 2 bits to this kchh  take off bottom, 3 bits cause array is now 128 bytes instead of 16 
-    output [0:1023] 		 o_wdata_rsp_d,   //change 127 to 129 kch
+    input [0:wdata_addr_width-1-3] i_wdata_req_a,  
+    output [0:1023] 		 o_wdata_rsp_d,
     output 			 o_wdata_rsp_v,
     output [0:3] 		 o_dbg_cnt_inc,
-    output [0:1]                 o_perror,         // added o_perror kch 
+    output [0:1]                 o_perror,      
     output [0:2]                 o_s1_perror,
     output                       o_put128_dbg_cnt_inc,
     input                        i_gate_sid
@@ -127,8 +124,8 @@ module capi_put128_plus #  (
    
 
    wire [0:4] 		   s1_v, s1_r;
-   wire 		   s1_cl_rdy = s1_put_cmd_v ;               // make this for flash_gt plus doesn't work kchh
-   assign o_put128_dbg_cnt_inc = ~ s1_r[4];    // fix for new command creation needs to stop data bus  
+   wire 		   s1_cl_rdy = s1_put_cmd_v ;        
+   assign o_put128_dbg_cnt_inc = ~ s1_r[4];   
 
    base_aburp_latch#(.width(aux_width+ctxtid_width+ea_width)) iinb_addr
      (.clk(clk),.reset(reset),
@@ -137,9 +134,10 @@ module capi_put128_plus #  (
       );
 
    wire [0:2] 		    s0_v, s0_r;
-   wire [0:129] 	    s0_d;   // changed 127 to 129 kch
+   wire [0:129] 	    s0_d;
    wire [0:3] 		    s0_c;  /* last beat count */
-// check and regen parity since bytes may be aligned differently kch 
+   
+   // check and regen parity since bytes may be aligned differently 
    wire [0:1]		    so_d_par;		    
    wire [0:3] 				s1_perror;
    capi_parcheck#(.width(ea_width-1)) put_data_d_pcheck0(.clk(clk),.reset(reset),.i_v((put_data_v & ~put_data_e)),.i_d(put_data_d[0:63]),.i_p(put_data_d[128]),.o_error(s1_perror[0]));
@@ -191,20 +189,15 @@ module capi_put128_plus #  (
    wire 		    s2tag_v, s3tag_v;
    wire                     s0_align_burp_v;
    wire                     align_burp_v;
-wire put_data_array_space_r_kch;
-wire [0:127] s0_d_kch;
-wire s0_v_kch,s0_e_kch,s0_align_burp_v_kch,align_burp_v_kch;
-wire [0:3] s0_c_kch;
-wire       array_we;
-wire       s0_array_we;
-wire       as0_r_kch;
-wire       o_offset_write_cycle;
 
+   wire       array_we;
+   wire       s0_array_we;
+   wire       o_offset_write_cycle;
 
    capi_put_align_delay_plus ialign_plus_delay
      (.clk(clk),.reset(reset),
       .i_v(put_data_v),.i_r(put_data_r),.i_d(put_data_d[0:127]),.i_c(put_data_c),.i_e(put_data_e),
-      .i_a_v(as0_v[1]),.i_a_r(as0_r[1]),.i_a_d(put_data_align_offset),   // added s1_crossing enable for4K and 512 cros
+      .i_a_v(as0_v[1]),.i_a_r(as0_r[1]),.i_a_d(put_data_align_offset), 
        .o_v(s0_v[0]),.o_r(s0_r[0]),.o_cmd_gen_r(1'b1),.o_d(s0_d[0:127]),.o_c(s0_c),.o_e(s0_e),.o_array_we(array_we),.o_s0_array_we(s0_array_we),.o_offset_write_cycle(offset_write_cycle)
       );
 
@@ -213,7 +206,7 @@ wire       o_offset_write_cycle;
    wire [0:ctxtid_width-1] s0_addr_ctxt;
    wire [0:aux_width-1]    s0_addr_aux;
    wire [0:ea_width-1] 	   s0_addr_ea;
-   wire [0:ea_width_nopar-8] 	   s0_addr_cl_in;  //nopar kch
+   wire [0:ea_width_nopar-8] 	   s0_addr_cl_in;
    wire [0:6] 		   s0_addr_bt_in;
    wire [0:4] 		   s0_beat_cnt, s0_beat_cnt_in;
    wire 		   s0_last_beat = (s0_beat_cnt == 3'b111);
@@ -230,7 +223,7 @@ wire       o_offset_write_cycle;
       (.clk(clk),.reset(reset),
        .ir_v(as1_addr_v), .ir_r(as1_addr_r), .ir_d({as1_addr_d_aux,as1_addr_d_ctxt,as1_addr_d_ea[0:ea_width-2],5'b00000}),
        .if_v(~(s0_e)),.if_d({s0_addr_aux,s0_addr_ctxt,s0_addr_cl_in,s0_addr_bt_in,s0_beat_cnt_in}),   // original
-       .o_v(s0_v[1]),.o_r(s0_r[1]), .o_d({s0_addr_aux,s0_addr_ctxt,s0_addr_ea[0:ea_width_nopar-1],s0_beat_cnt})); // add put_data_r to freeze beat count
+       .o_v(s0_v[1]),.o_r(s0_r[1]), .o_d({s0_addr_aux,s0_addr_ctxt,s0_addr_ea[0:ea_width_nopar-1],s0_beat_cnt}));
 
    capi_parity_gen#(.dwidth(64),.width(1)) s0_addr_ea_pgen(.i_d(s0_addr_ea[0:63]),.o_d(s0_addr_ea[64]));
 
@@ -244,13 +237,13 @@ wire       o_offset_write_cycle;
    wire [0:129] 	   s1_d;   // changed 127 to 129
    wire                    s1_offset_write_cycle; 
    
-   base_alatch#(.width(1+1+4+aux_width+ctxtid_width+ea_width+5+1)) is1_lat  //changed 128 to 130 kch
+   base_alatch#(.width(1+1+4+aux_width+ctxtid_width+ea_width+5+1)) is1_lat 
      (.clk(clk),.reset(reset),
       .i_v(s0_v[2]),.i_r(s0_r[2]),.i_d({s0_e,s0_last_beat,s0_c,s0_addr_aux,s0_addr_ctxt,s0_addr_ea,s0_beat_cnt,offset_write_cycle}),
       .o_v(s1_v[0]),.o_r(s1_r[0]),.o_d({s1_e,s1_last_beat,s1_c,s1_addr_aux,s1_addr_ctxt,s1_addr_ea,s1_beat_cnt,s1_offset_write_cycle})
       );
 
-   base_alatch#(.width(130)) is1_dat  //changed 128 to 130 kch
+   base_alatch#(.width(130)) is1_dat  
      (.clk(clk),.reset(reset),
       .i_v(s0_v[2] | offset_write_cycle),.i_r(),.i_d({s0_d}),
       .o_v(),.o_r(s1_r[0] | offset_write_cycle),.o_d({s1_d})
@@ -288,7 +281,7 @@ wire       o_offset_write_cycle;
 
    capi_get_bfr_mgr#(.tag_width(lcl_tag_width),.max_tags(max_tags),.rc_width(rc_width),.tsize_width(tsize_width),.bcnt_width(bcnt_width),.sid_width(sid_width)) itagmgr
      (.clk(clk),.reset(reset),
-      .o_alloc_v(s1tag_v),.o_alloc_r(s1tag_r),.o_alloc_id(s1_tag),.o_alloc_se(s1_put_data_e | crossing_end),.o_alloc_ae(1'b0),.o_alloc_tsize(12'h000),.o_alloc_sid(s1_sid),.o_alloc_f(s1_f),  /// alway a complete packet with a tag kch 
+      .o_alloc_v(s1tag_v),.o_alloc_r(s1tag_r),.o_alloc_id(s1_tag),.o_alloc_se(s1_put_data_e | crossing_end),.o_alloc_ae(1'b0),.o_alloc_tsize(12'h000),.o_alloc_sid(s1_sid),.o_alloc_f(s1_f),
       .i_wr_v(s1_rsp_v),.i_wr_id(s1_rsp_tag),.i_wr_rc(s1_rsp_rc),
       .o_rd_v(pd0_v),.o_rd_r(pd0_r),.o_rd_id(pd0_id),.o_rd_e(pd0_e),.o_rd_rc(pd0_rc), .o_rd_cnt(pd0_bcnt),
       .i_free_v(pd0_v & pd0_r),.i_free_id(pd0_id), .o_rm_err(o_rm_err),
@@ -309,7 +302,7 @@ wire       o_offset_write_cycle;
      assign s1tag_r = s1_cl_rdy ;  
    // filter until cl is ready
    wire 		   s1_cl_rdy_old = s1_e || s1_last_beat || (s0_v[2] & s0_e); // flash_gt
-   base_arfilter itag_fltr (.en(s1_cl_rdy),.i_v(s1tag_v),.i_r(s1tag_r_unused),.o_v(s1_v[2]),.o_r(s1_r[4]));   // use bit 4 instead of 2
+   base_arfilter itag_fltr (.en(s1_cl_rdy),.i_v(s1tag_v),.i_r(s1tag_r_unused),.o_v(s1_v[2]),.o_r(s1_r[4])); 
 
    base_acombine#(.ni(2),.no(1)) is1_cmb
      (.i_v(s1_v[1:2]),.i_r(s1_r[1:2]),
@@ -317,7 +310,7 @@ wire       o_offset_write_cycle;
    wire [0:lcl_tag_width-1] buf_wa;
    wire [0:2]               buf_wa_beat;
    wire 		    buf_we;
-   wire [0:129] 	    buf_wd;    // changfed 127 to 129 kch 
+   wire [0:129] 	    buf_wd; 
    wire [0:lcl_tag_width-1] s2_tag;
    wire [0:lcl_tag_width-1] idbuf_wr_tag;
    wire [0:lcl_tag_width-1] s1_tag_hold;
@@ -339,25 +332,23 @@ wire       o_offset_write_cycle;
    wire [0:4] buf_beat_cnt_out;
    wire [0:4] func_beat_cnt = hold_beat_cnt ? buf_beat_cnt_out : buf_beat_cnt_out + 5'b00001;
    wire [0:4] buf_beat_cnt_in = reset_beat_cnt ? 5'b00000 : func_beat_cnt;
-   base_vlat#(.width(5)) ibeat_kch(.clk(clk), .reset(reset), .din(buf_beat_cnt_in), .q(buf_beat_cnt_out));
+   base_vlat#(.width(5)) ibeat_inst(.clk(clk), .reset(reset), .din(buf_beat_cnt_in), .q(buf_beat_cnt_out));
 
-   wire  s2ns1_tag = (reset_beat_cnt & ~(s2_put_cmd_v & put_data_r));   // try this to simplify design hope it works........   offset might have to be non-zero
-//   assign  idbuf_wr_tag = s2ns1_tag ? s2_tag : s1_tag;
-// ******uncomment out this line when done testing
-   assign  idbuf_wr_tag = s2ns1_tag ? s2_tag : s1_tag_or_hold;  // made change cause put_128 had it in . think I missed a change
+   wire  s2ns1_tag = (reset_beat_cnt & ~(s2_put_cmd_v & put_data_r));  
+   assign  idbuf_wr_tag = s2ns1_tag ? s2_tag : s1_tag_or_hold;
 
    base_vlat#(.width(lcl_tag_width+3)) ibwa(.clk(clk), .reset(reset), .din({idbuf_wr_tag,buf_beat_cnt_out[2:4]}), .q({buf_wa,buf_wa_beat}));
-// fix for timing 
+
    wire [0:lcl_tag_width-1] s1_buf_wa;
    wire [0:2]               s1_buf_wa_beat;
    
    base_vlat#(.width(lcl_tag_width+3)) is1bwa(.clk(clk), .reset(reset), .din({buf_wa,buf_wa_beat}), .q({s1_buf_wa,s1_buf_wa_beat}));
    wire [0:127] s1_data;
-   base_vlat#(.width(128)) idat1(.clk(clk),.reset(1'b0),.din(s0_d[0:127]),.q(s1_data[0:127]));  // change 128 to 130 kch
-   base_vlat#(.width(128)) ibwd(.clk(clk),.reset(1'b0),.din(s1_d[0:127]),.q(buf_wd[0:127]));  // change 128 to 130 kch
+   base_vlat#(.width(128)) idat1(.clk(clk),.reset(1'b0),.din(s0_d[0:127]),.q(s1_data[0:127]));
+   base_vlat#(.width(128)) ibwd(.clk(clk),.reset(1'b0),.din(s1_d[0:127]),.q(buf_wd[0:127])); 
    
    // discard end beat 
-   wire 		    s1_en4 = s1_cl_rdy ;  // get rid of ~s1_e to fix
+   wire 		    s1_en4 = s1_cl_rdy ; 
    base_afilter is0fltr (.en(1'b1), .i_v(s1_v[3]), .i_r(s1_r[3]), .o_v(s1_v[4]), .o_r(s1_r[4]));
 
    
@@ -409,7 +400,6 @@ wire       o_offset_write_cycle;
    wire [0:7]               buf_we_slice;
    wire                     put_tsize_align16 = (s1_put_cmd_tsize[6:9] == 4'h0);
    base_vlat#(.width(1)) iwed(.clk(clk),.reset(1'b0),.din((s1_v[0] & s1_r[0] & ~(s1_e)) | offset_write_cycle),.q(buf_wd_v));
-//fix for timing 
    wire s1_buf_wd_v; 
    base_vlat#(.width(1)) is1wed(.clk(clk),.reset(1'b0),.din(buf_wd_v),.q(s1_buf_wd_v));
 

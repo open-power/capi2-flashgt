@@ -22,7 +22,7 @@ module capi_get#
    parameter beat_width = 3,
    parameter uid_width=5,
    parameter [0:uid_width-1] uid = 0,
-   parameter ea_width = 65, // changed 65 to 65 for parity kch 
+   parameter ea_width = 65,
    parameter rc_width=1,
    parameter ctxtid_width = 9,
    parameter aux_width=1,
@@ -30,7 +30,7 @@ module capi_get#
    parameter tsize_width = 12,
    parameter ssize_width = 18,
    parameter tstag_width = 1,
-   parameter pea_width=ea_width-13,    //changed 12 to 13 for parity kch 
+   parameter pea_width=ea_width-13,
    parameter ctag_width=8,
    parameter cto_width=1,
    parameter cnt_rsp_width= pea_width*2+ctxtid_width+ctag_width+4,
@@ -60,7 +60,7 @@ module capi_get#
     output [0:ssize_width-1] 	 get_data_bcnt,
     output 			 get_data_e, // aligned with get_data_valid
     output [0:3] 		 get_data_c, // count - valid only with _e, zero = 16 
-    output [0:129] 		 get_data_d, // follows get_data_valid by one cycle  changed 127 to 129 to add parity kch
+    output [0:129] 		 get_data_d, // follows get_data_valid by one cycle 
     output [0:rc_width-1] 	 get_data_rc, // tbd
    
     /* gx address interface */
@@ -75,7 +75,7 @@ module capi_get#
     input 			 i_cnt_rsp_v,
     input [0:cnt_rsp_width-1] 	 i_cnt_rsp_d,
     output 			 o_cnt_rsp_miss,
-    output [0:63] 		 o_cnt_pend_d,  //has ctxt parity 
+    output [0:63] 		 o_cnt_pend_d,
     output 			 o_cnt_pend_dropped,
 
     input 			 i_ctxt_trm_v,
@@ -87,9 +87,9 @@ module capi_get#
     /* gx data interface */
     input 			 i_rdata_v,
     input [0:rdata_addr_width-1] i_rdata_a,
-    input [0:129] 		 i_rdata_d,   // changed from 127 to 129 kch
+    input [0:129] 		 i_rdata_d, 
     output [0:4]                 o_s1_perror,
-    output [0:2]                 o_perror ,    // added o_perror kch  
+    output [0:2]                 o_perror , 
     input                        i_gate_sid
 
     );
@@ -103,7 +103,7 @@ module capi_get#
    /* buffer and tag manager */
    wire 		    r1_v, r1_r;
    wire [0:ea_width-1] 	    r1_d_ea;
-   wire         	    r1_d_ea_par;   // added parity kch 
+   wire         	    r1_d_ea_par; 
    wire [0:ctxtid_width-1]  r1_d_ctxt;
    wire [0:aux_width-1]     r1_d_aux;
    wire [0:ssize_width-1]   r1_d_size_raw;
@@ -121,8 +121,7 @@ module capi_get#
    base_vlat_sr#(.width(2)) iperror_lat(.clk(clk),.reset(reset),.set(s1_perror),.rst(2'd0),.q(hld_perror));
    base_vlat#(.width(1)) iperror_olat(.clk(clk),.reset(reset),.din(| hld_perror),.q(o_perror[0]));
    
-//   wire [0:6] 		    r1_d_ea_lsb = r1_d_ea[ea_width-7:ea_width-1];  // original 
-   wire [0:6] 		    r1_d_ea_lsb = r1_d_ea[ea_width-1-7:ea_width-1-1];  // added -1's to strip off parity kch 
+   wire [0:6] 		    r1_d_ea_lsb = r1_d_ea[ea_width-1-7:ea_width-1-1]; 
    
    wire [0:ssize_width-8]   r1_d_one_cl = {{ssize_width-8{1'b0}},1'b1};
    wire [0:ssize_width-8]   r1_d_zro_cl = {{ssize_width-8{1'b0}},1'b0};
@@ -144,7 +143,7 @@ module capi_get#
 
    base_alatch#(.width(aux_width+ctxtid_width+(ea_width-7)+14+(ssize_width-7))) ir1ltch   
      (.clk(clk),.reset(reset),
-      .i_v(r1_v),.i_r(r1_r),.i_d({r1_d_aux,r1_d_ctxt,r1_d_ea[0:ea_width-1-8],r1_d_ea_par,r1_d_ea_lsb,r1_d_extra,r1_d_cachelines}),  //generate parity on  r1_d_ea[0:ea_width-1-8] kch 
+      .i_v(r1_v),.i_r(r1_r),.i_d({r1_d_aux,r1_d_ctxt,r1_d_ea[0:ea_width-1-8],r1_d_ea_par,r1_d_ea_lsb,r1_d_extra,r1_d_cachelines}),
       .o_v(r2_v),.o_r(r2_r),.o_d({r2_d_aux,r2_d_ctxt,r2_d_ea,              r2_d_ea_lsb,r2_d_extra,r2_d_cachelines}) 
       );
    
@@ -158,7 +157,7 @@ module capi_get#
    wire [0:6] 		    s0_ealst_lsb;
    wire [0:ssize_width-7]   s0_d_cnt;
 
-   capi_unroll_cnt#(.iwidth(ea_width-7-1), .dwidth(aux_width+ctxtid_width+14), .cwidth(ssize_width-7)) iunrl     // add -1 to stript off parity 
+   capi_unroll_cnt#(.iwidth(ea_width-7-1), .dwidth(aux_width+ctxtid_width+14), .cwidth(ssize_width-7)) iunrl   
      (
       .clk(clk), .reset(reset),
       .din_v(r2_v),  .din_i(r2_d_ea[0:ea_width-8-1] ), .din_c(r2_d_cachelines), .din_d({r2_d_aux,r2_d_ctxt,r2_d_ea_lsb,r2_d_extra}),     .din_r(r2_r),  
@@ -168,14 +167,14 @@ module capi_get#
    capi_parcheck#(.width(ea_width-8))  r2_d_ea_pcheck(.clk(clk),.reset(reset),.i_v(r2_v),.i_d( r2_d_ea[0:ea_width-8-1]),.i_p( r2_d_ea[ea_width-8]),.o_error(s1_perror[1]));
    capi_parity_gen#(.dwidth(ea_width-8),.width(1)) s0_ea_pgen(.i_d(s0_ea[0:ea_width-8-1]),.o_d(s0_ea[ea_width-8]));
    
-   wire [0:lcl_tag_width-1] s1_tag;   //fixit start here kch 
+   wire [0:lcl_tag_width-1] s1_tag; 
    wire 		    s1d_v /*synthesis keep = 1 */;
    wire 		    s1d_r /*synthesis keep = 1 */;
    
    wire [0:1] 		    s1a_v /* synthesis keep = 1 */;
    wire [0:1] 		    s1a_r /* synthesis keep = 1 */;
    
-   wire [0:(ea_width-4)-4]  s1_ea;  // has parity in it 
+   wire [0:(ea_width-4)-4]  s1_ea;
    wire [0:ctxtid_width-1]  s1_ctxt;
    wire [0:aux_width-1]     s1_aux;
    wire [0:6] 		    s1_eafst_lsb;
@@ -221,7 +220,7 @@ module capi_get#
    wire 			  s2_req_v, s2_req_r;
    wire [0:lcl_tag_width-1] 	  s2_req_tag;   
    wire [0:sid_width-1] 	  s2_req_sid;
-   wire [0:aux_width+ctxtid_width+ea_width+tsize_width-1] s2_req_d;  // has ea_parity kch 
+   wire [0:aux_width+ctxtid_width+ea_width+tsize_width-1] s2_req_d;
    wire 						  s2_req_f;
    wire [0:2]         get_retry_s1_perror;
    capi_get_retry#(.tag_width(lcl_tag_width),.sid_width(sid_width),.aux_width(aux_width),.ctxtid_width(ctxtid_width),.ea_width(ea_width),.tsize_width(tsize_width),.rc_width(rc_width),.tstag_width(tstag_width),
@@ -232,7 +231,7 @@ module capi_get#
       .i_tstag_inv_v(i_tstag_inv_v),.i_tstag_inv_id(i_tstag_inv_id),
       .i_ctxt_trm_v(i_ctxt_trm_v),.i_ctxt_trm_id(i_ctxt_trm_id),
       .i_cnt_rsp_v(i_cnt_rsp_v),.i_cnt_rsp_d(i_cnt_rsp_d),.o_cnt_rsp_miss(o_cnt_rsp_miss),.o_cnt_pend_d(o_cnt_pend_d),.o_cnt_pend_dropped(o_cnt_pend_dropped),
-      .i_req_v(s1b_v),.i_req_r(s1b_r),.i_req_tag(s1_tag),.i_req_sid(s1_sid),.i_req_f(s1_f),.i_req_d({s1_aux,s1_ctxt,s1_ea[0:56],7'b0,s1_ea[57],s1_size}),   // put parity in bit m64 kch 
+      .i_req_v(s1b_v),.i_req_r(s1b_r),.i_req_tag(s1_tag),.i_req_sid(s1_sid),.i_req_f(s1_f),.i_req_d({s1_aux,s1_ctxt,s1_ea[0:56],7'b0,s1_ea[57],s1_size}),  
       .o_req_v(s2_req_v),.o_req_r(s2_req_r),.o_req_tag(s2_req_tag),.o_req_sid(s2_req_sid),.o_req_f(s2_req_f),.o_req_d(s2_req_d),
       .i_rsp_v(lcl_rsp_v),.i_rsp_tag(lcl_rsp_tag),.i_rsp_sid(lcl_rsp_sid),.i_rsp_d(lcl_rsp_rc),.i_rsp_tstag(lcl_rsp_tstag),
       .o_rsp_v(s1_rsp_v),.o_rsp_tag(s1_rsp_tag),.o_rsp_d(s1_rsp_rc),.o_rsp_sid(),

@@ -15,20 +15,7 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
+
 //                      MMIO ADDRESS MAP 
 //  0x2000000       per context cpc 
 //  0x2010000       Global Regs 
@@ -52,7 +39,7 @@
 //  0x2045000       next available address   *******unused   ********
 //  0x2048000       Tracking Table
 //  0x2050000       Trace Buffer
-//  0x2058000       RRQ  -- need to fix somehing here 
+//  0x2058000       RRQ 
 //  0x206000       afu debug port 0    end of AFU Debug 
 //  0x208000       afu debug port 1 
 //  0x20A000       afu debug port 0 
@@ -67,44 +54,41 @@ module ktms_afu#
    parameter id                 = 0,
    parameter ctxtid_width       = 10,
    parameter time_width         = 16,
-   parameter ea_width           = 65,   // changed from 64 to 65 to add ea parity kch 
+   parameter ea_width           = 65,   
    parameter la_width           = 24,
    parameter ssize_width        = 32,
-   //   parameter mmio_base          = 0,
    parameter data_latency       = 1,
-   //   parameter kdw                = 128,
-   //   parameter slite_width        = 32,
-   parameter lunid_width        = 64,    // changed 64 to 65 to add parity kch 
-   parameter lunid_width_w_par        = 65,    // changed 64 to 65 to add parity kch 
+   parameter lunid_width        = 64,   
+   parameter lunid_width_w_par        = 65, 
    parameter channels           = 2,  // how many serial-lite channels
    parameter chnlid_width = $clog2(channels),
    parameter max_reads          = 256, // max outstanding reads per channel
    parameter max_writes         = 256, // max outstanding writes per channel
    parameter syncid_width = 1,   
-   parameter tag_width          = 10,   // changed 9 to 10 to add parity kch 
+   parameter tag_width          = 10,  
    parameter lba_width          = 32,
    parameter cdb_width = 128,
    parameter cdb_par_width = 2,
-   parameter cdb_width_w_par  = 128 +2,   //added parity 
+   parameter cdb_width_w_par  = 128 +2, 
    parameter dma_rc_width = 8,
    parameter afu_rc_width = 8,
    parameter afu_erc_width=8,
    parameter datalen_width = 25,
-   parameter datalen_par_width = 1, // kch
-   parameter datalen_width_w_par = datalen_width+datalen_par_width,  // kch 
+   parameter datalen_par_width = 1,
+   parameter datalen_width_w_par = datalen_width+datalen_par_width, 
 
 
    // FC Interface Parameters
    parameter fc_cmd_width       = 2,
    parameter fc_tag_width       = 8,                     
    parameter fc_tag_par_width      = (fc_tag_width + 63)/64,
-   parameter fc_tag_width_w_par    = fc_tag_width+fc_tag_par_width, // added kch
+   parameter fc_tag_width_w_par    = fc_tag_width+fc_tag_par_width,
    parameter fc_lunid_width     = lunid_width,
    parameter fc_lunid_par_width = (fc_lunid_width + 63)/64,
    parameter fc_bufid_width     = 3,
    parameter fc_beatid_width    = datalen_width-1,
-   parameter fc_data_width      = 128,   // changed from 32 to 128 kch
-   parameter fc_data_par_width  = (fc_data_width + 63)/64,// parity every 64 bits 
+   parameter fc_data_width      = 128,  
+   parameter fc_data_par_width  = (fc_data_width + 63)/64,
    parameter fc_bytec_width = $clog2((fc_data_width/8)+1),
    parameter fc_status_width = 8,
    parameter log_width          = 72,
@@ -128,7 +112,7 @@ module ktms_afu#
     output     [0:fc_lunid_width*channels-1] o_fc_req_lun, 
     output [0:fc_lunid_par_width*channels-1] o_fc_req_lun_par,
     output          [0:cdb_width*channels-1] o_fc_req_cdb,
-    output      [0:cdb_par_width*channels-1] o_fc_req_cdb_par, // added kch ,
+    output      [0:cdb_par_width*channels-1] o_fc_req_cdb_par, 
     output      [0:datalen_width*channels-1] o_fc_req_length,
     output  [0:datalen_par_width*channels-1] o_fc_req_length_par,
 
@@ -139,7 +123,7 @@ module ktms_afu#
     input    [0:fc_tag_par_width*channels-1] i_fc_wdata_req_tag_par,
     input     [0:fc_beatid_width*channels-1] i_fc_wdata_req_beat,
     input       [0:datalen_width*channels-1] i_fc_wdata_req_size,
-    input                     [0:channels-1] i_fc_wdata_req_size_par, //added kch ,
+    input                     [0:channels-1] i_fc_wdata_req_size_par,
 
     output                    [0:channels-1] o_fc_wdata_rsp_v,
     input                     [0:channels-1] o_fc_wdata_rsp_r,
@@ -163,7 +147,7 @@ module ktms_afu#
 
     input                     [0:channels-1] i_fc_rsp_v,
     input        [0:fc_tag_width*channels-1] i_fc_rsp_tag,
-    input    [0:fc_tag_par_width*channels-1] i_fc_rsp_tag_par, // add parity kch
+    input    [0:fc_tag_par_width*channels-1] i_fc_rsp_tag_par, 
     input        [0:channels*fcstat_width-1] i_fc_rsp_fc_status,
     input        [0:channels*fcstat_width-1] i_fc_rsp_fcx_status,
     input        [0:channels*scstat_width-1] i_fc_rsp_scsi_status,
@@ -245,9 +229,9 @@ module ktms_afu#
 
    //x PSL Response Interface
     input                                    ha_rvalid, // A response is present
-    input                              [0:7] ha_rtag, // Accelerator generated request ID  not implementing parity yet kch 
+    input                              [0:7] ha_rtag, // Accelerator generated request ID 
     input                                    ha_rtagpar,
-    input                              [0:8] ha_rditag, // Accelerator generated request ID  not implementing parity yet kch 
+    input                              [0:8] ha_rditag, // Accelerator generated request ID 
     input                                    ha_rditagpar, 
     input                              [0:7] ha_response, // response code
     input                              [0:8] ha_rcredits, // twos compliment number of credits
@@ -289,8 +273,8 @@ module ktms_afu#
    localparam tstag_width = tag_width;
    
    localparam lidx_width = 8; // index into per-port lun table
-   localparam mmiobus_awidth = 29;    // changed from 28 to 29 to add address parity kch
-   localparam mmiobus_width = mmiobus_awidth+65;   // changed 64 to 65 to add address parity kch 
+   localparam mmiobus_awidth = 29;   
+   localparam mmiobus_width = mmiobus_awidth+65;  
    localparam rh_width = 15;
    localparam msinum_width = 8;
    localparam rrqnum_width = 2;
@@ -310,7 +294,7 @@ module ktms_afu#
 
    // per-context provisioning and control
    localparam mmioaddr_cpc     = 'h800000; // start of 
-   localparam mmioaddr_luntbl  = 'h804000;   // start of mmio space. luntbl further decioded in luntbl.v kch  orig h805000
+   localparam mmioaddr_luntbl  = 'h804000;   // start of mmio space. luntbl further decioded in luntbl.v
 
 
 //   localparam mmioaddr_errmon       = 'h810000;
@@ -369,7 +353,7 @@ module ktms_afu#
    wire [0:ngets-1] 			     get_addr_v;
    wire [0:ngets-1] 			     get_addr_r;
    
-   wire [0:(130*ngets)-1] 		     get_data_d;   // changed 128 to 130 to add parity kch check from here
+   wire [0:(130*ngets)-1] 		     get_data_d; 
    wire [0:(dma_bytec_width*ngets)-1] 	     get_data_c;
    wire [0:ngets-1] 			     get_data_v;
    wire [0:ngets-1] 			     get_data_e;
@@ -451,7 +435,7 @@ module ktms_afu#
    base_vlat#(.width(65*channels)) ifc0_mmin_lat(.clk(clk),.reset(1'b0),.din({i_fc_mmack,i_fc_mmdata}),.q({fc_mmack,fc_mmdata}));
 
 
-   localparam dbg_cnt_regs=71+28+8+21; // added +14 for 2 additional ports kch   made it 128 bits added 2 more
+   localparam dbg_cnt_regs=71+28+8+21; 
    
    wire [0:dbg_cnt_regs-1]                   dbg_cnt_inc;
 //   assign dbg_cnt_inc[50:53] = 4'b0000; 
@@ -467,7 +451,7 @@ module ktms_afu#
    wire 				     desc_mmack;
    wire [0:63] 				     desc_mmdata;
    localparam ctag_width = 8;
-   localparam pea_width  = ea_width-13; //changed 12 to 13 for ea parity kch 
+   localparam pea_width  = ea_width-13;
    localparam cnt_rsp_width = pea_width*2+ctxtid_width+ctag_width+4;
    wire 				     s1_cnt_rsp_v;
    wire [0:cnt_rsp_width-1] 		     s1_cnt_rsp_d;
@@ -559,8 +543,8 @@ module ktms_afu#
    wire 				     pslrdatb_mmack;
    
    
-   ktms_afu_mmio_ack#(.mmiobus_awidth(mmiobus_awidth-1),.ways(14+channels)) immdata_mux   //strip off parity kch
-     (.clk(clk),.reset(reset),.i_mmioabus(mmio_abus[0:mmiobus_awidth-2]),   // strip off parity kch 
+   ktms_afu_mmio_ack#(.mmiobus_awidth(mmiobus_awidth-1),.ways(14+channels)) immdata_mux  
+     (.clk(clk),.reset(reset),.i_mmioabus(mmio_abus[0:mmiobus_awidth-2]), 
       .i_v({int_mmack,  cpc_mmack,  dbgc_mmack, dbgr_mmack,  reg_mmack, rrq_mmack,trk_mmack, stl_mmack, desc_mmack,  fc_mmack, err_mmack, tbf_mmack,  ltb_mmack, pslrddtb_mmack, pslrdatb_mmack}),
       .i_d({int_mmdata, cpc_mmdata, dbgc_mmdata,dbgr_mmdata, reg_mmdata,rrq_mmdata,trk_mmdata,stl_mmdata,desc_mmdata, fc_mmdata,err_mmdata,tbf_mmdata, ltb_mmdata, pslrddtb_mmdata, pslrdatb_mmdata}),
       .o_v(s2_mmack),
@@ -717,7 +701,7 @@ module ktms_afu#
 	.i_ah_cabt(gbl_reg7[61:63]),
 	.i_paren(gbl_reg7[9]),
 	.i_cfg_ctrm_wait(gbl_reg7[60]),
-	.o_ctxt_upd_d(s1_ctxt_upd_d),   // parity checked in dma_top kch
+	.o_ctxt_upd_d(s1_ctxt_upd_d),  
 	.o_ctxt_add_v(s1_ctxt_add_v),
 	.o_ctxt_rmv_v(s1_ctxt_rmv_v),
 	.o_ctxt_trm_v(s1_ctxt_trm_v),
@@ -870,7 +854,7 @@ module ktms_afu#
        .hd0_cpl_byte_count(hd0_cpl_byte_count),
        .hd0_cpl_size(hd0_cpl_size),
        .hd0_cpl_data(hd0_cpl_data),
-       .i_error_status_hld(freeze_on_error & freeze_on_error_q),  // temp remove kchh when done with debug
+       .i_error_status_hld(freeze_on_error & freeze_on_error_q), 
        .o_latency_d(dma_latency),
        .i_drop_wrt_pckts(gbl_reg7[2]),
        .i_gate_sid(gbl_reg7[3]),
@@ -947,12 +931,12 @@ module ktms_afu#
    wire [0:lunid_width_w_par-1]                      s1_cmd_lun;
    wire [0:flgs_width-1]                     s1_cmd_flgs;
    
-   wire [0:datalen_width_w_par-1] 	     s1_cmd_data_len;     // added w_par kch 
+   wire [0:datalen_width_w_par-1] 	     s1_cmd_data_len;  
    wire [0:ctxtid_width-1] 		     s1_cmd_data_ctxt;
    wire [0:ea_width-1] 			     s1_cmd_data_ea;
    wire [0:msinum_width-1] 		     s1_cmd_msinum;
    wire [0:rrqnum_width-1] 		     s1_cmd_rrqnum;
-   wire [0:cdb_width_w_par-1] 		     s1_cmd_cdb;   // added w_par kch 
+   wire [0:cdb_width_w_par-1] 		     s1_cmd_cdb;
    wire [0:lba_width-1] 		     s1_cmd_lba;
    wire [0:channels-1] 			     s1_cmd_portmsk;
    wire [0:afu_rc_width-1] 		     s1_cmd_rc;
@@ -973,7 +957,7 @@ module ktms_afu#
    wire [0:63] 				     trk0_ts;
 
 
-   wire [0:ctxtid_width-2] 		     croom_wa;   // no parity kch ???
+   wire [0:ctxtid_width-2] 		     croom_wa; 
    wire [0:croom_width-1] 		     croom_wd;
    wire 				     croom_we;
    wire 				     s1_croom_err_v;
@@ -1077,7 +1061,7 @@ module ktms_afu#
 
 	.i_ec_set(s1_ec_set),
 	.i_ec_rst(s1_ec_rst),
-	.i_ec_id(s1_ec_id),  //parity cheecked in afu_int kch 
+	.i_ec_id(s1_ec_id), 
 
 	.i_cap_wr_v(s1_cap_wr_v),
 	.i_cap_wr_ctxt(s1_cap_wr_ctxt),
@@ -1136,7 +1120,7 @@ module ktms_afu#
         .o_r(s1_cmd_r),
         .o_flgs(s1_cmd_flgs),
 
-        .o_tag(s1_cmd_tag),    // has parity kch 
+        .o_tag(s1_cmd_tag), 
         .o_syncid(s1_cmd_syncid),
         .o_rcb_ctxt(s1_cmd_rcb_ctxt),
         .o_rcb_ec(s1_cmd_rcb_ec),
@@ -1149,7 +1133,7 @@ module ktms_afu#
 	.o_ioadllen(),
 	.o_data_len(s1_cmd_data_len),
 	.o_data_ctxt(s1_cmd_data_ctxt),
-	.o_data_ea(s1_cmd_data_ea),    //has parity kch 
+	.o_data_ea(s1_cmd_data_ea), 
 	.o_msinum(s1_cmd_msinum),
 	.o_rrq(s1_cmd_rrqnum),
 	.o_cdb(s1_cmd_cdb),
@@ -1162,7 +1146,7 @@ module ktms_afu#
 	.i_cmpl_v(s1_cmpl_v),
 	.i_cmpl_tag(s1_cmpl_tag),
 	.i_cmpl_syncid(s1_cmpl_syncid),
-        .o_perror(o_perror[45:48]),    // addded o_perror kch 
+        .o_perror(o_perror[45:48]),   
         .o_cmpl_error_hld(cmpl_error_hld),
         .o_tag_error_hld(tag_error_hld),
         .o_allocate_afu_tag(allocate_afu_tag),.o_free_afu_tag(free_afu_tag),.o_no_afu_tags(no_afu_tags),.i_threshold_zero(gbl_reg7[4]),
@@ -1200,8 +1184,6 @@ module ktms_afu#
      
    wire [0:4*64-1] afu_tag_latency = {afu_tag_sum,afu_tag_complete,54'b0,afu_tag_active,afu_tag_active_cycles}; 
 
-   // assign o_perror[57] = 1'b0;   // fixit this kch renumber o_perror when done with make
-
    capi_parcheck#(.width(9)) s1_cmd_tag_pcheck(.clk(clk),.reset(reset),.i_v(s1_cmd_v),.i_d(s1_cmd_tag[0:tag_width-2]),.i_p(s1_cmd_tag[tag_width-1]),.o_error(s1_perror[6]));
 
    // debug count 0 = command fetches,
@@ -1216,7 +1198,7 @@ module ktms_afu#
    wire [0:ea_width-1] 			     s2_cmd_data_ea;
    wire [0:ctxtid_width-1] 		     s2_cmd_data_ctxt;
    wire [0:tag_width-1] 		     s2_cmd_tag;
-   wire [0:datalen_width_w_par-1]	     s2_cmd_data_len;   // w_par kch 
+   wire [0:datalen_width_w_par-1]	     s2_cmd_data_len;
    wire [0:afu_rc_width-1] 		     s2_cmd_rc;
    wire [0:afu_erc_width-1] 		     s2_cmd_erc;
    wire [0:channels-1] 			     s2_cmd_portmsk;
@@ -1244,13 +1226,13 @@ module ktms_afu#
       
       .lunid_width(lunid_width),.lidx_width(lidx_width),
       .ea_width(ea_width),.channels(channels),.ssize_width(ssize_width),
-      .aux_width(flgs_width-1+tag_width+datalen_width_w_par+ea_width+cdb_width_w_par+ctxtid_width)  // added w_par kch
+      .aux_width(flgs_width-1+tag_width+datalen_width_w_par+ea_width+cdb_width_w_par+ctxtid_width) 
       ) irht
        (
 	.clk(clk),.reset(reset),
 	.i_ec_set(s1_ec_set),
 	.i_ec_rst(s1_ec_rst),
-	.i_ec_id(s1_ec_id),   //parity cheecked in afu_int kch 
+	.i_ec_id(s1_ec_id), 
 
 	.i_errinj(s1_errinj[47:50]),
 	.i_ctxt_rst_v(s1_ctxt_rmv_v),.i_ctxt_rst_d(s1_ctxt_upd_d),
@@ -1265,7 +1247,7 @@ module ktms_afu#
 	.i_req_lunid(s1_cmd_lun),
 	.i_req_vrh(s1_cmd_flgs[0]),
         .i_req_transfer_len(s1_cmd_cdb[10*8:14*8-1]),  
-	.i_req_tstag(s1_cmd_tag),   //done kch 
+	.i_req_tstag(s1_cmd_tag),  
 	.i_req_aux({s1_cmd_flgs[1:flgs_width-1],s1_cmd_tag,s1_cmd_data_len,s1_cmd_data_ea,s1_cmd_cdb,s1_cmd_data_ctxt}),  
 	.o_req_aux({s2_cmd_flgs[1:flgs_width-1],s2_cmd_tag,s2_cmd_data_len,s2_cmd_data_ea,s2_cmd_cdb,s2_cmd_data_ctxt}), 
 
@@ -1278,7 +1260,7 @@ module ktms_afu#
 	.o_req_lba(s2_cmd_lba),.o_req_lunid(s2_cmd_lun),.o_req_portmsk(s2_cmd_portmsk),.o_req_lidx(s2_cmd_lidx),.o_req_vrh(s2_cmd_flgs[0]), .o_req_plun(s2_cmd_plun),
 	.o_get_addr_v(get_addr_v[channels+1:channels+2]),
 	.o_get_addr_r(get_addr_r[channels+1:channels+2]),
-	.o_get_addr_ea(get_addr_d_ea[ea_width*(channels+1):ea_width*(channels+3)-1]),                 // parity added kch
+	.o_get_addr_ea(get_addr_d_ea[ea_width*(channels+1):ea_width*(channels+3)-1]),              
 	.o_get_addr_tstag(get_addr_d_tstag[tstag_width*(channels+1):tstag_width*(channels+3)-1]),
 	.o_get_addr_ctxt(get_addr_d_ctxt[ctxtid_width*(channels+1):ctxtid_width*(channels+3)-1]),  
 	.o_get_addr_size(get_addr_d_size[ssize_width*(channels+1):ssize_width*(channels+3)-1]),
@@ -1287,7 +1269,7 @@ module ktms_afu#
 	.i_get_data_d(get_data_d[130*(channels+1):130*(channels+3)-1]),
 	.i_get_data_e(get_data_e[channels+1:channels+2]),
 	.i_get_data_rc(get_data_rc[dma_rc_width*(channels+1):dma_rc_width*(channels+3)-1]),
-        .o_perror(o_perror[49:52]),   //added o_perror kch 
+        .o_perror(o_perror[49:52]), 
         .o_vrh_erc_hld(s1_vrh_erc_hld)
         );
 
@@ -1299,7 +1281,7 @@ module ktms_afu#
    wire [0:afu_erc_width-1] 		     s3_cmd_erc;
 
    wire [0:lunid_width_w_par-1] 		     s3_cmd_lun;
-   wire [0:fc_tag_width_w_par-1] 	     s3_cmd_fc_tag;   // added w_par kch
+   wire [0:fc_tag_width_w_par-1] 	     s3_cmd_fc_tag; 
    wire [0:chnlid_width-1] 		     s3_cmd_chnl;
    wire [0:tag_width-1] 		     s3_cmd_afu_tag;
    wire [0:lidx_width-1] 		     s3_cmd_lidx;
@@ -1308,7 +1290,7 @@ module ktms_afu#
 
    wire 				     s2_rsp_v, s2_rsp_r;
    wire [0:chnlid_width-1] 		     s2_rsp_chnl;
-   wire [0:fc_tag_width_w_par-1] 	     s2_rsp_fc_tag;    // added w_par kch 
+   wire [0:fc_tag_width_w_par-1] 	     s2_rsp_fc_tag;  
    wire 				     s2_rsp_fc_tag_valid;
    wire 				     s2_rsp_nc; // no channel
    wire 				     s3_vrh;
@@ -1317,7 +1299,7 @@ module ktms_afu#
    localparam cmd_aux_width = cdb_width_w_par+datalen_width_w_par+ctxtid_width+ea_width+flgs_width-1;
    wire [0:cmd_aux_width-1] 		     s3_cmd_aux;
    wire 				     s3_cmd_vrh;
-   wire [0:cdb_width_w_par-1] 		     s2_cmd_cdb_out;   // added w_par kch 
+   wire [0:cdb_width_w_par-1] 		     s2_cmd_cdb_out; 
    wire 				     s2_cmd_vrh = s2_cmd_flgs[0];
 
    capi_parcheck#(.width(64)) s2_cmd_cdb_pcheck0(.clk(clk),.reset(reset),.i_v(s2_cmd_v),.i_d(s2_cmd_cdb[0:63]),.i_p(s2_cmd_cdb[128]),.o_error(s1_perror[2]));
@@ -1407,7 +1389,7 @@ module ktms_afu#
    capi_parcheck#(.width(64)) s3_cmd_aux_pcheck0(.clk(clk),.reset(reset),.i_v(s3_cmd_v),.i_d(s3_cmd_aux[0:63]),.i_p(s3_cmd_aux[128]),.o_error(s1_perror[4]));
    capi_parcheck#(.width(64)) s3_cmd_aux_pcheck1(.clk(clk),.reset(reset),.i_v(s3_cmd_v),.i_d(s3_cmd_aux[64:127]),.i_p(s3_cmd_aux[129]),.o_error(s1_perror[5]));
 
-   wire [0:lba_width-1] 		     s3_cmd_lba = s3_cmd_aux[80-lba_width:80-1];  // todo possible parity check here kch 
+   wire [0:lba_width-1] 		     s3_cmd_lba = s3_cmd_aux[80-lba_width:80-1];
    
 
 
@@ -1418,15 +1400,15 @@ module ktms_afu#
    wire [0:afu_rc_width-1] 		     s4_cmd_rc;
    wire [0:afu_erc_width-1] 		     s4_cmd_erc;
 
-   wire [0:cdb_width_w_par-1] 		     s4_cmd_cdb;    // added w_par kch 
+   wire [0:cdb_width_w_par-1] 		     s4_cmd_cdb; 
    wire [0:lunid_width_w_par-1] 		     s4_cmd_lun;
    wire [0:ea_width-1] 			     s4_cmd_data_ea;
    wire [0:ctxtid_width-1] 		     s4_cmd_data_ctxt;
    wire 				     s4_cmd_fc_tag_valid;
-   wire [0:fc_tag_width_w_par-1] 	     s4_cmd_fc_tag;   // added w_par kch 
+   wire [0:fc_tag_width_w_par-1] 	     s4_cmd_fc_tag; 
    wire [0:chnlid_width-1] 		     s4_cmd_chnl;
    wire [0:tag_width-1] 		     s4_cmd_afu_tag;
-   wire [0:datalen_width_w_par-1] 	     s4_cmd_data_len;   // added w_par kch 
+   wire [0:datalen_width_w_par-1] 	     s4_cmd_data_len;
    wire [1:flgs_width-1] 		     s4_cmd_flgs;
 
    wire [0:63] 				     s1_dbg_reg3;
@@ -1435,7 +1417,7 @@ module ktms_afu#
    
    ktms_afu_ltbl#
      (.mmiobus_width(mmiobus_width),.mmio_addr(mmioaddr_luntbl),.idx_width(lidx_width),.portid_width(chnlid_width),.lunid_width(lunid_width_w_par),
-      .aux_width(1+fc_tag_width_w_par+tag_width+chnlid_width+1+afu_rc_width+afu_erc_width+cmd_aux_width)) ilun_tbl    // added w_par twice  to cmd_aux_width kch 
+      .aux_width(1+fc_tag_width_w_par+tag_width+chnlid_width+1+afu_rc_width+afu_erc_width+cmd_aux_width)) ilun_tbl  
        (.clk(clk),.reset(reset),
 	.i_mmiobus(mmiobus),
 	.i_v(s3_cmd_v),.i_r(s3_cmd_r),.i_port(s3_cmd_chnl),.i_idx(s3_cmd_lidx),.i_lunid(s3_cmd_lun),.i_vrh(s3_cmd_vrh),
@@ -1460,7 +1442,7 @@ module ktms_afu#
 
    wire [0:channels] 			     s1_rsp_r, s1_rsp_v;
    wire [0:((channels)*rslt_width)-1] 	     s1_rsp_stat;
-   wire [0:((channels)*fc_tag_width_w_par)-1]      s1_rsp_fc_tag;   // added w_par kch 
+   wire [0:((channels)*fc_tag_width_w_par)-1]      s1_rsp_fc_tag;  
    
    // response from afu only commands or commands that hit an error before channel allocation
    wire [0:tag_width-1] 		     s1_nc_rsp_tag;
@@ -1468,12 +1450,12 @@ module ktms_afu#
    wire [0:afu_erc_width-1] 		     s1_nc_rsp_erc;
    wire 				     s1_nc_rsp_ok;
    wire 				     s1_nc_rsp_fc_tag_valid;
-   wire [0:fc_tag_width_w_par-1] 	     s1_nc_rsp_fc_tag;            // added w_par kch 
+   wire [0:fc_tag_width_w_par-1] 	     s1_nc_rsp_fc_tag;          
    wire [0:chnlid_width-1] 		     s1_nc_rsp_chnl;
 
 
    // error prior to channel allocation bypasses the fc channel and goes straight to response.
-   base_alatch_burp#(.width(chnlid_width+1+fc_tag_width_w_par+tag_width+1+afu_rc_width+afu_erc_width)) is4_cmd_err_lat    //added w_par kch 
+   base_alatch_burp#(.width(chnlid_width+1+fc_tag_width_w_par+tag_width+1+afu_rc_width+afu_erc_width)) is4_cmd_err_lat  
      (.clk(clk),.reset(reset),
       .i_v(s4_cmda_v[channels] ),.i_r(s4_cmda_r[channels]),.i_d({s4_cmd_chnl,      s4_cmd_fc_tag, s4_cmd_fc_tag_valid,   s4_cmd_afu_tag,    s4_cmd_ok,    s4_cmd_rc,    s4_cmd_erc}),
       .o_v(s1_rsp_v[channels]),  .o_r(s1_rsp_r[channels]), .o_d({s1_nc_rsp_chnl, s1_nc_rsp_fc_tag, s1_nc_rsp_fc_tag_valid, s1_nc_rsp_tag, s1_nc_rsp_ok, s1_nc_rsp_rc, s1_nc_rsp_erc}));
@@ -1487,7 +1469,7 @@ module ktms_afu#
    wire [0:(fc_bufid_width+1)*channels-1]    s1_rm_cnt = {fc_bufid_width*channels{1'b0}};
    
    wire [0:63] 				     s1_dbg_reg0;
-   wire [0:63] 				     s1_dbg_reg0_chnl;  // ktms_fc_chnl does not drive anything using dbg reg0 for debug of parity errors kch 
+   wire [0:63] 				     s1_dbg_reg0_chnl;  
 
    wire 				     s4_cmd_tmgmt = s4_cmd_flgs[3];
    wire 				     s4_cmd_wnr = s4_cmd_flgs[4];
@@ -1518,7 +1500,7 @@ module ktms_afu#
 	     .lunid_width(lunid_width),
 	     .beatid_width(fc_beatid_width),
 	     .datalen_width(datalen_width),
-	     .afu_data_width(130),                 //changed from 128 to 130 to add parity kch
+	     .afu_data_width(130),
 	     .afu_bytec_width(dma_bytec_width),
 	     .fc_data_width(fc_data_width),
 
@@ -1541,8 +1523,7 @@ module ktms_afu#
 	    (
 	     .clk(clk),
 	     .reset(reset),
-//	     .o_dbg_inc(dbg_cnt_inc[i*14+40:(i+1)*14+40-1]), // 40:53,54:67,68:81,82:95,
-	     .o_dbg_inc({dbg_cnt_inc[i*14+40:(i+1)*14+36-1],dbg_cnt_nc}), // 40:49,54:63,68:79,82:91,
+	     .o_dbg_inc({dbg_cnt_inc[i*14+40:(i+1)*14+36-1],dbg_cnt_nc}), 
              .o_dbg_reg(s1_dbg_reg0_chnl[16*i:16*(i+1)-1]),
 	     .o_stallcount_v(stallcount_v[13+i]),
 	     .o_stallcount_r(stallcount_r[13+i]),
@@ -1552,15 +1533,15 @@ module ktms_afu#
 	     .i_cmd_rd(s4_cmd_rd),
 	     .i_cmd_wr(s4_cmd_wr),
 	     .i_cmd_tag(s4_cmd_fc_tag), 
-	     .i_cmd_cdb(s4_cmd_cdb),   // has parity in bits 128 and 129 kch 
+	     .i_cmd_cdb(s4_cmd_cdb), 
 	     .i_cmd_lun(s4_cmd_lun),
 	     .i_cmd_ea(s4_cmd_data_ea),
 	     .i_cmd_tstag(s4_cmd_afu_tag),
 	     .i_cmd_ctxt(s4_cmd_data_ctxt),
-	     .i_cmd_data_len(s4_cmd_data_len),    // has parity kch 
+	     .i_cmd_data_len(s4_cmd_data_len), 
 	     .put_addr_r(put_addr_r[i]),
 	     .put_addr_v(put_addr_v[i]),
-	     .put_addr_ea(put_addr_d_ea[(ea_width*i):(ea_width*(i+1))-1]),      //has parity kch
+	     .put_addr_ea(put_addr_d_ea[(ea_width*i):(ea_width*(i+1))-1]),   
 	     .put_addr_tstag(put_addr_d_tstag[(tstag_width*i):(tstag_width*(i+1))-1]),
 	     .put_addr_ctxt(put_addr_d_ctxt[(ctxtid_width*i):(ctxtid_width*(i+1))-1]),
 	     .put_data_r(put_data_r[i]),
@@ -1594,7 +1575,7 @@ module ktms_afu#
 	     
 	     .o_rslt_r(s1_rsp_r[i]),
 	     .o_rslt_v(s1_rsp_v[i]),
-	     .o_rslt_tag(s1_rsp_fc_tag[(fc_tag_width_w_par*i):(fc_tag_width_w_par*(i+1))-1]),   // added w_par kch 
+	     .o_rslt_tag(s1_rsp_fc_tag[(fc_tag_width_w_par*i):(fc_tag_width_w_par*(i+1))-1]), 
 	     .o_rslt_stat(s1_rsp_stat[(rslt_width*i):(rslt_width*(i+1))-1]),
 
 	     .o_fc_req_v(o_fc_req_v[i]),
@@ -1605,7 +1586,7 @@ module ktms_afu#
 	     .o_fc_req_lun(o_fc_req_lun[i*fc_lunid_width:(i+1)*fc_lunid_width-1]),
 	     .o_fc_req_lun_par(o_fc_req_lun_par[i]),
 	     .o_fc_req_cdb(o_fc_req_cdb[i*cdb_width:(i+1)*cdb_width-1]),
-	     .o_fc_req_cdb_par(o_fc_req_cdb_par[i*cdb_par_width:(i+1)*cdb_par_width-1]),                       // added kch 
+	     .o_fc_req_cdb_par(o_fc_req_cdb_par[i*cdb_par_width:(i+1)*cdb_par_width-1]),                 
 	     .o_fc_req_length(o_fc_req_length[i*datalen_width:(i+1)*datalen_width-1]),
 	     .o_fc_req_length_par(o_fc_req_length_par[i]),
 
@@ -1616,7 +1597,7 @@ module ktms_afu#
 	     .i_fc_wdata_req_tag_par(i_fc_wdata_req_tag_par[i*fc_tag_par_width:(i+1)*fc_tag_par_width-1]),
 	     .i_fc_wdata_req_beat(i_fc_wdata_req_beat[i*fc_beatid_width:(i+1)*fc_beatid_width-1]),
 	     .i_fc_wdata_req_size(i_fc_wdata_req_size[i*datalen_width:(i+1)*datalen_width-1]),
-	     .i_fc_wdata_req_size_par(i_fc_wdata_req_size_par[i]),    // added kch 
+	     .i_fc_wdata_req_size_par(i_fc_wdata_req_size_par[i]), 
 
 	     .o_fc_wdata_rsp_v(o_fc_wdata_rsp_v[i]),
 	     .o_fc_wdata_rsp_r(o_fc_wdata_rsp_r[i]),
@@ -1626,7 +1607,7 @@ module ktms_afu#
 	     .o_fc_wdata_rsp_tag_par(o_fc_wdata_rsp_tag_par[i*fc_tag_par_width:(i+1)*fc_tag_par_width-1]),
 	     .o_fc_wdata_rsp_beat(o_fc_wdata_rsp_beat[i*fc_beatid_width:(i+1)*fc_beatid_width-1]),
 	     .o_fc_wdata_rsp_data(o_fc_wdata_rsp_data[i*fc_data_width:(i+1)*fc_data_width-1]),
-	     .o_fc_wdata_rsp_data_par(o_fc_wdata_rsp_data_par[i*fc_data_par_width:(i+1)*fc_data_par_width-1]),  // added kch 
+	     .o_fc_wdata_rsp_data_par(o_fc_wdata_rsp_data_par[i*fc_data_par_width:(i+1)*fc_data_par_width-1]),
 
 	     .i_fc_rdata_rsp_v(i_fc_rdata_rsp_v[i]),
 	     .i_fc_rdata_rsp_r(i_fc_rdata_rsp_r[i]),
@@ -1651,19 +1632,11 @@ module ktms_afu#
 	     .i_fc_rsp_underrun(i_fc_rsp_underrun[i]),
 	     .i_fc_rsp_overrun(i_fc_rsp_overrun[i]),
 	     .i_fc_rsp_resid(i_fc_rsp_resid[i*32:(i+1)*32-1]),
-             .o_perror(o_perror[57+2*i:57+2*i+1])   // added o_perror kch bits 57:64 
+             .o_perror(o_perror[57+2*i:57+2*i+1])
 	     );
 
 	end // for (i=0; i<channels; i++)
    endgenerate
-
-
-
-
-   // TODO: Hook these up when functions supported    completed kch commented theses out
- //  assign o_fc_req_tag_par[0:fc_tag_par_width-1] = {fc_tag_par_width{1'b0}};
-//   assign o_fc_req_lun_par[0:fc_lunid_par_width-1] = {fc_lunid_par_width{1'b0}};
-//   assign o_fc_wdata_rsp_data_par[0:fc_data_par_width-1] = {fc_data_par_width{1'b0}};
 
 
    // completed instructions from timeout.
@@ -1672,14 +1645,14 @@ module ktms_afu#
 
 
    wire 			     s1a_rsp_v, s1a_rsp_r;
-   wire [0:fc_tag_width_w_par-1]     s1a_rsp_fc_tag;     // added w_par
+   wire [0:fc_tag_width_w_par-1]     s1a_rsp_fc_tag; 
    wire [0:rslt_width-1] 	     s1a_rsp_stat;
 
    wire [0:channels] 		     s1_rsp_sel;
-   base_arr_mux#(.ways(channels+1),.width(fc_tag_width_w_par)) is1rsp_mux            // added w_par kch 
+   base_arr_mux#(.ways(channels+1),.width(fc_tag_width_w_par)) is1rsp_mux       
      (
       .clk(clk),.reset(reset),
-      .i_v(s1_rsp_v),.i_r(s1_rsp_r),.i_d({s1_rsp_fc_tag, s1_nc_rsp_fc_tag}),  // follow both back fixit kch
+      .i_v(s1_rsp_v),.i_r(s1_rsp_r),.i_d({s1_rsp_fc_tag, s1_nc_rsp_fc_tag}),
       .o_v(s1a_rsp_v),.o_r(s1a_rsp_r),.o_d(s1a_rsp_fc_tag),.o_sel(s1_rsp_sel));
    assign dbg_cnt_inc[3] = s1a_rsp_v & s1a_rsp_r;
 
@@ -1711,8 +1684,8 @@ module ktms_afu#
    wire [0:tag_width-1] 	     s2_fc_rsp_afu_tag;
    base_mem#(.addr_width(chnlid_width+fc_tag_width),.width(tag_width)) ifctag_mem
      (.clk(clk),
-      .we(s4_cmd_fc_tag_valid & s4_cmd_v), .wa({ s4_cmd_chnl, s4_cmd_fc_tag[0:fc_tag_width_w_par-2]}),.wd(   s4_cmd_afu_tag),  // stripped off parity for wa kch 
-      .re(s1a_rsp_re),                     .ra({s1a_rsp_chnl,s1a_rsp_fc_tag[0:fc_tag_width_w_par-2]}),.rd(s2_fc_rsp_afu_tag)   // stripped off parity for ra kch  
+      .we(s4_cmd_fc_tag_valid & s4_cmd_v), .wa({ s4_cmd_chnl, s4_cmd_fc_tag[0:fc_tag_width_w_par-2]}),.wd(   s4_cmd_afu_tag), 
+      .re(s1a_rsp_re),                     .ra({s1a_rsp_chnl,s1a_rsp_fc_tag[0:fc_tag_width_w_par-2]}),.rd(s2_fc_rsp_afu_tag) 
       );
 
    wire [0:tag_width-1] 	     s2_rsp_afu_tag = s2_rsp_nc ? s2_nc_rsp_afu_tag : s2_fc_rsp_afu_tag;
@@ -1750,13 +1723,13 @@ module ktms_afu#
    wire                              s2_retry_rcb_re;
    wire [0:8]                        s2_retry_rcb_afu_tag;
 
-   base_mem#(.addr_width(tag_width-1),.width(1+1+msinum_width+ctxtid_width+1+ea_width+syncid_width)) icmdmem   //added -1 to reduce addrwidth for parity kch 
+   base_mem#(.addr_width(tag_width-1),.width(1+1+msinum_width+ctxtid_width+1+ea_width+syncid_width)) icmdmem 
      (.clk(clk),
-      .wa(s1_cmd_tag[0:tag_width-2]),    .wd({~s1_cmd_wnr,s1_cmd_sule,s1_cmd_msinum, s1_cmd_rcb_ctxt,s1_cmd_rcb_ec, s1_cmd_rcb_ea, s1_cmd_syncid}),.we(s1_cmd_v),  // add [0:tag_width-2] to strip off parity kch  
-      .ra(s3_rsp_afu_tag[0:tag_width-2]),.rd({ s4a_rsp_rnw,s4a_rsp_sule,s4a_rsp_msinum,     s4a_rsp_ctxt,    s4a_rsp_ec,     s4a_rsp_ea, s4a_rsp_syncid}),.re(s3_rsp_re)   // add [0:tag_width-2] to strip off parity kch
+      .wa(s1_cmd_tag[0:tag_width-2]),    .wd({~s1_cmd_wnr,s1_cmd_sule,s1_cmd_msinum, s1_cmd_rcb_ctxt,s1_cmd_rcb_ec, s1_cmd_rcb_ea, s1_cmd_syncid}),.we(s1_cmd_v), 
+      .ra(s3_rsp_afu_tag[0:tag_width-2]),.rd({ s4a_rsp_rnw,s4a_rsp_sule,s4a_rsp_msinum,     s4a_rsp_ctxt,    s4a_rsp_ec,     s4a_rsp_ea, s4a_rsp_syncid}),.re(s3_rsp_re)
       );
 
-   base_mem#(.addr_width(tag_width-1),.width(ctxtid_width+ea_width+1+64)) icmd_retry_mem   //added -1 to reduce addrwidth for parity kch 
+   base_mem#(.addr_width(tag_width-1),.width(ctxtid_width+ea_width+1+64)) icmd_retry_mem 
      (.clk(clk),
       .wa(s1_cmd_tag[0:tag_width-2]),    .wd({s1_cmd_rcb_ctxt,s1_cmd_rcb_ea,s1_cmd_rcb_timestamp,s1_cmd_rcb_hp}),.we(s1_cmd_v),  //  
       .ra(s2_cmd_tag[0:tag_width-2]),.rd({s2_retry_rcb_ctxt,s2_retry_rcb_ea,s2_retry_rcb_timestamp,s2_retry_rcb_hp}),.re(1'b1)   
@@ -1769,18 +1742,16 @@ module ktms_afu#
    base_vlat#(.width(10)) i_dlay_cmplt_tag(.clk(clk),.reset(reset),.din({(s3_rsp_v & s3_rsp_r),s3_rsp_afu_tag[0:8]}),.q({s3_rsp_check_v,s3_rsp_check_tag}));
    base_vlat#(.width(10)) i_dlay_tag(.clk(clk),.reset(reset),.din({(s1_cmd_v & s1_cmd_r),s1_cmd_tag[0:8]}),.q({s2_cmd_check_v,s2_cmd_check_tag}));
 
-   base_vmem#(.a_width(tag_width-1),.rports(2)) ots_rcb  // added -1 kch 
+   base_vmem#(.a_width(tag_width-1),.rports(2)) ots_rcb
      (.clk(clk),.reset(reset),
-      .i_set_v(s1_cmd_v),.i_set_a(s1_cmd_tag[0:tag_width-2]),  // added [0:tag_width-2] kch
-      .i_rst_v(s3_rsp_v & s3_rsp_r),.i_rst_a(s3_rsp_afu_tag[0:tag_width-2]),  // added 0:tag_width-2 kch
+      .i_set_v(s1_cmd_v),.i_set_a(s1_cmd_tag[0:tag_width-2]), 
+      .i_rst_v(s3_rsp_v & s3_rsp_r),.i_rst_a(s3_rsp_afu_tag[0:tag_width-2]), 
       .i_rd_en(2'b11),.i_rd_a({s3_rsp_afu_tag[0:tag_width-2],s1_cmd_tag[0:tag_width-2]}),.o_rd_d({s1_read_outst,s2_write_outst})
       );
    wire s3_read_error = s3_rsp_check_v & ~(s1_read_outst);
    wire s2_write_error = s2_cmd_check_v & (s2_write_outst);
    wire rcb_read_error_hld;
    wire rcb_write_error_hld;
-//   assign dbg_cnt_inc[128] = s3_read_error ;
-//   assign dbg_cnt_inc[127] = s2_write_error;
    wire [0:tag_width-2] 		     s2_cmd_error_tag;
    wire [0:tag_width-2]  write_error_tag;
 
@@ -1895,7 +1866,7 @@ module ktms_afu#
 	.o_put_addr_v(put_addr_v[put_asa]),
 	.o_put_addr_r(put_addr_r[put_asa]),
 	.o_put_addr_ctxt(put_addr_d_ctxt[put_asa*ctxtid_width:(put_asa+1)*ctxtid_width-1]),
-	.o_put_addr_ea(put_addr_d_ea[put_asa*ea_width:(put_asa+1)*ea_width-1]),                 //has parity kch
+	.o_put_addr_ea(put_addr_d_ea[put_asa*ea_width:(put_asa+1)*ea_width-1]),            
 	.o_put_addr_tstag(put_addr_d_tstag[put_asa*tstag_width:(put_asa+1)*tstag_width-1]),
 	
 	.i_put_done_v(put_done_v[put_asa]),
@@ -2022,7 +1993,7 @@ module ktms_afu#
       .o_rsp_sintr_id(s6_rsp_sintr_id),
       .o_dbg_cnt_inc(dbg_cnt_inc[98]),
       .o_rsp_aux({s6_rsp_syncid,s6_rsp_rnw,s6_rsp_afu_tag,s6_rsp_tagret,s6_rsp_ctxt,s6_rsp_msinum}),
-      .o_perror(o_perror[66])    // added o_perror kch   
+      .o_perror(o_perror[66])  
     );
 
 
@@ -2135,7 +2106,6 @@ module ktms_afu#
    assign dbgr_mmdata = 64'd0;
 `endif // !`ifdef DEBUG_REG
 
-   // TODO - fix these, some sources are too big
    assign s1a_pipemon_v[0] = s1_cmd_v;
    assign s1a_pipemon_v[1] = s2_cmd_v;
    assign s1a_pipemon_v[2] = s3_cmd_v;
@@ -2274,7 +2244,7 @@ base_vlat_sr#(.width(128)) iea_valid (.clk(clk),.reset(reset),.set(set_xlate_tag
    wire 			     s1_perfmon_v;
    wire [0:tag_width-1] 	     s1_perfmon_tag;
 			     
-   ktms_afu_track#(.mmioaddr(mmioaddr_track),.mmiobus_width(mmiobus_width),.tag_width(tag_width-1),.ea_width(ea_width),.ctxtid_width(ctxtid_width),.lba_width(lba_width), //added -1 kch 
+   ktms_afu_track#(.mmioaddr(mmioaddr_track),.mmiobus_width(mmiobus_width),.tag_width(tag_width-1),.ea_width(ea_width),.ctxtid_width(ctxtid_width),.lba_width(lba_width),
 		   .chnlid_width(chnlid_width),.lidx_width(lidx_width),.rslt_width(rslt_width),
 		   .afu_rc_width(afu_rc_width),.afu_erc_width(afu_erc_width),.fcstat_width(fcstat_width),.fcxstat_width(fcxstat_width),.scstat_width(scstat_width),.reslen_width(reslen_width)) iafu_track
      (.clk(clk),.reset(reset),.i_mmiobus(mmiobus),
@@ -2396,7 +2366,6 @@ base_vlat_sr#(.width(128)) iea_valid (.clk(clk),.reset(reset),.set(set_xlate_tag
         .o_perror(o_perror[70:71])
         );
 
-//  assign dbg_cnt_inc[16:20] = {xlate_rd_lt_32,xlate_rd_lt_512,xlate_rd_lt_4K,xlate_rd_lt_16K,xlate_rd_gt_16K};
    wire                              s1a_irq_v, s1a_irq_r;
    wire                              s1_irq_tstag_v;
    wire [0:tstag_width-1]            s1_irq_tstag;

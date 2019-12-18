@@ -24,11 +24,11 @@ use ieee.std_logic_1164.all;
 
 ENTITY psl_xilstrte3 IS
   PORT(
-       datain: out std_logic_vector(3 downto 0);
-       dataout: in std_logic_vector(3 downto 0);
-       datat: in std_logic;
-       ce_in: in std_logic;
-       ce_t: in std_logic);
+    datain: out std_logic_vector(3 downto 0);
+    dataout: in std_logic_vector(3 downto 0);
+    datat: in std_logic;
+    ce_in: in std_logic;
+    ce_t: in std_logic);
 
 END psl_xilstrte3;
 
@@ -36,48 +36,47 @@ END psl_xilstrte3;
 
 ARCHITECTURE psl_xilstrte3 OF psl_xilstrte3 IS
 
-Signal datatbus : std_logic_vector(3 downto 0);
-Signal di : std_logic_vector(3 downto 0);
-Signal do : std_logic_vector(3 downto 0);
-Signal dts : std_logic_vector(0 to 3);
-Signal fcsbo : std_logic;
-Signal fcsbts : std_logic;
+  Signal datatbus : std_logic_vector(3 downto 0);
+  Signal di : std_logic_vector(3 downto 0);
+  Signal do : std_logic_vector(3 downto 0);
+  Signal dts : std_logic_vector(0 to 3);
+  Signal fcsbo : std_logic;
+  Signal fcsbts : std_logic;
 
 
 begin
 
--- datatbus <= not(datat) & not(datat) & not(datat) & not(datat);
-datatbus <= datat & datat & datat & datat;
+  datatbus <= datat & datat & datat & datat;
 
-datain <= di;
-do <= dataout;
-dts <= datatbus;
-fcsbo <= ce_in;
-fcsbts <= ce_t;  -- not(ce_t);
+  datain <= di;
+  do <= dataout;
+  dts <= datatbus;
+  fcsbo <= ce_in;
+  fcsbts <= ce_t;
 
-STARTUPE3_inst : STARTUPE3
-generic map (
-PROG_USR => "FALSE", -- Activate program event security feature. Requires encrypted bitstreams.
-SIM_CCLK_FREQ => 0.0 -- Set the Configuration Clock Frequency(ns) for simulation
-)
-port map (
---CFGCLK => CFGCLK, -- 1-bit output: Configuration main clock output
---CFGMCLK => CFGMCLK, -- 1-bit output: Configuration internal oscillator clock output
-DI => di, -- 4-bit output: Allow receiving on the D input pin
---EOS => EOS, -- 1-bit output: Active-High output signal indicating the End Of Startup
---PREQ => PREQ, -- 1-bit output: PROGRAM request to fabric output
-DO => do, -- 4-bit input: Allows control of the D pin output
-DTS=> dts, -- 4-bit input: Allows tristate of the D pin
-FCSBO => fcsbo, -- 1-bit input: Contols the FCS_B pin for flash access
-FCSBTS => fcsbts, -- 1-bit input: Tristate the FCS_B pin
-GSR => '0', -- 1-bit input: Global Set/Reset input (GSR cannot be used for the port)
-GTS => '0', -- 1-bit input: Global 3-state input (GTS cannot be used for the port name)
-KEYCLEARB => '1', -- 1-bit input: Clear AES Decrypter Key input from Battery-Backed RAM (BBRAM)
-PACK => '0', -- 1-bit input: PROGRAM acknowledge input
-USRCCLKO => '0', -- 1-bit input: User CCLK input
-USRCCLKTS => '1', -- 1-bit input: User CCLK 3-state enable input
-USRDONEO => '0', -- 1-bit input: User DONE pin output control
-USRDONETS => '1' -- 1-bit input: User DONE 3-state enable output
-);
+  STARTUPE3_inst : STARTUPE3
+    generic map (
+      PROG_USR => "FALSE", -- Activate program event security feature. Requires encrypted bitstreams.
+      SIM_CCLK_FREQ => 0.0 -- Set the Configuration Clock Frequency(ns) for simulation
+      )
+    port map (
+      --CFGCLK => CFGCLK,   -- 1-bit output: Configuration main clock output
+      --CFGMCLK => CFGMCLK, -- 1-bit output: Configuration internal oscillator clock output
+      DI => di,             -- 4-bit output: Allow receiving on the D input pin
+      --EOS => EOS,         -- 1-bit output: Active-High output signal indicating the End Of Startup
+      --PREQ => PREQ,       -- 1-bit output: PROGRAM request to fabric output
+      DO => do,             -- 4-bit input: Allows control of the D pin output
+      DTS=> dts,            -- 4-bit input: Allows tristate of the D pin
+      FCSBO => fcsbo,       -- 1-bit input: Contols the FCS_B pin for flash access
+      FCSBTS => fcsbts,     -- 1-bit input: Tristate the FCS_B pin
+      GSR => '0',           -- 1-bit input: Global Set/Reset input (GSR cannot be used for the port)
+      GTS => '0',           -- 1-bit input: Global 3-state input (GTS cannot be used for the port name)
+      KEYCLEARB => '1',     -- 1-bit input: Clear AES Decrypter Key input from Battery-Backed RAM (BBRAM)
+      PACK => '0',          -- 1-bit input: PROGRAM acknowledge input
+      USRCCLKO => '0',      -- 1-bit input: User CCLK input
+      USRCCLKTS => '1',     -- 1-bit input: User CCLK 3-state enable input
+      USRDONEO => '0',      -- 1-bit input: User DONE pin output control
+      USRDONETS => '1'      -- 1-bit input: User DONE 3-state enable output
+      );
 
 END psl_xilstrte3;

@@ -37,8 +37,6 @@ module base_initsm#
    wire 		en = ~dout_v | dout_r;
    
    base_vlat_en#(.width(LOG_COUNT),.rstv(COUNT-1)) countl(.clk(clk), .reset(reset), .enable(en),.din(count_in), .q(count));
-// change to use all the tags . old design used tags-1 kch 0208018
-//   base_vlat_en#(.width(1))                        actl(.clk(clk), .reset(reset), .enable(en),.din(act_in), .q(act));
    base_vlat_en#(.width(1),.rstv(1'b1))                        actl(.clk(clk), .reset(reset), .enable(en),.din(act_in), .q(act));
    assign dout_d = count;
    assign dout_v = act;

@@ -44,7 +44,7 @@ module ktms_sl_cmddec#
    output 		       i_r,
    input 		       i_v,
    input 		       i_e,
-   input [0:129] 	       i_d,     // changed 127 to 129 to add parity kch
+   input [0:129] 	       i_d,
    input [0:dma_rc_width-1]    i_rc,
 
    output 		       i_ec_r,
@@ -64,13 +64,13 @@ module ktms_sl_cmddec#
    output [0:rh_width-1]       o_rh,
    output [0:lunid_width_w_par-1]    o_lunid,
    output [0:ioadllen_width-1] o_ioadllen,
-   output [0:datalen_width_w_par-1]  o_data_len,     // has parity kch. 
-   output [0:ctxtid_width-1]   o_data_ctxt,  // has parity kch 
-   output                      o_data_ctxt_v, // added ctxt valid bit kch 
+   output [0:datalen_width_w_par-1]  o_data_len,    
+   output [0:ctxtid_width-1]   o_data_ctxt, 
+   output                      o_data_ctxt_v,
    output [0:ea_width-1]       o_data_ea,
    output [0:msinum_width-1]   o_msinum,
    output [0:rrqnum_width-1]   o_rrq,
-   output [0:cdb_width_w_par-1]      o_cdb,  // added w_par kch 
+   output [0:cdb_width_w_par-1]      o_cdb,
    output [0:channels-1]       o_portmsk,
    output [0:dma_rc_width-1]   o_rc,
    output [0:1] 	       o_timeout_flg,
@@ -154,13 +154,13 @@ module ktms_sl_cmddec#
    wire [0:lunid_width_w_par-1]     s1_lunid    = {s1_dw1[63:0],i_d[129]};
    wire [0:datalen_width_w_par-1]   s1_datalen  = {s1_sw0[datalen_width-1:0],s1_sw0_par};
    wire [0:ioadllen_width-1]  s1_ioadllen = s1_sw1[ioadllen_width-1:0];
-   wire [0:ea_width-1] 	      s1_dataea   = {s1_dw1[ea_width-2:0],i_d[129]}; // sim 73520 kch 
+   wire [0:ea_width-1] 	      s1_dataea   = {s1_dw1[ea_width-2:0],i_d[129]};
    wire [0:msinum_width-1]    s1_msinum   = s1_b0[msinum_width-1:0];
    wire [0:rrqnum_width-1]    s1_rrq      = s1_b1[rrqnum_width-1:0];
    wire [0:63] 		      s1_cdb0     = i_d[64:127];
-   wire  		      s1_cdb0_par = i_d[129];   // added parity kch 
+   wire  		      s1_cdb0_par = i_d[129];
    wire [0:63] 		      s1_cdb1     = i_d[0:63];
-   wire  		      s1_cdb1_par = i_d[128];   // added parity kch 
+   wire  		      s1_cdb1_par = i_d[128];
    wire [0:15] 		      s1_timeout_d  = s1_hw1;
 
    wire 		      s1_ctxt_en      = s1_act & (s1_beat == 3'd0);
@@ -182,7 +182,7 @@ module ktms_sl_cmddec#
    
     
 
-   wire [0:129] 	      s2_cdb;    // changed 127 to 129 kch 
+   wire [0:129] 	      s2_cdb;
    wire [0:flgs_width-1]      s1_flgs;
    assign s1_flgs[0] = s1_vrh;
    assign s1_flgs[1] = s1_afu_cmd;
@@ -209,11 +209,11 @@ module ktms_sl_cmddec#
    base_vlat_en#(.width(rrqnum_width))   irrq     (.clk(clk),.reset(1'b0),.din(s1_rrq),     .q(o_rrq),         .enable(s1_rrq_en));
    base_vlat_en#(.width(64))               icdb0    (.clk(clk),.reset(1'b0),.din(s1_cdb0),    .q(s2_cdb[0:63] ), .enable(s1_cdb0_en));
    base_vlat_en#(.width(64))               icdb1    (.clk(clk),.reset(1'b0),.din(s1_cdb1),    .q(s2_cdb[64:127]),.enable(s1_cdb1_en));
-   base_vlat_en#(.width(1))                icdb0_par    (.clk(clk),.reset(1'b0),.din(s1_cdb0_par),.q(s2_cdb[128] ), .enable(s1_cdb0_en));  // added parity kch 
-   base_vlat_en#(.width(1))                icdb1_par    (.clk(clk),.reset(1'b0),.din(s1_cdb1_par),.q(s2_cdb[129]),.enable(s1_cdb1_en));    // added parity kch 
+   base_vlat_en#(.width(1))                icdb0_par    (.clk(clk),.reset(1'b0),.din(s1_cdb0_par),.q(s2_cdb[128] ), .enable(s1_cdb0_en)); 
+   base_vlat_en#(.width(1))                icdb1_par    (.clk(clk),.reset(1'b0),.din(s1_cdb1_par),.q(s2_cdb[129]),.enable(s1_cdb1_en));
    base_vlat_en#(.width(dma_rc_width))     irclat   (.clk(clk),.reset(1'b0),.din(s1_rc),      .q(o_rc),          .enable(s1_rc_en));
    
-   assign o_cdb = s2_cdb[128-cdb_width:129]; // changed 127 to 129 kch 
+   assign o_cdb = s2_cdb[128-cdb_width:129];
 
    wire 		      s2_v, s2_r;
    

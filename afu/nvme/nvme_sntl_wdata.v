@@ -70,13 +70,13 @@ module nvme_sntl_wdata#
     (* mark_debug = "false" *)
     output reg         [tag_width-1:0] o_wdata_req_tag_out,
     (* mark_debug = "false" *)
-    output reg                         o_wdata_req_tag_par_out, // added kch 
+    output reg                         o_wdata_req_tag_par_out, 
     (* mark_debug = "false" *)
     output reg      [beatid_width-1:0] o_wdata_req_beat_out,
     (* mark_debug = "false" *)
     output reg     [datalen_width-1:0] o_wdata_req_size_out,
     (* mark_debug = "false" *)
-    output reg                         o_wdata_req_size_par_out, // added kch 
+    output reg                         o_wdata_req_size_par_out, 
 
     // ----------------------------------------------------
     // data response interface (writes).  
@@ -92,10 +92,10 @@ module nvme_sntl_wdata#
     (* mark_debug = "false" *)
     input              [tag_width-1:0] i_wdata_rsp_tag_in,
     (* mark_debug = "false" *)
-    input                              i_wdata_rsp_tag_par_in, // added kch 
+    input                              i_wdata_rsp_tag_par_in,
     input           [beatid_width-1:0] i_wdata_rsp_beat_in,
     input             [data_width-1:0] i_wdata_rsp_data_in,
-    input      [data_fc_par_width-1:0] i_wdata_rsp_data_par_in, // added kch 
+    input      [data_fc_par_width-1:0] i_wdata_rsp_data_par_in,
     // ----------------------------------------------------
     // sislite write (DMA read to host)
     // ----------------------------------------------------
@@ -105,12 +105,12 @@ module nvme_sntl_wdata#
     (* mark_debug = "false" *)
     input              [tag_width-1:0] dma_wdata_req_tag, // afu req tag
     (* mark_debug = "false" *)
-    input                              dma_wdata_req_tag_par, // afu req tag par added kch 
+    input                              dma_wdata_req_tag_par, // afu req tag par
     (* mark_debug = "false" *)
     input          [datalen_width-1:0] dma_wdata_req_reloff, // offset from start address of this command
     (* mark_debug = "false" *)
     input         [wdatalen_width-1:0] dma_wdata_req_length, // number of bytes to request, max 4KB
-    input                              dma_wdata_req_length_par, // added kch 
+    input                              dma_wdata_req_length_par,
     (* mark_debug = "false" *)
     output reg                         wdata_dma_req_pause, // backpressure
   
@@ -124,12 +124,12 @@ module nvme_sntl_wdata#
     (* mark_debug = "false" *)
     output reg         [tag_width-1:0] wdata_dma_cpl_tag,
     (* mark_debug = "false" *)
-    output reg                         wdata_dma_cpl_tag_par, // added kch 
+    output reg                         wdata_dma_cpl_tag_par,
     (* mark_debug = "false" *)
     output reg     [datalen_width-1:0] wdata_dma_cpl_reloff, // starting offset in bytes of the first beat
     (* mark_debug = "false" *)
     output reg                   [9:0] wdata_dma_cpl_length, // number of bytes 128B max
-    output reg                 [129:0] wdata_dma_cpl_data, // payload data   // changed 127 to 129 kch 
+    output reg                 [129:0] wdata_dma_cpl_data, // payload data  
     (* mark_debug = "false" *)
     output reg                         wdata_dma_cpl_first, // header cycle for this packet - data not valid
     (* mark_debug = "false" *)
@@ -149,7 +149,7 @@ module nvme_sntl_wdata#
     input              [tag_width-1:0] wbuf_wdata_req_tag, //    afu req tag  
     input          [tag_par_width-1:0] wbuf_wdata_req_tag_par, //    
     input          [datalen_width-1:0] wbuf_wdata_req_reloff, // offset from start address of this command  
-    // input      [datalen_par_width-1:0] wbuf_wdata_req_reloff_par, // comment out for now kch   
+    // input      [datalen_par_width-1:0] wbuf_wdata_req_reloff_par, 
     input         [wdatalen_width-1:0] wbuf_wdata_req_length, // number of bytes to request, max 4096B
     input     [wdatalen_par_width-1:0] wbuf_wdata_req_length_par, // number of bytes to request, max 4096B
     input           [wbufid_width-1:0] wbuf_wdata_req_wbufid, // buffer id
@@ -238,11 +238,11 @@ module nvme_sntl_wdata#
         
         if( dma_wdata_req_valid )
           begin
-             req_fifo_wrdata = { zero[wbufid_width-1:0],  zero[wbufid_par_width-1:0], 1'b0, 2'b01, dma_wdata_req_tag, dma_wdata_req_tag_par, dma_wdata_req_reloff, dma_wdata_req_length, dma_wdata_req_length_par}; // added parity bits kch 
+             req_fifo_wrdata = { zero[wbufid_width-1:0],  zero[wbufid_par_width-1:0], 1'b0, 2'b01, dma_wdata_req_tag, dma_wdata_req_tag_par, dma_wdata_req_reloff, dma_wdata_req_length, dma_wdata_req_length_par};
           end
         else
           begin
-             req_fifo_wrdata = {  wbuf_wdata_req_wbufid, wbuf_wdata_req_wbufid_par, 2'b10, wbuf_wdata_req_tag, wbuf_wdata_req_tag_par, wbuf_wdata_req_reloff, wbuf_wdata_req_length, wbuf_wdata_req_length_par}; // added parity bits kch
+             req_fifo_wrdata = {  wbuf_wdata_req_wbufid, wbuf_wdata_req_wbufid_par, 2'b10, wbuf_wdata_req_tag, wbuf_wdata_req_tag_par, wbuf_wdata_req_reloff, wbuf_wdata_req_length, wbuf_wdata_req_length_par};
           end
         
         wdata_dma_req_pause = req_fifo_afull;
@@ -293,7 +293,7 @@ module nvme_sntl_wdata#
      begin
         o_wdata_req_v_out         = req_valid; 
         o_wdata_req_tag_out       = req_tag;
-        o_wdata_req_tag_par_out   = req_tag_par;  // added kch 
+        o_wdata_req_tag_par_out   = req_tag_par; 
         // convert reloff to beats.  reloff is bytes,  beats is data_width/8 bytes
         o_wdata_req_beat_out      = req_reloff[datalen_width-1:datalen_width-beatid_width];
         o_wdata_req_size_out      = {zero[datalen_width-1:wdatalen_width], req_length};
@@ -347,7 +347,7 @@ module nvme_sntl_wdata#
    reg                         s0_wdata_e;
    reg                         s0_wdata_error;
    reg         [tag_width-1:0] s0_wdata_tag;
-   reg                         s0_wdata_tag_par;  // added kch 
+   reg                         s0_wdata_tag_par;
    reg      [beatid_width-1:0] s0_wdata_beat;
    reg        [data_width-1:0] s0_wdata_data_in;   
    reg        [data_width-1:0] s0_wdata_data;   
@@ -397,7 +397,7 @@ module nvme_sntl_wdata#
      (.oddpar(1'b1),.data({s0_wdata_tag[tag_width-1:1],(s0_wdata_tag[0]^wdata_pe_inj_q)}),.datap(s0_wdata_tag_par),.check(s0_wdata_valid),.parerr(s1_perror)); 
 
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors 
    nvme_srlat#
      (.width(1))  iwbuf_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(wdata_perror_int));
@@ -502,7 +502,7 @@ module nvme_sntl_wdata#
    // ---------------------------------------------------------
 
    localparam framebuf_width=data_width;                       // width in bits
-   localparam framebuf_par_width=data_fc_par_width;                // added kch  
+   localparam framebuf_par_width=data_fc_par_width;            
    localparam framebuf_size=128;                               // bytes per buffer entry
    localparam framebuf_entries=16;                             // number of buffer entries
    localparam framebuf_beats=framebuf_size/(framebuf_width/8); // number of beats per entry
@@ -512,14 +512,14 @@ module nvme_sntl_wdata#
 
    localparam fb_memsize = framebuf_beats * framebuf_entries;
    localparam fb_addrsize = $clog2(fb_memsize);
-   reg [framebuf_par_width+framebuf_width-1:0] framebuf[0:fb_memsize-1];  // added parity bits 129:128 kch 
+   reg [framebuf_par_width+framebuf_width-1:0] framebuf[0:fb_memsize-1];
    reg [framebuf_par_width+framebuf_width-1:0] framebuf_wdata, framebuf_rdata;    
    reg                       [fb_addrsize-1:0] framebuf_waddr, framebuf_raddr;
    reg                                         framebuf_write;
    reg                                         framebuf_push;
    reg                                         framebuf_pop;
    
-   localparam framehdr_width = tag_width +1 + beatid_width + framebuf_awidth+1 + 1 + 1;  // added +1 to add parity kch 
+   localparam framehdr_width = tag_width +1 + beatid_width + framebuf_awidth+1 + 1 + 1; 
    reg                    [framehdr_width-1:0] framehdr[0:framebuf_entries-1];
    reg                    [framehdr_width-1:0] framehdr_wdata, framehdr_rdata;
    reg                       [fbptr_width-1:0] framehdr_waddr, framehdr_raddr;
@@ -577,7 +577,7 @@ module nvme_sntl_wdata#
              fb_offset_q       <= zero[framebuf_awidth:0];
             
              fb_hdr_tag_q      <= zero[tag_width-1:0];
-             fb_hdr_tag_par_q  <= 1'b0;   // added kch
+             fb_hdr_tag_par_q  <= 1'b0; 
              fb_hdr_beat_q     <= zero[beatid_width-1:0];
              fb_hdr_numbeats_q <= zero[framebuf_awidth:0];
              fb_hdr_error_q    <= 1'b0;            
@@ -595,7 +595,7 @@ module nvme_sntl_wdata#
              fb_offset_q       <= fb_offset_d;
              
              fb_hdr_tag_q      <= fb_hdr_tag_d;
-             fb_hdr_tag_par_q  <= fb_hdr_tag_par_d;   // added kch
+             fb_hdr_tag_par_q  <= fb_hdr_tag_par_d;
              fb_hdr_beat_q     <= fb_hdr_beat_d;
              fb_hdr_numbeats_q <= fb_hdr_numbeats_d;
              fb_hdr_error_q    <= fb_hdr_error_d;
@@ -685,7 +685,7 @@ module nvme_sntl_wdata#
        
         // header fifo controls
         fb_hdr_tag_d       = fb_hdr_tag_q;
-        fb_hdr_tag_par_d   = fb_hdr_tag_par_q;   // added kch
+        fb_hdr_tag_par_d   = fb_hdr_tag_par_q;  
         fb_hdr_beat_d      = fb_hdr_beat_q;      // beat at start of buffer
         fb_hdr_numbeats_d  = fb_hdr_numbeats_q;  // number of valid beats in this buffer
         fb_hdr_error_d     = fb_hdr_error_q;     // error indication from afu
@@ -701,7 +701,7 @@ module nvme_sntl_wdata#
             begin 
                // receive first beat of data for a new tag
                fb_hdr_tag_d       = wdata_dma_tag;
-               fb_hdr_tag_par_d   = wdata_dma_tag_par;   // added kch
+               fb_hdr_tag_par_d   = wdata_dma_tag_par; 
                fb_hdr_beat_d      = wdata_dma_beat;   
                fb_hdr_numbeats_d  = fb_offset_q;
                fb_hdr_error_d     = wdata_dma_error;
@@ -919,7 +919,7 @@ module nvme_sntl_wdata#
           end
 
         // header result from header buffer
-        { s1_hdr_tag, s1_hdr_tag_par, s1_hdr_beat, s1_hdr_numbeats, s1_hdr_error, s1_hdr_end } = framehdr_rdata;   // added s1_hdr_tag_par kch 
+        { s1_hdr_tag, s1_hdr_tag_par, s1_hdr_beat, s1_hdr_numbeats, s1_hdr_error, s1_hdr_end } = framehdr_rdata; 
         
         s1_offset_p1 = s1_offset_q + one[framebuf_awidth:0];
 
@@ -972,7 +972,7 @@ module nvme_sntl_wdata#
              s2_valid_d   = s1_valid_q;
              s2_raddr_d   = framebuf_raddr;
              s2_tag_d     = s1_hdr_tag;
-             s2_tag_par_d = s1_hdr_tag_par;   // added kch 
+             s2_tag_par_d = s1_hdr_tag_par;  
              s2_reloff_d  = {      s1_hdr_beat[beatid_width-1:0], zero[datalen_width-beatid_width-1:0] };  // convert beats to bytes
              s2_length_d  = { s1_hdr_numbeats[framebuf_awidth:0], zero[datalen_width-beatid_width-1:0] };  // convert beats to bytes
              s2_first_d   = s1_first_q;

@@ -25,7 +25,7 @@ module capi_jctrl#(parameter cred_width=1, ctxtid_width=16, parameter ctxt_add_a
    input 		     ha_jval, // A valid job control command is present
    input [0:7] 		     ha_jcom, // Job control command opcode
    input [0:63] 	     ha_jea,
-   input         	     ha_jeapar, // added kch
+   input         	     ha_jeapar,
    output 		     ah_jcack, //   lpc operation is done
    output 		     ah_jrunning, // Accelerator is running
    output 		     ah_jdone, // Accelerator is finished
@@ -63,7 +63,7 @@ module capi_jctrl#(parameter cred_width=1, ctxtid_width=16, parameter ctxt_add_a
    base_vlat_sr#(.width(1)) iperror_lat(.clk(clk),.reset(i_reset),.set(s1_perror),.rst(1'd0),.q(hld_perror));
    base_vlat#(.width(1)) iperror_olat(.clk(clk),.reset(i_reset),.din(| hld_perror),.q(o_perror));
    wire                      ll_ctxt_par;
-   wire [0:ctxtid_width-1] ll_ctxt = {ha_jea[64-ctxtid_width+1:63],ll_ctxt_par};  // added +1 to remove paity bit from the equation. size =10 bit ctxt size is 9 kch
+   wire [0:ctxtid_width-1] ll_ctxt = {ha_jea[64-ctxtid_width+1:63],ll_ctxt_par}; 
    wire [0:llcmdid_width-1] ll_cmd = ha_jea[0:llcmdid_width-1];
    capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) ijctrl_gen(.i_d(ll_ctxt[0:ctxtid_width-2]),.o_d(ll_ctxt_par));
   

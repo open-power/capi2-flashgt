@@ -20,7 +20,7 @@ module capi_dma_write_plus#
    parameter ctag_width=8, // capi tag
    parameter tag_width=3,  // dma engine tag
    parameter rc_width=1,
-   parameter beat_width=3,   // changed from 3 to 5
+   parameter beat_width=3, 
    parameter width_512=5,
    parameter ea_width = 64,
    parameter tstag_width=1,
@@ -69,8 +69,7 @@ module capi_dma_write_plus#
     input [0:7] 		  i_dwad,
 
     output [0:1023] 		  d0h_ddata,
-//    output [0:15] 		  ah_brpar,
-    output                        o_perror,      // added o_perror kch 
+    output                        o_perror,   
     output [0:((7*3)+4)*64-1]          o_latency_d,
     input                         i_reset_lat_cntrs
     );
@@ -92,8 +91,7 @@ module capi_dma_write_plus#
    base_vlat#(.width(1025)) iwdata_rsp_lat(.clk(clk),.reset(reset),.din({i_wdata_rsp_v,i_wdata_rsp_d}),.q({s0_wdata_rsp_v,s0_wdata_rsp_d})); 
 
    
-  // capi_parity_gen#(.width(pwidth)) ipgen(.i_d(s0_wdata_rsp_d),.o_d(data_par));   //comment out since parity already exists kch
-   base_vlat#(.width(1024)) idlat(.clk(clk),.reset(reset),.din(s0_wdata_rsp_d),.q(mem_wd)); //got rid of parity bits since they exist in  s0_wdata_rsp_d kch
+   base_vlat#(.width(1024)) idlat(.clk(clk),.reset(reset),.din(s0_wdata_rsp_d),.q(mem_wd)); 
 
    wire 	       s1_rsp_v = i_rsp_v;
    wire 	       s2_rsp_v;
@@ -389,16 +387,11 @@ module capi_dma_write_plus#
   assign o_latency_d = {tag_latency_d,port_latency_d,total_dma_writes0,total_dma_writes1,total_dma_writes2,total_dma_writes3};   
 
 
-//   wire [0:tsize_width-1] s1_size_sum = s1_size + s1_ea[ea_width-4-1:ea_width-1-1];  // added -1 and -1 to strip off parity should be bits 59:63 kch 
    wire [0:tsize_width-1] s1_size_sum = s1_size;  // address no longer in count calculation for p9psld
 
    localparam count_width = (tsize_width-4);
-//   localparam count_width = (tsize_width-4-3);
-//   wire [0:count_width-1] s1_cnt_raw = s1_size_sum[tsize_width-4-count_width:tsize_width-4-1];
-   wire [0:count_width-1-3] s1_cnt_raw = s1_size_sum[tsize_width-4-count_width:tsize_width-4-1-3];  // 128 bytes now transferred so take off 3 bits
-//   wire [0:count_width-1] s1_cnt = (|s1_size_sum[tsize_width-4:tsize_width-1]) ? s1_cnt_raw+1 : s1_cnt_raw;   // original 03/21/17 kch 
+   wire [0:count_width-1-3] s1_cnt_raw = s1_size_sum[tsize_width-4-count_width:tsize_width-4-1-3]; 
    wire [0:count_width-1] s1_cnt = (|s1_size_sum[tsize_width-4-3:tsize_width-1]) ? s1_cnt_raw+1 : s1_cnt_raw;       
-//   wire [0:count_width-1] s1_cnt =  s1_cnt_raw;  // see if this works. should not have to add 1 to count with flash_gt plus design
       
 
    
@@ -491,10 +484,6 @@ module capi_dma_write_plus#
    base_vlat#(.width(ltag_width+1+3+2-3)) ir2_lat(.clk(clk),.reset(reset),.q({r2_v,r2_ltag,r2_beat}),.din({r1b_v,r1_ltag,r1_beat}));
 
    wire [0:7] 		  r2_data_we;
-//   base_decode#(.enc_width(3),.dec_width(8)) idata_we_dec
-//     (.en(r2_v),.din(r2_beat[2:width_512-1]),.dout(r2_data_we));
-
-//   base_vlat#(.width(ltag_width+2+8)) ir3_lat(.clk(clk),.reset(reset),.q({data_we,data_wa}),.din({r2_data_we,r2_ltag,r2_beat[0:1]}));
    base_vlat#(.width(ltag_width+2+1)) ir3_lat(.clk(clk),.reset(reset),.q({data_we,data_wa}),.din({r2_v,r2_ltag,r2_beat[0:1]}));
 
    // when we have written the last beat of data, send request to capi   
@@ -518,7 +507,7 @@ module capi_dma_write_plus#
       );
 
 
-endmodule // capi_dma_put
+endmodule
 
 
 

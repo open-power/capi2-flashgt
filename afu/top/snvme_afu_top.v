@@ -20,9 +20,9 @@
 module snvme_afu_top#
   (
    parameter fc_tag_width    = 8,   // per port tag width
-   parameter tag_width       = 10,   // afu tag width changed 9 to 10 to add parity kch 
+   parameter tag_width       = 10, 
    parameter datalen_width   = 25,  // max 16M transfer
-   parameter data_width      = 128, // change fc width from 32 to 128 kch 01/04/16
+   parameter data_width      = 128, 
    parameter data_par_width  = (data_width + 63) / 64,
    parameter data_bytes      = data_width/8,
    parameter bytec_width     = $clog2(data_bytes+1),
@@ -113,21 +113,19 @@ module snvme_afu_top#
    input                   ha_jval, // A valid job control command is present
    input             [0:7] ha_jcom, // Job control command opcode
    input                   ha_jcompar,
-   input            [0:63] ha_jea, // Save/Restore address  added parity checking kch 
+   input            [0:63] ha_jea, // Save/Restore address 
    input                   ha_jeapar,
    output                  ah_jrunning, // Accelerator is running
    output                  ah_jdone, // Accelerator is finished
    output           [0:63] ah_jerror, // Accelerator error code. 0 = success
    output                  ah_tbreq, // timebase request (not used)
-//   output                  ah_jyield, // Accelerator wants to stop
 
    // Accelerator Command Interface
    output                  ah_cvalid, // A valid command is present
-   output            [0:7] ah_ctag, // request id  no parity for now kch not much coverage 
+   output            [0:7] ah_ctag, // request id 
    output                  ah_ctagpar,
-   output           [0:12] ah_com, // command PSL will execute    no parity for now will revisit todo kch 
+   output           [0:12] ah_com, // command PSL will execute  
    output                  ah_compar,
-//   output            [0:2] ah_cpad, // prefetch inattributes
    output            [0:2] ah_cabt, // abort if translation intr is generated
    output           [0:63] ah_cea, // Effective byte address for command     
    output                  ah_ceapar,
@@ -162,9 +160,9 @@ module snvme_afu_top#
 
    //x PSL Response Interface
    input                   ha_rvalid, // A response is present
-   input             [0:7] ha_rtag, // Accelerator generated request ID  not implementing parity yet kch 
+   input             [0:7] ha_rtag, // Accelerator generated request ID 
    input                   ha_rtagpar, 
-   input             [0:8] ha_rditag, // Accelerator generated request ID  not implementing parity yet kch 
+   input             [0:8] ha_rditag, // Accelerator generated request ID 
    input                   ha_rditagpar, 
    input             [0:7] ha_response, // response code
    input             [0:8] ha_rcredits, // twos compliment number of credits
@@ -207,7 +205,7 @@ module snvme_afu_top#
    wire [     lunid_width-1:0] fc0_req_lun;
    wire [ lunid_par_width-1:0] fc0_req_lun_par;
    wire [               127:0] fc0_req_cdb;
-   wire [                 1:0] fc0_req_cdb_par;    // added kch 
+   wire [                 1:0] fc0_req_cdb_par;
    wire [   datalen_width-1:0] fc0_req_length;
    
    wire                        fc0_wdata_req_v;
@@ -216,14 +214,14 @@ module snvme_afu_top#
    wire [fc_tag_par_width-1:0] fc0_wdata_req_tag_par;   
    wire [    beatid_width-1:0] fc0_wdata_req_beat;
    wire [   datalen_width-1:0] fc0_wdata_req_size;
-   wire                        fc0_wdata_req_size_par; // added kch 
+   wire                        fc0_wdata_req_size_par;
    
    wire                        fc0_wdata_rsp_v;
    wire                        fc0_wdata_rsp_r;
    wire                        fc0_wdata_rsp_e;
    wire                        fc0_wdata_rsp_error;
    wire [    fc_tag_width-1:0] fc0_wdata_rsp_tag;
-   wire [    fc_tag_par_width-1:0] fc0_wdata_rsp_tag_par;   // added kch need to add input in svme kch 
+   wire [    fc_tag_par_width-1:0] fc0_wdata_rsp_tag_par;  
    wire [    beatid_width-1:0] fc0_wdata_rsp_beat;
    wire [      data_width-1:0] fc0_wdata_rsp_data;
    wire [  data_par_width-1:0] fc0_wdata_rsp_data_par;
@@ -238,8 +236,7 @@ module snvme_afu_top#
    wire [    fc_tag_par_width-1:0] fc0_rdata_rsp_tag_par;
    wire [      data_width-1:0] fc0_rdata_rsp_data;
    wire [  data_par_width-1:0] fc0_rdata_rsp_data_par;
-  //  wire [  data_par_width-1:0] fc0_rdata_rsp_data_par_kch;
-   
+ 
    wire                        fc0_rsp_v;
    wire [    fc_tag_width-1:0] fc0_rsp_tag;
    wire [fc_tag_par_width-1:0] fc0_rsp_tag_par;
@@ -277,7 +274,7 @@ module snvme_afu_top#
    wire [     lunid_width-1:0] fc1_req_lun;
    wire [ lunid_par_width-1:0] fc1_req_lun_par;
    wire [               127:0] fc1_req_cdb;
-   wire [                 1:0] fc1_req_cdb_par;    // added kch 
+   wire [                 1:0] fc1_req_cdb_par; 
    wire [   datalen_width-1:0] fc1_req_length;
    
    wire                        fc1_wdata_req_v;
@@ -293,7 +290,7 @@ module snvme_afu_top#
    wire                        fc1_wdata_rsp_e;
    wire                        fc1_wdata_rsp_error;
    wire [    fc_tag_width-1:0] fc1_wdata_rsp_tag;
-    wire [    fc_tag_par_width-1:0] fc1_wdata_rsp_tag_par;   // added kch need to add input in svme kch 
+    wire [    fc_tag_par_width-1:0] fc1_wdata_rsp_tag_par;
   wire [    beatid_width-1:0] fc1_wdata_rsp_beat;
    wire [      data_width-1:0] fc1_wdata_rsp_data;
    wire [  data_par_width-1:0] fc1_wdata_rsp_data_par;
@@ -308,7 +305,6 @@ module snvme_afu_top#
    wire [    fc_tag_par_width-1:0] fc1_rdata_rsp_tag_par;
    wire [      data_width-1:0] fc1_rdata_rsp_data;
    wire [  data_par_width-1:0] fc1_rdata_rsp_data_par;
-// wire [  data_par_width-1:0] fc1_rdata_rsp_data_par_kch;
   
    wire                        fc1_rsp_v;
    wire [    fc_tag_width-1:0] fc1_rsp_tag;
@@ -347,7 +343,7 @@ module snvme_afu_top#
    wire [     lunid_width-1:0] fc2_req_lun;
    wire [ lunid_par_width-1:0] fc2_req_lun_par;
    wire [               127:0] fc2_req_cdb;
-   wire [                 1:0] fc2_req_cdb_par;    // added kch 
+   wire [                 1:0] fc2_req_cdb_par;  
    wire [   datalen_width-1:0] fc2_req_length;
    wire                        fc2_wdata_req_v;
    wire                        fc2_wdata_req_r;
@@ -355,13 +351,13 @@ module snvme_afu_top#
    wire [fc_tag_par_width-1:0] fc2_wdata_req_tag_par;   
    wire [    beatid_width-1:0] fc2_wdata_req_beat;
    wire [   datalen_width-1:0] fc2_wdata_req_size;
-   wire                        fc2_wdata_req_size_par; // added kch 
+   wire                        fc2_wdata_req_size_par;
    wire                        fc2_wdata_rsp_v;
    wire                        fc2_wdata_rsp_r;
    wire                        fc2_wdata_rsp_e;
    wire                        fc2_wdata_rsp_error;
    wire [    fc_tag_width-1:0] fc2_wdata_rsp_tag;
-   wire [    fc_tag_par_width-1:0] fc2_wdata_rsp_tag_par;   // added kch need to add input in svme kch 
+   wire [    fc_tag_par_width-1:0] fc2_wdata_rsp_tag_par; 
    wire [    beatid_width-1:0] fc2_wdata_rsp_beat;
    wire [      data_width-1:0] fc2_wdata_rsp_data;
    wire [  data_par_width-1:0] fc2_wdata_rsp_data_par;
@@ -374,7 +370,6 @@ module snvme_afu_top#
    wire [    fc_tag_par_width-1:0] fc2_rdata_rsp_tag_par;
    wire [      data_width-1:0] fc2_rdata_rsp_data;
    wire [  data_par_width-1:0] fc2_rdata_rsp_data_par;
-  //  wire [  data_par_width-1:0] fc2_rdata_rsp_data_par_kch;
    wire                        fc2_rsp_v;
    wire [    fc_tag_width-1:0] fc2_rsp_tag;
    wire [fc_tag_par_width-1:0] fc2_rsp_tag_par;
@@ -410,7 +405,7 @@ module snvme_afu_top#
    wire [     lunid_width-1:0] fc3_req_lun;
    wire [ lunid_par_width-1:0] fc3_req_lun_par;
    wire [               127:0] fc3_req_cdb;
-   wire [                 1:0] fc3_req_cdb_par;    // added kch 
+   wire [                 1:0] fc3_req_cdb_par; 
    wire [   datalen_width-1:0] fc3_req_length;
    wire                        fc3_wdata_req_v;
    wire                        fc3_wdata_req_r;
@@ -424,7 +419,7 @@ module snvme_afu_top#
    wire                        fc3_wdata_rsp_e;
    wire                        fc3_wdata_rsp_error;
    wire [    fc_tag_width-1:0] fc3_wdata_rsp_tag;
-    wire [    fc_tag_par_width-1:0] fc3_wdata_rsp_tag_par;   // added kch need to add input in svme kch 
+    wire [    fc_tag_par_width-1:0] fc3_wdata_rsp_tag_par; 
   wire [    beatid_width-1:0] fc3_wdata_rsp_beat;
    wire [      data_width-1:0] fc3_wdata_rsp_data;
    wire [  data_par_width-1:0] fc3_wdata_rsp_data_par;
@@ -437,7 +432,6 @@ module snvme_afu_top#
    wire [    fc_tag_par_width-1:0] fc3_rdata_rsp_tag_par;
    wire [      data_width-1:0] fc3_rdata_rsp_data;
    wire [  data_par_width-1:0] fc3_rdata_rsp_data_par;
-// wire [  data_par_width-1:0] fc3_rdata_rsp_data_par_kch;
    wire                        fc3_rsp_v;
    wire [    fc_tag_width-1:0] fc3_rsp_tag;
    wire [fc_tag_par_width-1:0] fc3_rsp_tag_par;
@@ -535,7 +529,6 @@ module snvme_afu_top#
       .i_fc0_req_lun_par_in(fc0_req_lun_par),
       .i_fc0_req_cdb_in(fc0_req_cdb),
       .i_fc0_req_cdb_par_in(fc0_req_cdb_par),
-//      .i_fc0_req_cdb_in(fc0_req_cdb),    //fixit  nnedd to add and connect????
       .i_fc0_req_length_in(fc0_req_length),
       .i_fc0_req_length_par_in(fc0_req_length_par),
 
@@ -672,7 +665,6 @@ module snvme_afu_top#
       .i_fc2_req_lun_par_in(fc2_req_lun_par),
       .i_fc2_req_cdb_in(fc2_req_cdb),
       .i_fc2_req_cdb_par_in(fc2_req_cdb_par),
-//      .i_fc2_req_cdb_in(fc2_req_cdb),    //fixit  nnedd to add and connect????
       .i_fc2_req_length_in(fc2_req_length),
       .i_fc2_req_length_par_in(fc2_req_length_par),
       .o_fc2_wdata_req_v_out(fc2_wdata_req_v),
@@ -859,9 +851,9 @@ module snvme_afu_top#
       .o_fc_req_lun({fc0_req_lun,fc1_req_lun,fc2_req_lun,fc3_req_lun}),                                   
       .o_fc_req_lun_par({fc0_req_lun_par,fc1_req_lun_par,fc2_req_lun_par,fc3_req_lun_par}),               
       .o_fc_req_cdb({fc0_req_cdb,fc1_req_cdb,fc2_req_cdb,fc3_req_cdb}),                                   
-      .o_fc_req_cdb_par({fc0_req_cdb_par,fc1_req_cdb_par,fc2_req_cdb_par,fc3_req_cdb_par}),   //          
+      .o_fc_req_cdb_par({fc0_req_cdb_par,fc1_req_cdb_par,fc2_req_cdb_par,fc3_req_cdb_par}),    
       .o_fc_req_length({fc0_req_length,fc1_req_length,fc2_req_length,fc3_req_length}),                    
-      .o_fc_req_length_par({fc0_req_length_par,fc1_req_length_par,fc2_req_length_par,fc3_req_length_par}),  // added _par kch 
+      .o_fc_req_length_par({fc0_req_length_par,fc1_req_length_par,fc2_req_length_par,fc3_req_length_par}),  
       .i_fc_wdata_req_v({fc0_wdata_req_v,fc1_wdata_req_v,fc2_wdata_req_v,fc3_wdata_req_v}),                                   
       .i_fc_wdata_req_r({fc0_wdata_req_r,fc1_wdata_req_r,fc2_wdata_req_r,fc3_wdata_req_r}),                                   
       .i_fc_wdata_req_tag({fc0_wdata_req_tag,fc1_wdata_req_tag,fc2_wdata_req_tag,fc3_wdata_req_tag}),                         
@@ -874,7 +866,7 @@ module snvme_afu_top#
       .o_fc_wdata_rsp_e({fc0_wdata_rsp_e,fc1_wdata_rsp_e,fc2_wdata_rsp_e,fc3_wdata_rsp_e}),
       .o_fc_wdata_rsp_error({fc0_wdata_rsp_error,fc1_wdata_rsp_error,fc2_wdata_rsp_error,fc3_wdata_rsp_error}),
       .o_fc_wdata_rsp_tag({fc0_wdata_rsp_tag,fc1_wdata_rsp_tag,fc2_wdata_rsp_tag,fc3_wdata_rsp_tag}),
-      .o_fc_wdata_rsp_tag_par({fc0_wdata_rsp_tag_par,fc1_wdata_rsp_tag_par,fc2_wdata_rsp_tag_par,fc3_wdata_rsp_tag_par}),    // added kch
+      .o_fc_wdata_rsp_tag_par({fc0_wdata_rsp_tag_par,fc1_wdata_rsp_tag_par,fc2_wdata_rsp_tag_par,fc3_wdata_rsp_tag_par}), 
       .o_fc_wdata_rsp_beat({fc0_wdata_rsp_beat,fc1_wdata_rsp_beat,fc2_wdata_rsp_beat,fc3_wdata_rsp_beat}),
       .o_fc_wdata_rsp_data({fc0_wdata_rsp_data,fc1_wdata_rsp_data,fc2_wdata_rsp_data,fc3_wdata_rsp_data}),
       .o_fc_wdata_rsp_data_par({fc0_wdata_rsp_data_par,fc1_wdata_rsp_data_par,fc2_wdata_rsp_data_par,fc3_wdata_rsp_data_par}),
@@ -889,7 +881,7 @@ module snvme_afu_top#
       .i_fc_rdata_rsp_data_par({fc0_rdata_rsp_data_par,fc1_rdata_rsp_data_par,fc2_rdata_rsp_data_par,fc3_rdata_rsp_data_par}),
       .i_fc_rsp_v({fc0_rsp_v,fc1_rsp_v,fc2_rsp_v,fc3_rsp_v}),
       .i_fc_rsp_tag({fc0_rsp_tag,fc1_rsp_tag,fc2_rsp_tag,fc3_rsp_tag}),
-      .i_fc_rsp_tag_par({fc0_rsp_tag_par,fc1_rsp_tag_par,fc2_rsp_tag_par,fc3_rsp_tag_par}),   // added kch need input generator
+      .i_fc_rsp_tag_par({fc0_rsp_tag_par,fc1_rsp_tag_par,fc2_rsp_tag_par,fc3_rsp_tag_par}), 
       .i_fc_rsp_fc_status({fc0_rsp_fc_status,fc1_rsp_fc_status,fc2_rsp_fc_status,fc3_rsp_fc_status}),
       .i_fc_rsp_fcx_status({fc0_rsp_fcx_status,fc1_rsp_fcx_status,fc2_rsp_fcx_status,fc3_rsp_fcx_status}),
       .i_fc_rsp_scsi_status({fc0_rsp_scsi_status,fc1_rsp_scsi_status,fc2_rsp_scsi_status,fc3_rsp_scsi_status}),
@@ -900,7 +892,6 @@ module snvme_afu_top#
       .i_fc_rsp_overrun({fc0_rsp_overrun,fc1_rsp_overrun,fc2_rsp_overrun,fc3_rsp_overrun}),
       .i_fc_rsp_resid({fc0_rsp_resid,fc1_rsp_resid,fc2_rsp_resid,fc3_rsp_resid}),
       .i_fc_rsp_rdata_beats({fc0_rsp_rdata_beats,fc1_rsp_rdata_beats,fc2_rsp_rdata_beats,fc3_rsp_rdata_beats}),
-//      .i_fc_status_event({fc0_status_event,fc1_status_event,fc2_status_event,fc3_status_event}),  // orig kch 
       .i_fc_status_event({fc2_status_event,fc3_status_event,fc0_status_event,fc1_status_event}),  // swap event bytes per spec bye 2,3,0,1
       .i_fc_port_ready({fc0_port_ready,fc1_port_ready,fc2_port_ready,fc3_port_ready}),
       .i_fc_port_fatal_error({fc0_port_fatal_error,fc1_port_fatal_error,fc2_port_fatal_error,fc3_port_fatal_error}),
@@ -999,7 +990,6 @@ module snvme_afu_top#
 
   
    // suspend clock
-   // todo: 32.678kHz clock for low power mode
    wire pci_exp0_susclk_out;
    assign pci_exp0_susclk_out = 1'b0;
    OBUF pci0_susclk_buf (
@@ -1035,7 +1025,6 @@ module snvme_afu_top#
 
   
    // suspend clock
-   // todo: 32.678kHz clock for low power mode
    wire pci_exp1_susclk_out;
    assign pci_exp1_susclk_out = 1'b0;
    OBUF pci1_susclk_buf (
@@ -1069,7 +1058,6 @@ module snvme_afu_top#
       );
 
    // suspend clock
-   // todo: 32.678kHz clock for low power mode
    wire pci_exp2_susclk_out;
    assign pci_exp2_susclk_out = 1'b0;
    OBUF pci2_susclk_buf (
@@ -1105,7 +1093,6 @@ module snvme_afu_top#
 
   
    // suspend clock
-   // todo: 32.678kHz clock for low power mode
    wire pci_exp3_susclk_out;
    assign pci_exp3_susclk_out = 1'b0;
    OBUF pci3_susclk_buf (

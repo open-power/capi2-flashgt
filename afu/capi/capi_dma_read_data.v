@@ -16,7 +16,7 @@
 // *! limitations under the License.
 // *!***************************************************************************
  module capi_dma_read_data#
-   (parameter ea_width = 65, // changed 64 to 65 to add parity kch 
+   (parameter ea_width = 65,
     parameter ctxtid_width = 16,
     parameter tstag_width = 1,
     parameter tsize_width=12, // transaction size field
@@ -38,7 +38,6 @@
     input 			  clk,
     input 			  reset,
 
-//      .i_v(r1a_v[1]),.i_r(r1a_r[1]),  .i_d({r1_rc,r1_ltag,r1_tag,r1_size,r1_bt,r1_sid,r1_tstag}),
   
     input  [0:1] i_v,
     output [0:1] i_r,
@@ -59,7 +58,7 @@
     
     output 			  o_rdata_v,
     output [0:wdata_addr_width-1] o_rdata_a,
-    output [0:129] 		  o_rdata_d,   //  kch changed 127 to 129
+    output [0:129] 		  o_rdata_d, 
     output [0:7]                  o_data_ra,
     output                        o_free_tag_v,
     output [0:5]                  o_free_ltag
@@ -100,7 +99,6 @@
    wire [0:5]              r3_ltag;
    localparam count_width = (tsize_width-4);
 
-// new logic for performance
 
    wire             r2_rd_data_rdy;
    wire             r3_ra_v;
@@ -120,7 +118,6 @@
    (.clk(clk),.reset(reset),.enable(r2_v & r2_wait_r),.din({r2_rc,r2_ltag,r2_tag,r2_size,r2_bt_plus,r2_sid,r2_tstag}),.q({r2_rc_hld,r2_ltag_hld,r2_tag_hld,r2_size_hld,r2_bt_plus_hld,r2_sid_hld,r2_tstag_hld}));
    wire r2_data_valid = r2_rd_data_rdy & i_sync & ~r3_e;
    assign r2_wait_r = (r2_r & ~ r2_rd_data_rdy) | r3_e;
-//   wire r2_wait_v = r2_v & ~ r2_rd_data_rdy & ~r3_e;
    wire r2_wait_v =  r2_rd_data_rdy & i_sync & ~r3_e;
 
    capi_read_unroll_cnt#(.dwidth(rc_width+6+tag_width+sid_width+tstag_width),.iwidth(beat_512_width),.cwidth(count_width))iunrl
@@ -156,7 +153,6 @@
    wire [0:1023]               s1_data_rd;
    
 
-//   base_vlat#(.width(beat_512_width-2)) ir5_blat(.clk(clk),.reset(reset),.din(r4_bt[2:beat_512_width-1]),.q(r4_beat));
    base_vlat#(.width(beat_512_width)) is1r3_lat(.clk(clk),.reset(reset),.din(r3_bt),.q(s1_r3_bt));
    base_vlat#(.width(beat_512_width-2)) is2r3_beat(.clk(clk),.reset(reset),.din(s1_r3_bt[2:beat_512_width-1]),.q(s2_r3_beat));
    base_vlat#(.width(tag_width)) is1r3_tag(.clk(clk),.reset(reset),.din(r3_tag),.q(s1_r3_tag));
@@ -164,9 +160,9 @@
    base_vlat#(.width(2)) is1r3_2_vr(.clk(clk),.reset(reset),.din({s1_r3_v,s1_r3_r}),.q({s2_r3_v,s2_r3_r}));
    base_vlat#(.width(1)) idatard(.clk(clk),.reset(reset),.din(r3_ra_v),.q(rd_data_port_v));
    base_vlat_en#(.width(1024)) is1_dat(.clk(clk), .reset(1'b0), .enable(rd_data_port_v), .din(i_d), .q(s1_data_rd));  
-   base_emux#(.width(128),.ways(8)) idmux(.din(s1_data_rd),.sel(s2_r3_beat),.dout(o_rdata_d[0:127]));  // changed from 128 to 130 to add parity kch 
+   base_emux#(.width(128),.ways(8)) idmux(.din(s1_data_rd),.sel(s2_r3_beat),.dout(o_rdata_d[0:127])); 
 
-   capi_parity_gen#(.dwidth(64),.width(1)) o_rdata_d_pgen0(.i_d(o_rdata_d[0:63]),.o_d(o_rdata_d[128]));     // gen parity for byte alligned data kch
+   capi_parity_gen#(.dwidth(64),.width(1)) o_rdata_d_pgen0(.i_d(o_rdata_d[0:63]),.o_d(o_rdata_d[128]));    
    capi_parity_gen#(.dwidth(64),.width(1)) o_rdata_d_pgen1(.i_d(o_rdata_d[64:127]),.o_d(o_rdata_d[129]));
 
 

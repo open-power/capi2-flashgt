@@ -15,20 +15,6 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
 
 
 module ktms_afu_gbl_reg#
@@ -81,7 +67,7 @@ module ktms_afu_gbl_reg#
    localparam [0:63] reg8_rstv = 64'h0000_0000_005C_0000; // rrin read timeout in us
    localparam [0:63] reg9_rstv = 64'h0000_0000_0000_0000; // rrin read timeout in us  
    localparam [0:63] reg10_rstv = 64'h0000_0000_0000_0000; // fc perror init values
-   localparam [0:63] reg11_rstv = 64'h0000_0000_0000_0001; // mask false errors until fixed
+   localparam [0:63] reg11_rstv = 64'h0000_0000_0000_0001; // mask false error
    
    // logic to clear afu control register if the departing context matches the global interrupt context and msi=0
    wire [0:ctxtid_width-1] 	s1_ctxtupd_d;
@@ -109,13 +95,13 @@ module ktms_afu_gbl_reg#
    wire 		       gbl_rnw;  // read not write
    wire 		       gbl_vld;  // valid 
    wire 		       gbl_dw;   // double word
-   wire [0:64] 		       gbl_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       gbl_data; 
    wire [0:24]  	       gbl_addr;
    wire [0:1+1+1+1+24+64-1]      gbl_mmiobus;
-   assign {gbl_vld,gbl_cfg,gbl_rnw,gbl_dw,gbl_addr,gbl_data} = i_mmiobus; // omit any extra data bits
-   assign gbl_mmiobus = {gbl_vld,gbl_cfg,gbl_rnw,gbl_dw,gbl_addr[0:23],gbl_data[0:63]};  // created to strip of parity 
+   assign {gbl_vld,gbl_cfg,gbl_rnw,gbl_dw,gbl_addr,gbl_data} = i_mmiobus; 
+   assign gbl_mmiobus = {gbl_vld,gbl_cfg,gbl_rnw,gbl_dw,gbl_addr[0:23],gbl_data[0:63]}; 
 
-   ktms_mmwr_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmio_addr),.lcladdr_width(lcladdr_width+1)) immwr_dec  //added -2 stripped off parity
+   ktms_mmwr_dec#(.mmiobus_width(mmiobus_width-2),.addr(mmio_addr),.lcladdr_width(lcladdr_width+1)) immwr_dec 
      (.clk(clk),.reset(reset),
       .i_mmiobus(gbl_mmiobus),
       .o_wr_r(s1_wr_r), .o_wr_v(s1_wr_v),.o_wr_addr(s1_wr_addr),.o_wr_d(s1_wr_d)

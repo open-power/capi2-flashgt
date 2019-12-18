@@ -107,14 +107,14 @@ architecture psl_i2cacc of psl_i2cacc is
           din   : in std_logic_vector(0 to width-1));
   End Component psl_rise_vdff;
 
-function gate_and (gate : std_logic; din : std_logic_vector) return std_logic_vector is
-begin
-  if (gate = '1') then
-    return din;
-  else
-    return (0 to din'length-1 => '0');
-  end if;
-end gate_and;
+  function gate_and (gate : std_logic; din : std_logic_vector) return std_logic_vector is
+  begin
+    if (gate = '1') then
+      return din;
+    else
+      return (0 to din'length-1 => '0');
+    end if;
+  end gate_and;
 
   Signal status_psl_i2cacc_bytecnt: std_logic_vector(0 to 7);  -- v8bit
   Signal status_psl_i2cacc_rdata: std_logic_vector(0 to 7);  -- v8bit
@@ -170,7 +170,7 @@ end gate_and;
 
 begin 
   
-endff_i2cacc_data_q: psl_en_rise_vdff GENERIC MAP ( width => 64 ) PORT MAP (
+  endff_i2cacc_data_q: psl_en_rise_vdff GENERIC MAP ( width => 64 ) PORT MAP (
     dout => i2cacc_data_q,
     en => i2cacc_wren,
     din => i2cacc_data,

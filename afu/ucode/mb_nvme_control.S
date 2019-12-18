@@ -738,7 +738,7 @@ nvme_init_1:
         or r22, r0, r3
         MMIORD4I(NVME_REG_CAP+4)
         or r23, r0, r3
-        /* todo: check some capabilities:
+        /* should check some capabilities here:
          *  CAP.MPSMAX = memory page size max -> CC.MPS must be <= CAP.MPSMAX 
          *  CAP.MPSMIN = memory page size min
          *  CAP.DSTRD = doorbell stride -> use this to determine doorbell addresses
@@ -821,7 +821,7 @@ nvme_init_rdy:
         bslli r7, r7, 8
         swi   r7, r11, REGS_NVME_FW_STATUS        
         
-        /* todo: BMP - use data returned by identify to check for expected settings */
+        /* BMP - should check data returned by identify cmd here */
         UCODE_STATUS(0x0A)
 
 
@@ -841,8 +841,8 @@ nvme_init_rdy:
         bnei r3, nvme_init_fail
         UCODE_STATUS(0x0B)
         
-        /* todo: for multiple namespaces, loop through list and fill in the table */
-        /* for now, just grab the first namespace */
+        /* for multiple namespace support, loop through list and fill in the table */
+        /* only 1 namespace currently supported so for now so grab the first namespace */
         lwi r7, r11, SNTL_ADQ_BUFFER
 
         #ifdef SIM
@@ -866,12 +866,12 @@ nvme_init_nsid_table:
         
         brlid r15, sntl_get_ns_blocksize  /* reads SNTL_ADQ_BUFFER, returns r12=LBADS {r6,r5} = number of 4K blocks */
         nop
-        swi r12, r11, SNTL_BLKSZ_TABLE /* todo: for multiple namespaces, loop through list and fill in the table */
+        swi r12, r11, SNTL_BLKSZ_TABLE /* for multiple namespace support, loop through list and fill in the table */
         swi r0, r11, SNTL_BLKSZ_TABLE+4 /* bit 0 of 2nd word = ACA status */
         swi r5, r11, SNTL_NSZE_TABLE
         swi r6, r11, SNTL_NSZE_TABLE+4
 
-        /* todo: BMP - use data returned by identify to check for expected settings */
+        /* BMP - should check data returned by identify cmd here */
         
         /* copy 8B EUI to TGT_PNAME reg */
         lwi r9, r11, SNTL_ADQ_BUFFER | 120  /* big endian - MSB */
@@ -1944,7 +1944,7 @@ mode_page_08:
 mode_page_0A:
         /* Control mode page - SPC-4 7.5.7 & SNTL 6.3.3.3 */
         .byte 0x0A, 0x0A  /* page code/length */
-        .byte 0b00001110  /* TST=000 TMF_ONLY=0 DPICZ=1 D_SENSE=1 GLTSD=1 RLEC=0 todo: check DPICZ value */
+        .byte 0b00001110  /* TST=000 TMF_ONLY=0 DPICZ=1 D_SENSE=1 GLTSD=1 RLEC=0 (should check DPICZ value?) */
         .byte 0b00010010  /* QUEUE ALGO MODIFIER=0b0001 NUAR=0 (reservations not supported) QERR=0b01 */
         .byte 0b00000000  /* VS RAC=0 UA_INTLCK_CTRL=0b00 SWP=0 */
         .byte 0b11000000  /* ATO=1 TAS=1 ATMPE=0 RWWP=0 revs AUTOLOAD MODE=000 */

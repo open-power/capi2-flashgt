@@ -22,7 +22,7 @@
 //  File : nvme_sntl_wbuf.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer payload write buffer
+//  Description : FlashGT+ - SCSI to NVMe Layer payload write buffer
 //                
 //  *************************************************************************
 
@@ -67,10 +67,10 @@ module nvme_sntl_wbuf#
     //-------------------------------------------------------
     input                                  cmd_wbuf_req_valid,
     input                  [cid_width-1:0] cmd_wbuf_req_cid,
-    input              [cid_par_width-1:0] cmd_wbuf_req_cid_par, // added kch 
+    input              [cid_par_width-1:0] cmd_wbuf_req_cid_par, 
     input              [datalen_width-1:0] cmd_wbuf_req_reloff, // offset from start address of this command  
     input               [wbufid_width-1:0] cmd_wbuf_req_wbufid,
-    input           [wbufid_par_width-1:0] cmd_wbuf_req_wbufid_par, // added kch 
+    input           [wbufid_par_width-1:0] cmd_wbuf_req_wbufid_par,
     input                           [63:0] cmd_wbuf_req_lba,
     input                           [15:0] cmd_wbuf_req_numblks,
     input                                  cmd_wbuf_req_unmap,
@@ -81,9 +81,9 @@ module nvme_sntl_wbuf#
     //-------------------------------------------------------
     output reg                             wbuf_cmd_status_valid, // asserted when data transfer for a cid/wbufid is complete
     output reg          [wbufid_width-1:0] wbuf_cmd_status_wbufid,
-    output reg      [wbufid_par_width-1:0] wbuf_cmd_status_wbufid_par, // added kch 
+    output reg      [wbufid_par_width-1:0] wbuf_cmd_status_wbufid_par,
     output reg             [cid_width-1:0] wbuf_cmd_status_cid,
-    output reg         [cid_par_width-1:0] wbuf_cmd_status_cid_par, // added kch 
+    output reg         [cid_par_width-1:0] wbuf_cmd_status_cid_par,
     output reg                             wbuf_cmd_status_error, // 0 = data is in the buffer  1 = error, data is not valid
     input                                  cmd_wbuf_status_ready,
 
@@ -115,12 +115,12 @@ module nvme_sntl_wbuf#
     // ----------------------------------------------------   
     output reg                             wbuf_wdata_req_valid, 
     output reg             [tag_width-1:0] wbuf_wdata_req_tag, //    afu req tag  
-    output reg         [tag_par_width-1:0] wbuf_wdata_req_tag_par, //    added kch  
+    output reg         [tag_par_width-1:0] wbuf_wdata_req_tag_par,
     output reg         [datalen_width-1:0] wbuf_wdata_req_reloff, // offset from start address of this command  
     output reg        [wdatalen_width-1:0] wbuf_wdata_req_length, // number of bytes to request, max 4096B
-    output reg    [wdatalen_par_width-1:0] wbuf_wdata_req_length_par, //added kch 
+    output reg    [wdatalen_par_width-1:0] wbuf_wdata_req_length_par,
     output reg          [wbufid_width-1:0] wbuf_wdata_req_wbufid, // buffer id
-    output reg      [wbufid_par_width-1:0] wbuf_wdata_req_wbufid_par, // added kch 
+    output reg      [wbufid_par_width-1:0] wbuf_wdata_req_wbufid_par, 
     input                                  wdata_wbuf_req_ready, 
    
     // ----------------------------------------------------
@@ -130,12 +130,12 @@ module nvme_sntl_wbuf#
     input                                  wdata_wbuf_rsp_end,
     input                                  wdata_wbuf_rsp_error,
     input                  [tag_width-1:0] wdata_wbuf_rsp_tag,
-    input              [tag_par_width-1:0] wdata_wbuf_rsp_tag_par, // added kch 
+    input              [tag_par_width-1:0] wdata_wbuf_rsp_tag_par, 
     input               [wbufid_width-1:0] wdata_wbuf_rsp_wbufid,
-    input           [wbufid_par_width-1:0] wdata_wbuf_rsp_wbufid_par, // added kch 
+    input           [wbufid_par_width-1:0] wdata_wbuf_rsp_wbufid_par,
     input               [beatid_width-1:0] wdata_wbuf_rsp_beat,
     input                 [data_width-1:0] wdata_wbuf_rsp_data,
-    input          [data_fc_par_width-1:0] wdata_wbuf_rsp_data_par, // added kch 
+    input          [data_fc_par_width-1:0] wdata_wbuf_rsp_data_par,
     output reg                             wbuf_wdata_rsp_ready,
    
 
@@ -184,7 +184,7 @@ module nvme_sntl_wbuf#
    wire                              [1:0] s1_perror;
    wire                              [2:0] wbuf_perror_int;
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors
    nvme_srlat#
      (.width(2))  iwbuf_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(wbuf_perror_int[2:1]));
@@ -251,7 +251,7 @@ module nvme_sntl_wbuf#
         else
           begin             
              wbufid_init_q       <= wbufid_init_d;
-             wbufid_init_par_q   <= wbufid_init_par_d;  // added kch 
+             wbufid_init_par_q   <= wbufid_init_par_d;
              wbufid_init_done_q  <= wbufid_init_done_d;
              idfree_v_q          <= idfree_v_d;
              idfree_wbufid_q     <= idfree_wbufid_d;
@@ -555,15 +555,6 @@ module nvme_sntl_wbuf#
      end  
 
    wire    [1:0]    xxq_perror_inj = wbuf_pe_inj_q[3:2];
-   //   nvme_pcheck#
-   //   (
-   //    .bits_per_parity_bit(8),
-   //    .width(wbuf_width)
-   //   ) ipcheck_wbuf_mem 
-   //   (.oddpar(1'b1),.data({wbuf_rddata[wbuf_width-1:1],(wbuf_rddata[0]^wbuf_pe_inj_q[1])}),.datap(wbuf_rddata_par),.check(wbuf_read),.parerr(s1_perror[1])); 
-
-   //  deleted pcheck. It is checked at pcie kch 
-   // assign s1_perror[1] = 1'b0;
 
    //-------------------------------------------------------
    // request to wdata
@@ -572,19 +563,19 @@ module nvme_sntl_wbuf#
 
    // save cid and upper part of reloff for comparision with response
    localparam wbuf_beatid_lower = wbuf_entry_awidth + $clog2(data_bytes); 
-   localparam wbuf_stat_width = 2 + cid_width + beatid_width - wbuf_beatid_lower;  // added 1+ for parity kch 
+   localparam wbuf_stat_width = 2 + cid_width + beatid_width - wbuf_beatid_lower;
    reg [wbuf_stat_width-1:0] stat_wrdata, stat_rddata;
    reg    [wbufid_width-1:0] stat_wraddr, stat_rdaddr;
    reg                       stat_write;   
-   reg [1+wbuf_stat_width-1:0] stat_mem[wbuf_numids-1:0];  // added 1+ for mem parity 
+   reg [1+wbuf_stat_width-1:0] stat_mem[wbuf_numids-1:0];
 
    // save request info to unmap data
    reg                        unmap_valid_q, unmap_valid_d;   
    reg                        unmap_stat_valid_q, unmap_stat_valid_d;   
    reg        [cid_width-1:0] unmap_cid_q, unmap_cid_d;
-   reg    [cid_par_width-1:0] unmap_cid_par_q, unmap_cid_par_d;  // added kch 
+   reg    [cid_par_width-1:0] unmap_cid_par_q, unmap_cid_par_d; 
    reg     [wbufid_width-1:0] unmap_wbufid_q, unmap_wbufid_d;
-   reg [wbufid_par_width-1:0] unmap_wbufid_par_q, unmap_wbufid_par_d;  // added kch 
+   reg [wbufid_par_width-1:0] unmap_wbufid_par_q, unmap_wbufid_par_d; 
    reg                 [63:0] unmap_lba_q, unmap_lba_d;
    reg                 [15:0] unmap_numblks_q, unmap_numblks_d;
    reg [wbuf_entry_awidth-1:0] unmap_offset_q, unmap_offset_d;
@@ -647,7 +638,7 @@ module nvme_sntl_wbuf#
        
         // save reloff & cid for when wdata responds
         stat_write                 = cmd_wbuf_req_valid & wdata_wbuf_req_ready;
-        stat_wraddr                = cmd_wbuf_req_wbufid;   // check parity kch fixit  
+        stat_wraddr                = cmd_wbuf_req_wbufid;  
         stat_wrdata                = { cmd_wbuf_req_reloff[beatid_width-1:wbuf_beatid_lower], cmd_wbuf_req_cid_par, cmd_wbuf_req_cid };
         
      end
@@ -658,9 +649,9 @@ module nvme_sntl_wbuf#
 
    reg                        stat_rd_q, stat_rd_d;   
    reg        [cid_width-1:0] stat_cid_q, stat_cid_d;
-   reg    [cid_par_width-1:0] stat_cid_par_q, stat_cid_par_d;  // added kch 
+   reg    [cid_par_width-1:0] stat_cid_par_q, stat_cid_par_d;  
    reg     [wbufid_width-1:0] stat_wbufid_q, stat_wbufid_d;
-   reg [wbufid_par_width-1:0] stat_wbufid_par_q, stat_wbufid_par_d;  // added kch 
+   reg [wbufid_par_width-1:0] stat_wbufid_par_q, stat_wbufid_par_d; 
    reg                        stat_error_q, stat_error_d;
 
    // check mem parity 
@@ -689,7 +680,7 @@ module nvme_sntl_wbuf#
      begin
         stat_rd_q         <= stat_rd_d;
         stat_cid_q        <= stat_cid_d;
-        stat_cid_par_q    <= stat_cid_par_d;  // added kch 
+        stat_cid_par_q    <= stat_cid_par_d; 
         stat_wbufid_q     <= stat_wbufid_d;
         stat_wbufid_par_q <= stat_wbufid_par_d;
         stat_error_q      <= stat_error_d;
@@ -784,7 +775,7 @@ module nvme_sntl_wbuf#
           begin
              stat_rd_d                  = 1'b1;
              stat_cid_d[tag_width-1:0]  = wdata_wbuf_rsp_tag;
-             stat_cid_par_d[0]          = wdata_wbuf_rsp_tag_par;  // added kch ended here stat_cid_
+             stat_cid_par_d[0]          = wdata_wbuf_rsp_tag_par;
              stat_wbufid_d              = wdata_wbuf_rsp_wbufid;
              stat_wbufid_par_d          = wdata_wbuf_rsp_wbufid_par;
              stat_error_d               = wdata_wbuf_rsp_error;                 
@@ -794,7 +785,7 @@ module nvme_sntl_wbuf#
           begin         
              stat_valid_d    = 1'b1;
              stat_cid_d      = stat_rddata[cid_width-1:0];
-             stat_cid_par_d  = stat_rddata[cid_par_width + cid_width-1:cid_width];   // added kch 
+             stat_cid_par_d  = stat_rddata[cid_par_width + cid_width-1:cid_width]; 
              if( stat_cid_q[tag_width-1:0] != stat_rddata[tag_width-1:0] )
                begin
                   // tag mismatch - fatal error
@@ -806,7 +797,7 @@ module nvme_sntl_wbuf#
         if( unmap_stat_valid_q )
           begin                  
              wbuf_cmd_status_cid         = unmap_cid_q;
-             wbuf_cmd_status_cid_par     = unmap_cid_par_q;  // added kch 
+             wbuf_cmd_status_cid_par     = unmap_cid_par_q;
              wbuf_cmd_status_wbufid      = unmap_wbufid_q;
              wbuf_cmd_status_wbufid_par  = unmap_wbufid_par_q;
              wbuf_cmd_status_error       = 1'b0;
@@ -819,7 +810,7 @@ module nvme_sntl_wbuf#
         else
           begin
              wbuf_cmd_status_cid         = stat_cid_q;
-             wbuf_cmd_status_cid_par     = stat_cid_par_q;  // added kch 
+             wbuf_cmd_status_cid_par     = stat_cid_par_q;
              wbuf_cmd_status_wbufid      = stat_wbufid_q;
              wbuf_cmd_status_wbufid_par  = stat_wbufid_par_q;
              wbuf_cmd_status_error       = stat_error_q;

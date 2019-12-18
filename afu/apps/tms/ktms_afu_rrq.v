@@ -44,8 +44,8 @@ module ktms_afu_rrq#
    // rrq start and end from context regs
    input 		      i_rrq_st_we,
    input 		      i_rrq_ed_we,
-   input [0:ctxtid_width-1]   i_rrq_ctxt,     //parity check in ktms_afu_int kch 
-   input [0:64] 	      i_rrq_wd,  // added parity kch 
+   input [0:ctxtid_width-1]   i_rrq_ctxt, 
+   input [0:64] 	      i_rrq_wd,
 		      
    output 		      i_rsp_r,
    input 		      i_rsp_v,
@@ -227,8 +227,8 @@ module ktms_afu_rrq#
 
    wire 		      s4a_v, s4a_r;
    wire 		      s3_re;
-   wire [0:64] 		      s4_cur;    // changed these from 63 to 64 kch 
-   wire [0:64] 		      s4_rrq_st; //
+   wire [0:64] 		      s4_cur;  
+   wire [0:64] 		      s4_rrq_st; 
    wire [0:64] 		      s4_rrq_ed; 
    wire [0:ctxtid_width-1]    s4_ctxt;
    wire 		      s4_error;
@@ -244,7 +244,7 @@ module ktms_afu_rrq#
 
    base_mem#(.width(65),.addr_width(ctxtid_width-1)) irrq_st_mem(.clk(clk),.we(i_rrq_st_we),.wa(i_rrq_ctxt[0:ctxtid_width-2]),.wd(i_rrq_wd),.re(s3_re),.ra(s3_ctxt[0:ctxtid_width-2]),.rd(s4_rrq_st));
    base_mem#(.width(65),.addr_width(ctxtid_width-1)) irrq_ed_mem(.clk(clk),.we(i_rrq_ed_we),.wa(i_rrq_ctxt[0:ctxtid_width-2]),.wd(i_rrq_wd),.re(s3_re),.ra(s3_ctxt[0:ctxtid_width-2]),.rd(s4_rrq_ed));
-   wire [0:63] 		      s4_nxt = s4_error ? s4_cur : ((s4_cur[0:62] == s4_rrq_ed[0:62]) ? {s4_rrq_st[0:62],~s4_cur[63]} : s4_cur[0:63]+64'd8);  // added 0:63 kch 
+   wire [0:63] 		      s4_nxt = s4_error ? s4_cur : ((s4_cur[0:62] == s4_rrq_ed[0:62]) ? {s4_rrq_st[0:62],~s4_cur[63]} : s4_cur[0:63]+64'd8); 
    wire                       s4_nxt_par;
 
    capi_parity_gen#(.dwidth(64),.width(1)) s4_nxt_pgen(.i_d(s4_nxt[0:63]),.o_d(s4_nxt_par));
@@ -259,7 +259,7 @@ module ktms_afu_rrq#
    assign i_rrq_wd_par = i_rrq_wd[63] ? i_rrq_wd[64] : ~i_rrq_wd[64];
  
    base_primux#(.ways(2),.width(65+ctxtid_width)) icm_wmux
-     (.i_v({i_rrq_st_we,s4a_v}),.i_r({i_rrq_st_r_dummy,s4a_r}),.i_d({i_rrq_ctxt,i_rrq_wd[0:62],1'b1,i_rrq_wd_par,s4_ctxt,s4_nxt,s4_nxt_par}),.o_v(s4b_v),.o_r(s4b_r),.o_d({s4_wa,s4_wd}),.o_sel(s4_sel));  // add 1 and not bit 64 kch 
+     (.i_v({i_rrq_st_we,s4a_v}),.i_r({i_rrq_st_r_dummy,s4a_r}),.i_d({i_rrq_ctxt,i_rrq_wd[0:62],1'b1,i_rrq_wd_par,s4_ctxt,s4_nxt,s4_nxt_par}),.o_v(s4b_v),.o_r(s4b_r),.o_d({s4_wa,s4_wd}),.o_sel(s4_sel));
    assign s4b_r = 1'b1;
 
    base_vlat#(.width(1+ctxtid_width+65)) icr_wlat(.clk(clk),.reset(1'b0), .din({s4_sel[1],s4_wa,s4_wd}),.q({s5_rst,s5_wa,s5_wd}));
@@ -312,8 +312,8 @@ module ktms_afu_rrq#
    wire [0:64]                rrq_data;
    wire [0:4+24+64-1]         rrq_mmiobus;
 
-   assign {rrq_vld,rrq_cfg,rrq_rnw,rrq_dw,rrq_addr,rrq_data} = i_mmiobus; // omit any extra data bits kch
-   assign rrq_mmiobus = {rrq_vld,rrq_cfg,rrq_rnw,rrq_dw,rrq_addr[0:23],rrq_data[0:63]};  // created to strip of parity  kch
+   assign {rrq_vld,rrq_cfg,rrq_rnw,rrq_dw,rrq_addr,rrq_data} = i_mmiobus;
+   assign rrq_mmiobus = {rrq_vld,rrq_cfg,rrq_rnw,rrq_dw,rrq_addr[0:23],rrq_data[0:63]}; 
    ktms_mmrd_dec#(.lcladdr_width(lcladdr_width),.addr(mmioaddr),.mmiobus_width(mmiobus_width-2)) immrd_dec
      (.clk(clk),.reset(reset),.i_mmiobus(rrq_mmiobus),
       .o_rd_r(m1_rd_r),.o_rd_v(m1_rd_v),.o_rd_addr(m1_rd_ra),

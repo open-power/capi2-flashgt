@@ -22,7 +22,7 @@ module ktms_afu_desc#
    parameter pea_width=52,
    parameter cnt_rsp_width=2*pea_width+ctxtid_width+ctag_width+4
    )
-   /* note: we swizlle the data because apparently kernel software is converting this from le to be.  So, we have to make it come out le
+   /* note: we swizzle the data because apparently kernel software is converting this from le to be.  So, we have to make it come out le
     */
   (input                      clk,
    input 		      reset, 
@@ -121,9 +121,9 @@ module ktms_afu_desc#
    wire [0:3] 	  s1_reg_ab_we;
    base_vlat#(.width(4)) is1_reg_ab_we_lat(.clk(clk),.reset(reset),.din(s0_reg_ab_wwe),.q(s1_reg_ab_we));
 
-   wire [0:64] 	  s1_mmdata;   // changed 63 to 64 kch
+   wire [0:64] 	  s1_mmdata; 
    wire           s1_mmwr;
-   base_vlat#(.width(65)) is1_mmdata_lat(.clk(clk),.reset(reset),.din({ha_mmdata,ha_mmdatapar}),.q(s1_mmdata));  // 64 to 65 kch
+   base_vlat#(.width(65)) is1_mmdata_lat(.clk(clk),.reset(reset),.din({ha_mmdata,ha_mmdatapar}),.q(s1_mmdata)); 
    base_vlat#(.width(1)) is1_mmwr_lat(.clk(clk),.reset(reset),.din(ha_mmval & ~ha_mmrnw),.q(s1_mmwr));  
    wire s1_reg_ab_we_act = (s1_reg_ab_we[0]|s1_reg_ab_we[1]|s1_reg_ab_we[2]|s1_reg_ab_we[3]);
    wire           s1_perror;
@@ -202,8 +202,8 @@ module ktms_afu_desc#
    wire 	  s2_cnt_rsp_v;
    base_vlat#(.width(1)) is2_cnt_rsp_vlat(.clk(clk),.reset(reset),.din(s1_reg_ab_we[3]),.q(s2_cnt_rsp_v));
    wire s2_cnt_rsp_ctxt_par;
-   wire [0:ctxtid_width-1] s2_cnt_rsp_ctxt = {rega[64-ctxtid_width+1:64-1],s2_cnt_rsp_ctxt_par};  //  added +1 to compensate for parity in ctxt width (went from 9 to 10)
-   capi_parity_gen#(.dwidth(9),.width(1)) afu_desc_pgen(.i_d(s2_cnt_rsp_ctxt[0:ctxtid_width-2]),.o_d(s2_cnt_rsp_ctxt_par));  // added parity kch 
+   wire [0:ctxtid_width-1] s2_cnt_rsp_ctxt = {rega[64-ctxtid_width+1:64-1],s2_cnt_rsp_ctxt_par}; 
+   capi_parity_gen#(.dwidth(9),.width(1)) afu_desc_pgen(.i_d(s2_cnt_rsp_ctxt[0:ctxtid_width-2]),.o_d(s2_cnt_rsp_ctxt_par));
    wire [0:ctag_width-1]   s2_cnt_rsp_ctag = rega[32-ctag_width:32-1];
    wire [0:pea_width-1]    s2_cnt_rsp_addr = regb[0:pea_width-1];
    wire [0:3] 		   s2_cnt_rsp_rc   = regb[52:55];

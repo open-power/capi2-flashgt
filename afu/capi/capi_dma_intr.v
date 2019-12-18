@@ -67,7 +67,7 @@ module capi_dma_intr#
       );
 
    wire [0:ctag_width-1] s0_ctag = {{ctag_width-ltag_width{1'b0}},s0_ltag};
-   localparam eamsb_width = ea_width-1-irqsrc_width;  // added -1 to get rid of parity kch 
+   localparam eamsb_width = ea_width-1-irqsrc_width;
    wire                           s0_ea_par;
    wire [0:ea_width-1] 		  s0_ea = {{eamsb_width{1'b0}},i_req_d_src,s0_ea_par};
    capi_parity_gen#(.dwidth(ea_width-1),.width(1)) s0_ea_pgen(.i_d(s0_ea[0:63]),.o_d(s0_ea_par));
@@ -87,7 +87,7 @@ module capi_dma_intr#
 
    assign o_rsp_v = i_rsp_v;
 
-endmodule // capi_dma_put
+endmodule
 
 
 

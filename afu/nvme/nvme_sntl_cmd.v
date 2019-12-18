@@ -22,7 +22,7 @@
 //  File : nvme_sntl_cmd.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer command processing
+//  Description : FlashGT+ - SCSI to NVMe Layer command processing
 //                
 //  *************************************************************************
 
@@ -88,7 +88,7 @@ module nvme_sntl_cmd#
     input                       [1:0] i_req_cdb_par_in, 
 
     //-------------------------------------------------------
-    // admin/microcode interface        parity checked at fifo kch 
+    // admin/microcode interface     
     //-------------------------------------------------------
     output reg                        cmd_admin_valid,
     input                             admin_cmd_ack,
@@ -122,7 +122,7 @@ module nvme_sntl_cmd#
     //-------------------------------------------------------
     output reg                        cmd_rsp_v,
     output reg        [tag_width-1:0] cmd_rsp_tag,
-    output reg                        cmd_rsp_tag_par, // added kch 
+    output reg                        cmd_rsp_tag_par,
     output reg     [fcstat_width-1:0] cmd_rsp_fc_status,
     output reg    [fcxstat_width-1:0] cmd_rsp_fcx_status,
     output reg                  [7:0] cmd_rsp_scsi_status,
@@ -174,7 +174,7 @@ module nvme_sntl_cmd#
     //-------------------------------------------------------
     output reg                        cmd_wbuf_req_valid, // asserted when data transfer for a cid/wbufid is complete
     output reg        [cid_width-1:0] cmd_wbuf_req_cid,
-    output reg    [cid_par_width-1:0] cmd_wbuf_req_cid_par, // added kch 
+    output reg    [cid_par_width-1:0] cmd_wbuf_req_cid_par,
     output reg    [datalen_width-1:0] cmd_wbuf_req_reloff, // offset from start address of this command  
     output reg     [wbufid_width-1:0] cmd_wbuf_req_wbufid,
     output reg [wbufid_par_width-1:0] cmd_wbuf_req_wbufid_par,
@@ -204,7 +204,7 @@ module nvme_sntl_cmd#
    
     output reg                        cmd_wbuf_idfree_valid, // done with with wbufid
     output reg     [wbufid_width-1:0] cmd_wbuf_idfree_wbufid, 
-    output reg [wbufid_par_width-1:0] cmd_wbuf_idfree_wbufid_par, // added kch 
+    output reg [wbufid_par_width-1:0] cmd_wbuf_idfree_wbufid_par,
    
     //-------------------------------------------------------
     // SCSI unmap command events
@@ -260,7 +260,7 @@ module nvme_sntl_cmd#
     // track error status from on sisl write payload
     input                             dma_cmd_wdata_valid,
     input             [cid_width-1:0] dma_cmd_wdata_cid,
-    input         [cid_par_width-1:0] dma_cmd_wdata_cid_par, // added kch 
+    input         [cid_par_width-1:0] dma_cmd_wdata_cid_par, 
     input                             dma_cmd_wdata_error,
     output reg                        cmd_dma_wdata_ready,
 
@@ -326,7 +326,7 @@ module nvme_sntl_cmd#
    wire                         [5:0] s1_perror;
 
    // Parity error srlat 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity 
    nvme_srlat#
      (.width(6))  icmd_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(cmd_perror_int));
@@ -345,9 +345,9 @@ module nvme_sntl_cmd#
    reg                                req_cnt_v_q;
    reg                [cmd_width-1:0] req_cmd_q;
    reg                [tag_width-1:0] req_tag_q;
-   reg                                req_tag_par_q;  // added kch 
+   reg                                req_tag_par_q;
    reg              [lunid_width-1:0] req_lun_q;
-   reg                                req_lun_par_q;  // added kch 
+   reg                                req_lun_par_q;
    reg            [datalen_width-1:0] req_length_q;
    reg                                req_length_par_q;
    reg                        [127:0] req_cdb_q;
@@ -359,9 +359,9 @@ module nvme_sntl_cmd#
    reg                                req_cnt_v_d;
    reg                [cmd_width-1:0] req_cmd_d;
    reg                [tag_width-1:0] req_tag_d;
-   reg                                req_tag_par_d;  // added kch 
+   reg                                req_tag_par_d;
    reg              [lunid_width-1:0] req_lun_d;
-   reg                                req_lun_par_d;  // added kch 
+   reg                                req_lun_par_d;
    reg            [datalen_width-1:0] req_length_d;
    reg                                req_length_par_d;
    reg                        [127:0] req_cdb_d;
@@ -394,9 +394,9 @@ module nvme_sntl_cmd#
              req_cnt_v_q      <= req_cnt_v_d;
              req_cmd_q        <= req_cmd_d;
              req_tag_q        <= req_tag_d;
-             req_tag_par_q    <= req_tag_par_d;   // added kch 
+             req_tag_par_q    <= req_tag_par_d;
              req_lun_q        <= req_lun_d;
-             req_lun_par_q    <= req_lun_par_d;   //added kch
+             req_lun_par_q    <= req_lun_par_d;
              req_length_q     <= req_length_d;
              req_length_par_q <= req_length_par_d;
              req_cdb_q        <= req_cdb_d;    
@@ -410,9 +410,9 @@ module nvme_sntl_cmd#
         req_v_d           = req_v_q;
         req_cmd_d         = req_cmd_q;
         req_tag_d         = req_tag_q;
-        req_tag_par_d     = req_tag_par_q;     // added kch 
+        req_tag_par_d     = req_tag_par_q; 
         req_lun_d         = req_lun_q;
-        req_lun_par_d     = req_lun_par_q;  // added kch 
+        req_lun_par_d     = req_lun_par_q;
         req_length_d      = req_length_q;
         req_length_par_d  = req_length_par_q;
         req_cdb_d         = req_cdb_q;
@@ -425,9 +425,9 @@ module nvme_sntl_cmd#
              req_cnt_v_d       = 1'b1;
              req_cmd_d         = i_req_cmd_in;
              req_tag_d         = i_req_tag_in;
-             req_tag_par_d     = i_req_tag_par_in;  // added kch 
+             req_tag_par_d     = i_req_tag_par_in;
              req_lun_d         = i_req_lun_in;
-             req_lun_par_d     = i_req_lun_par_in;  // added kch 
+             req_lun_par_d     = i_req_lun_par_in;
              req_length_d      = i_req_length_in; 
              req_length_par_d  = i_req_length_par_in; 
              req_cdb_d         = i_req_cdb_in;
@@ -484,7 +484,7 @@ module nvme_sntl_cmd#
           begin
              wdata_valid_d    = 1'b1;
              wdata_cid_d      = dma_cmd_wdata_cid;
-             wdata_cid_par_d  = dma_cmd_wdata_cid_par;  // added kch 
+             wdata_cid_par_d  = dma_cmd_wdata_cid_par;
           end
 
         if( wdata_taken )
@@ -619,8 +619,7 @@ module nvme_sntl_cmd#
         if (cmd_pe_inj_q[5] & s5_admin_fifo_valid)
           cmd_pe_inj_d[5] = 1'b0;
      end  
-   // check parity on trk_rdaddr kch 
-
+  
    nvme_pcheck#
      (
       .bits_per_parity_bit(8),
@@ -669,7 +668,7 @@ module nvme_sntl_cmd#
    reg       [31:s0_rr_width] s0_rr_noused;
 
    reg       [trk_awidth-1:0] s0_init_q, s0_init_d;
-   reg                        s0_init_par_q, s0_init_par_d;  // moved to here kch 
+   reg                        s0_init_par_q, s0_init_par_d; 
    reg                        s0_init_done_q, s0_init_done_d;
 
    // stage 0 result
@@ -694,13 +693,13 @@ module nvme_sntl_cmd#
 
    // stage 1 result - wait for tracking table read
    reg        [cid_width-1:0] s1_cid_q, s1_cid_d;
-   reg    [cid_par_width-1:0] s1_cid_par_q,s1_cid_par_d;   // moved to this kch 
+   reg    [cid_par_width-1:0] s1_cid_par_q,s1_cid_par_d; 
    reg                  [7:0] s1_cmd_q, s1_cmd_d;
    reg    [datalen_width-1:0] s1_reloff_q, s1_reloff_d;
    reg    [datalen_width-1:0] s1_length_q, s1_length_d;
    reg                        s1_length_par_q, s1_length_par_d;
    reg      [lunid_width-1:0] s1_lun_q, s1_lun_d;   
-   reg                        s1_lun_par_q, s1_lun_par_d;  // moved to here kch 
+   reg                        s1_lun_par_q, s1_lun_par_d;  
    reg                [127:0] s1_data_q, s1_data_d;
    reg                  [1:0] s1_data_par_q,s1_data_par_d;
    reg                        s1_debug_ack_q, s1_debug_ack_d;
@@ -715,7 +714,7 @@ module nvme_sntl_cmd#
    reg                        s2_valid_q, s2_valid_d;
    reg        [trk_width-1:0] s2_trk_data_q, s2_trk_data_d;
    reg        [cid_width-1:0] s2_cid_q, s2_cid_d;
-   reg    [cid_par_width-1:0] s2_cid_par_q, s2_cid_par_d;  // moved to here kch 
+   reg    [cid_par_width-1:0] s2_cid_par_q, s2_cid_par_d; 
    reg                  [7:0] s2_cmd_q, s2_cmd_d; 
    reg    [datalen_width-1:0] s2_reloff_q, s2_reloff_d; 
    reg    [datalen_width-1:0] s2_length_q, s2_length_d;
@@ -724,23 +723,23 @@ module nvme_sntl_cmd#
    reg      [lunid_width-1:0] s2_lun_q, s2_lun_d;
    reg                        s2_lun_par_q, s2_lun_par_d;
    reg                [127:0] s2_data_q, s2_data_d;
-   reg                  [1:0] s2_data_par_q, s2_data_par_d; // moved to here kch 
+   reg                  [1:0] s2_data_par_q, s2_data_par_d;
    reg                        s2_debug_ack_q, s2_debug_ack_d;
    
    // stage 3 result - first half of decode/update results
    reg                        s3_valid_q, s3_valid_d;
    reg        [trk_width-1:0] s3_trk_data_q, s3_trk_data_d;
    reg        [cid_width-1:0] s3_cid_q, s3_cid_d;
-   reg    [cid_par_width-1:0] s3_cid_par_q, s3_cid_par_d; // added kch 
+   reg    [cid_par_width-1:0] s3_cid_par_q, s3_cid_par_d; 
    reg                  [7:0] s3_cmd_q, s3_cmd_d;
    reg    [datalen_width-1:0] s3_reloff_q, s3_reloff_d;
    reg    [datalen_width-1:0] s3_length_q, s3_length_d;
    reg                        s3_length_par_q, s3_length_par_d;
    reg    [datalen_width-1:0] s3_reloffp_q, s3_reloffp_d;
    reg      [lunid_width-1:0] s3_lun_q, s3_lun_d;
-   reg      [lunid_width-1:0] s3_lun_par_q, s3_lun_par_d; // added kch 
+   reg      [lunid_width-1:0] s3_lun_par_q, s3_lun_par_d; 
    reg                [127:0] s3_data_q, s3_data_d;
-   reg                  [7:0] s3_data_par_q, s3_data_par_d;  // added kch 
+   reg                  [7:0] s3_data_par_q, s3_data_par_d;  
    
    // stage 4 result - updated tracking table entry and results to output queues
    reg        [trk_width-1:0] s4_trk_wrdata_q;
@@ -749,8 +748,8 @@ module nvme_sntl_cmd#
    reg                        s4_trk_write_d;
    reg       [trk_awidth-1:0] s4_trk_wraddr_q;
    reg       [trk_awidth-1:0] s4_trk_wraddr_d;
-   reg                        s4_trk_wraddr_par_q;   // added kch
-   reg                        s4_trk_wraddr_par_d;  // added kch 
+   reg                        s4_trk_wraddr_par_q;  
+   reg                        s4_trk_wraddr_par_d;
 
   // queue up write requests
    reg [cid_par_width+cid_width-1:0] s4_iowr_cmdid_q, s4_iowr_cmdid_d;
@@ -801,10 +800,10 @@ module nvme_sntl_cmd#
    reg        [cmd_width-1:0] s4_admin_cmd_q, s4_admin_cmd_d;
    reg        [cid_width-1:0] s4_admin_cid_q, s4_admin_cid_d;
    reg      [lunid_width-1:0] s4_admin_lun_q, s4_admin_lun_d;
-   reg                        s4_admin_lun_par_q, s4_admin_lun_par_d;  // added kch 
+   reg                        s4_admin_lun_par_q, s4_admin_lun_par_d; 
    reg    [datalen_width-1:0] s4_admin_length_q, s4_admin_length_d;
    reg                [127:0] s4_admin_cdb_q, s4_admin_cdb_d;
-   reg                  [7:0] s4_admin_cdb_par_q, s4_admin_cdb_par_d;   // added kch 
+   reg                  [7:0] s4_admin_cdb_par_q, s4_admin_cdb_par_d;
    
    // responses to sislite
    reg                        s4_rsp_push_q, s4_rsp_push_d;
@@ -814,7 +813,7 @@ module nvme_sntl_cmd#
    reg                 [31:0] s4_rsp_resid_q, s4_rsp_resid_d;   
    reg                 [31:0] s4_rsp_data_q, s4_rsp_data_d;   
    reg        [tag_width-1:0] s4_rsp_tag_q, s4_rsp_tag_d;
-   reg                        s4_rsp_tag_par_q, s4_rsp_tag_par_d;  // added kch
+   reg                        s4_rsp_tag_par_q, s4_rsp_tag_par_d; 
    reg     [lunidx_width-1:0] s4_rsp_lunidx_q, s4_rsp_lunidx_d;
    reg                        s4_rsp_naca_q, s4_rsp_naca_d;
    reg                        s4_rsp_flush_q, s4_rsp_flush_d;
@@ -918,44 +917,44 @@ module nvme_sntl_cmd#
    always @(posedge clk)
      begin        
         s0_cid_q                    <= s0_cid_d;
-        s0_cid_par_q                <= s0_cid_par_d;  // added kch 
+        s0_cid_par_q                <= s0_cid_par_d; 
         s0_cmd_q                    <= s0_cmd_d;
         s0_reloff_q                 <= s0_reloff_d;
         s0_length_q                 <= s0_length_d;
-        s0_length_par_q             <= s0_length_par_d;  // added kch 
+        s0_length_par_q             <= s0_length_par_d;
         s0_lun_q                    <= s0_lun_d;
         s0_lun_par_q                <= s0_lun_par_d;
         s0_data_q                   <= s0_data_d;
         s0_data_par_q               <= s0_data_par_d;
 
         s1_cid_q                    <= s1_cid_d;
-        s1_cid_par_q                <= s1_cid_par_d;   // added kch 
+        s1_cid_par_q                <= s1_cid_par_d;
         s1_cmd_q                    <= s1_cmd_d;
         s1_reloff_q                 <= s1_reloff_d;
         s1_length_q                 <= s1_length_d;
-        s1_length_par_q             <= s1_length_par_d;  // added kch 
+        s1_length_par_q             <= s1_length_par_d; 
         s1_lun_q                    <= s1_lun_d;
         s1_data_q                   <= s1_data_d;
-        s1_data_par_q               <= s1_data_par_d;   // added kch 
+        s1_data_par_q               <= s1_data_par_d;
         
         s1_trk_wrdata_q             <= s1_trk_wrdata_d;
         s1_trk_wraddr_q             <= s1_trk_wraddr_d;
         
         s2_trk_data_q               <= s2_trk_data_d;
         s2_cid_q                    <= s2_cid_d;
-        s2_cid_par_q                <= s2_cid_par_d;   // added kch 
+        s2_cid_par_q                <= s2_cid_par_d; 
         s2_cmd_q                    <= s2_cmd_d;
         s2_reloff_q                 <= s2_reloff_d;
         s2_length_q                 <= s2_length_d;
-        s2_length_par_q             <= s2_length_par_d;  // added kch 
+        s2_length_par_q             <= s2_length_par_d;
         s2_reloffp_q                <= s2_reloffp_d;
         s2_lun_q                    <= s2_lun_d;
         s2_data_q                   <= s2_data_d;
-        s2_data_par_q               <= s2_data_par_d;    // added kch 
+        s2_data_par_q               <= s2_data_par_d; 
 
         s3_trk_data_q               <= s3_trk_data_d;
         s3_cid_q                    <= s3_cid_d;
-        s3_cid_par_q                <= s3_cid_par_d;  // added kch 
+        s3_cid_par_q                <= s3_cid_par_d;
         s3_cmd_q                    <= s3_cmd_d;
         s3_reloff_q                 <= s3_reloff_d;
         s3_length_q                 <= s3_length_d;
@@ -964,11 +963,11 @@ module nvme_sntl_cmd#
         s3_lun_q                    <= s3_lun_d;
         s3_lun_par_q                <= s3_lun_par_d;
         s3_data_q                   <= s3_data_d;
-        s3_data_par_q               <= s3_data_par_d;   // added kch 
+        s3_data_par_q               <= s3_data_par_d;
         
         s4_trk_wrdata_q             <= s4_trk_wrdata_d;
         s4_trk_wraddr_q             <= s4_trk_wraddr_d;
-        s4_trk_wraddr_par_q         <= s4_trk_wraddr_par_d; // added kch 
+        s4_trk_wraddr_par_q         <= s4_trk_wraddr_par_d;
         s4_ioq_lba_q                <= s4_ioq_lba_d;
         s4_ioq_numblks_q            <= s4_ioq_numblks_d;
         s4_ioq_nsid_q               <= s4_ioq_nsid_d;
@@ -999,14 +998,14 @@ module nvme_sntl_cmd#
         s4_admin_lun_par_q          <= s4_admin_lun_par_d;
         s4_admin_length_q           <= s4_admin_length_d;
         s4_admin_cdb_q              <= s4_admin_cdb_d;
-        s4_admin_cdb_par_q          <= s4_admin_cdb_par_d;   // added kch 
+        s4_admin_cdb_par_q          <= s4_admin_cdb_par_d; 
         s4_rsp_status_q             <= s4_rsp_status_d;
         s4_rsp_resid_over_q         <= s4_rsp_resid_over_d;
         s4_rsp_resid_under_q        <= s4_rsp_resid_under_d;
         s4_rsp_resid_q              <= s4_rsp_resid_d;
         s4_rsp_data_q               <= s4_rsp_data_d;
         s4_rsp_tag_q                <= s4_rsp_tag_d;
-        s4_rsp_tag_par_q            <= s4_rsp_tag_par_d; // added kch
+        s4_rsp_tag_par_q            <= s4_rsp_tag_par_d; 
         s4_rsp_lunidx_q             <= s4_rsp_lunidx_d;
         s4_rsp_naca_q               <= s4_rsp_naca_d;
         s4_dma_error_q              <= s4_dma_error_d;         
@@ -1056,7 +1055,7 @@ module nvme_sntl_cmd#
    reg                s0_wbuf_stall;
 
    // check parity for decodes below 
-   // no need to check dma_cmd_cid since it is generated at th output of nvme_sntl_dma.v kch 
+   // no need to check dma_cmd_cid since it is generated at th output of nvme_sntl_dma.v
    nvme_pcheck#
      (
       .bits_per_parity_bit(8),
@@ -1086,7 +1085,7 @@ module nvme_sntl_cmd#
       ) ipgen_s0_init_par 
        (.oddpar(1'b1),.data(s0_init_d[tag_width-1:0]),.datap(s0_init_par)); 
    
-   wire         [1:0] s5_iowr_fifo_data_par;  // changed s4 to s5 kch 
+   wire         [1:0] s5_iowr_fifo_data_par; 
 
    
    always @*
@@ -1251,7 +1250,7 @@ module nvme_sntl_cmd#
           begin
              s0_valid_d      = 1'b1;
              s0_cid_d        = { zero[cid_width-1:trk_awidth], checker_tag };
-             s0_cid_par_d    = {1'b1, checker_tag_par};  // added kch 
+             s0_cid_par_d    = {1'b1, checker_tag_par}; 
              s0_cmd_d        = CMD_CHECKER[7:0];
              s0_data_d[3:0]  = checker_action;
              checker_taken   = 1'b1;
@@ -1273,7 +1272,7 @@ module nvme_sntl_cmd#
              s0_valid_d   = 1'b1;
              s0_cid_d     = wdata_cid_q;
              s0_cmd_d     = CMD_WDATA_ERR[7:0]; 
-             s0_cid_par_d = wdata_cid_par_q;  // added kch 
+             s0_cid_par_d = wdata_cid_par_q;
              wdata_taken  = 1'b1;                      
           end
         else if( (| s0_rr_gnt) )
@@ -1304,7 +1303,7 @@ module nvme_sntl_cmd#
              if( s0_rr_gnt[rr_ioq] )
                begin
                   s0_cid_d         = ioq_sntl_cpl_cmdid;
-                  s0_cid_par_d     = ioq_sntl_cpl_cmdid_par;  // added kch 
+                  s0_cid_par_d     = ioq_sntl_cpl_cmdid_par;  
                   s0_cmd_d         = CMD_CPL_IOQ[7:0];
                   s0_data_d[14:0]  = ioq_sntl_cpl_status;
                end
@@ -1404,19 +1403,19 @@ module nvme_sntl_cmd#
    always @*
      begin
         trk_rdaddr       = s0_cid_q[trk_awidth-1:0];
-        trk_rdaddr_par   = s0_cid_par_q[0];   // added kch 
+        trk_rdaddr_par   = s0_cid_par_q[0]; 
         
         s1_valid_d       = s0_valid_q;
         s1_cid_d         = s0_cid_q;
-        s1_cid_par_d     = s0_cid_par_q;  // added kch 
+        s1_cid_par_d     = s0_cid_par_q; 
         s1_cmd_d         = s0_cmd_q;           
         s1_reloff_d      = s0_reloff_q;
         s1_length_d      = s0_length_q;
-        s1_length_par_d  = s0_length_par_q;  // added kch 
+        s1_length_par_d  = s0_length_par_q; 
         s1_lun_d         = s0_lun_q;
         s1_lun_par_d     = s0_lun_par_q;
         s1_data_d        = s0_data_q;      
-        s1_data_par_d    = s0_data_par_q;      // added kch  
+        s1_data_par_d    = s0_data_par_q;   
 
         s1_trk_wrdata_d  = trk_wrdata;
         s1_trk_write_d   = trk_write;
@@ -1428,21 +1427,20 @@ module nvme_sntl_cmd#
    // stage 2
    //-------------------------------------------------------
    // - tracking table read output valid
-   // - todo: ecc check
-
+ 
    always @*
      begin
         s2_valid_d       = s1_valid_q;
         s2_cid_d         = s1_cid_q;
-        s2_cid_par_d     = s1_cid_par_q;   // added kch 
+        s2_cid_par_d     = s1_cid_par_q; 
         s2_cmd_d         = s1_cmd_q;           
         s2_reloff_d      = s1_reloff_q;
         s2_length_d      = s1_length_q;
-        s2_length_par_d  = s1_length_par_q; // added kch 
+        s2_length_par_d  = s1_length_par_q;
         s2_lun_d         = s1_lun_q;
         s2_lun_par_d     = s1_lun_par_q;
         s2_data_d        = s1_data_q;        
-        s2_data_par_d    = s1_data_par_q;    // added kch       
+        s2_data_par_d    = s1_data_par_q;     
         s2_reloffp_d     = s1_reloff_q + s1_length_q;
         s2_debug_ack_d   = s1_debug_ack_q;
 
@@ -1912,7 +1910,7 @@ module nvme_sntl_cmd#
         // check for other errors in CDB
         // only fields for read or write commands checked here
         // other commands handled by microcontroller are checked separately
-        // todo: check s2_cdb_protect
+        // should check s2_cdb_protect here
         // s2_chk_cdb_error_d  = s2_cdb_control_q[2];  // NACA bit - NVMe SCSI translation spec 1.5 section 3.3.  Return ILLEGAL FIELD IN CDB
         s2_chk_cdb_error_d = s2_cdb_control_q[2] & disable_aca;
 
@@ -1934,7 +1932,7 @@ module nvme_sntl_cmd#
         // report_luns will only return address method=0b00 or 0b01
         // set nsid=0xffffffff for any other LUN
 
-        // todo: handle more that 255 LUNs?
+        // handles max of 255 LUNs
         
         case(s1_lun_q[63:62])
           2'b00:
@@ -2164,7 +2162,7 @@ module nvme_sntl_cmd#
         s3_valid_d             = s2_valid_q;
         s3_trk_data_d          = s2_trk_data_q;
         s3_cid_d               = s2_cid_q;
-        s3_cid_par_d           = s2_cid_par_q;  // added kch 
+        s3_cid_par_d           = s2_cid_par_q; 
         s3_cmd_d               = s2_cmd_q;
         s3_reloff_d            = s2_reloff_q;
         s3_length_d            = s2_length_q;
@@ -2173,7 +2171,7 @@ module nvme_sntl_cmd#
         s3_lun_d               = s2_lun_q;
         s3_lun_par_d           = s2_lun_par_q;
         s3_data_d              = s2_data_q;            
-        s3_data_par_d          = s2_data_par_q;   // added kch          
+        s3_data_par_d          = s2_data_par_q;         
 
 
         // for timing, do some add/subtract/compares in this stage
@@ -2306,7 +2304,7 @@ module nvme_sntl_cmd#
         s4_rsp_push_d         = 1'b0;
         s4_rsp_status_d       = { 5'h0, NVME_SCT_GENERIC, NVME_SC_G_SUCCESS };
         s4_rsp_tag_d          = s3_cid_q[tag_width-1:0]; 
-        s4_rsp_tag_par_d      = s3_cid_par_q[0];  // added kch 
+        s4_rsp_tag_par_d      = s3_cid_par_q[0]; 
         s4_rsp_resid_under_d  = 1'b0;
         s4_rsp_resid_over_d   = 1'b0;
         s4_rsp_resid_d        = zero[31:0]; 
@@ -2391,12 +2389,11 @@ module nvme_sntl_cmd#
         // interface for commands that need microcode
         s4_admin_push_d              = 1'b0;
         s4_admin_cmd_d               = s3_cmd_q; 
-        s4_admin_lun_d               = s3_lun_q;   // added kch 
+        s4_admin_lun_d               = s3_lun_q;  
         s4_admin_lun_par_d           = s3_lun_par_q;  
         s4_admin_length_d            = s3_length_q;
-        //        s4_admin_length_par_d      = s3_length_par_q;  // added kch  comment out for now
-        s4_admin_cdb_d               = s3_data_q;
-        s4_admin_cdb_par_d           = s3_data_par_q;    // added kch 
+         s4_admin_cdb_d               = s3_data_q;
+        s4_admin_cdb_par_d           = s3_data_par_q;   
         // s4_admin_cid_d - set after tracking table
         
         // DMA lookup results
@@ -2408,7 +2405,7 @@ module nvme_sntl_cmd#
         s4_wbuf_push_d               = 1'b0;
         s4_wbuf_unmap_d              = 1'b0;
         s4_wbuf_cmdid_d              = s3_cid_q;
-        s4_wbuf_cmdid_par_d          = s3_cid_par_q;  //added kch
+        s4_wbuf_cmdid_par_d          = s3_cid_par_q;  
         s4_wbuf_reloff_d             = zero[datalen_width-1:0]; // first 4K block
         s4_wbuf_lba_d                = s3_ioq_lba_q;  
         s4_wbuf_numblks_d            = s3_ioq_numblks_q;               
@@ -2420,14 +2417,14 @@ module nvme_sntl_cmd#
         s4_wbuf_idfree_wbufid_par_d  = s3_data_par_q[wbufid_width-1:0];
         cmd_wbuf_idfree_valid        = s4_wbuf_idfree_valid_q;
         cmd_wbuf_idfree_wbufid       = s4_wbuf_idfree_wbufid_q;
-        cmd_wbuf_idfree_wbufid_par   = s4_wbuf_idfree_wbufid_par_q;  // added kch 
+        cmd_wbuf_idfree_wbufid_par   = s4_wbuf_idfree_wbufid_par_q;
 
         cmd_admin_lunlu_clraca       = 1'b0;
         cmd_admin_lunlu_clraca_idx   = s3_lun_q[lunidx_width+47:48];
 
         s4_checker_lunreset          = 1'b0;
         s4_checker_lunreset_tag      = s3_cid_q[tag_width-1:0]; 
-        s4_checker_lunreset_tag_par  = s3_cid_par_q[0];  // added kch 
+        s4_checker_lunreset_tag_par  = s3_cid_par_q[0];
 
         s4_events_d                  = 32'h0;
         
@@ -2520,8 +2517,7 @@ module nvme_sntl_cmd#
                               
                               if( s3_chk_length_zero_q )
                                 begin
-                                   // return success for zero length
-                                   // todo: should this be a flush instead?
+                                   // return success for zero length                              
                                    s4_rsp_status_d = { 5'h0, NVME_SCT_GENERIC,  NVME_SC_G_SUCCESS };
                                 end    
 
@@ -2815,8 +2811,7 @@ module nvme_sntl_cmd#
                // DMA read for ADMIN command (doesn't use write buffer)
                // - check reloff/length vs request length
                // - increment tracking table reloff by number of bytes requested.  
-
-               // todo: should the transfer be aborted?
+           
                
                s4_trk_wr_tstamp2  = regs_xx_timer2[15:0];
                s4_dma_valid_d     = 1'b1;
@@ -2976,7 +2971,7 @@ module nvme_sntl_cmd#
                if( s3_trk_rd_state != TRK_ST_UNMAPQ ||
                    ~s3_instcnt_match_q )
                  begin
-                    // todo: should the wbuf be freed for this case?
+                    // 
                  end
                else
                  begin
@@ -3006,7 +3001,7 @@ module nvme_sntl_cmd#
                     s4_trk_wr_state    = TRK_ST_UNMAPIOQ2;
                     if( ~s3_instcnt_match_q )
                       begin                    
-                         // todo: error case
+                         // 
                       end              
                     else
                       begin
@@ -3024,7 +3019,7 @@ module nvme_sntl_cmd#
                     
                     if( ~s3_instcnt_match_q )
                       begin                    
-                         // todo: error case
+                         //
                       end              
                     else
                       begin
@@ -3102,7 +3097,7 @@ module nvme_sntl_cmd#
                // completion for UNMAP commands that were combined
                s4_trk_wr_tstamp2     = regs_xx_timer2[15:0];                                                                  
                s4_rsp_status_d       = s3_data_q[14:0];                                                                                      
-               // todo: should there be a resid calc for unmap?
+         
                              
                s4_trk_wr_state                  = TRK_ST_IDLE;
                s4_trk_wr_debug[EX_DBG_STATERR]  = s3_data_q[14:0]!=zero[14:0];
@@ -3112,7 +3107,7 @@ module nvme_sntl_cmd#
                if( s3_trk_rd_state != TRK_ST_UNMAPIOQ2 ||
                    ~s3_instcnt_match_q )
                  begin                    
-                    // todo: error case
+                    //
                  end
                else
                  begin
@@ -3299,8 +3294,7 @@ module nvme_sntl_cmd#
                         TRK_ST_WRERR:
                           begin
                              /* a DMA access was out of bounds for the command */
-                             /* indicates a misconfiguration? */
-                             /* todo: should the NVMe status be included as well? */
+                             /* indicates a misconfiguration? */                            
                              s4_rsp_push_d                = 1'b1;
                              if( s3_trk_rd_debug[EX_DBG_WDATAERR] )
                                begin
@@ -3318,7 +3312,7 @@ module nvme_sntl_cmd#
 
                       default:
                         begin
-                           // todo
+                           // 
                         end
                     endcase // case (s3_trk_rd_state)                    
                  end // if ( s3_instcnt_match_q )               
@@ -3336,8 +3330,7 @@ module nvme_sntl_cmd#
                  begin
                     s4_rsp_status_d   = s3_data_q[14:0];
                     s4_rsp_data_d     = s3_data_q[63:32];
-                    s4_trk_wr_status  = s4_rsp_status_d;                         
-                    // todo: check instcnt, current state
+                    s4_trk_wr_status  = s4_rsp_status_d;                                          
                     if( s3_trk_rd_opcode == 8'hC0 ||
                         s3_trk_rd_opcode == 8'hC1 )
                       begin
@@ -3460,7 +3453,7 @@ module nvme_sntl_cmd#
                            s4_trk_wr_status               = s4_rsp_status_d;
                         end
 
-                      // todo: TRK_ST_UNMAP* timeout handling.  for now, don't time out.
+                      // TRK_ST_UNMAP* doesn't have a timeout
                       // actual timeout should be >> 1ms
                       
                    end
@@ -3559,7 +3552,7 @@ module nvme_sntl_cmd#
                  
                  default:
                    begin
-                      // todo: parity error
+                      //
                    end                 
                endcase // case ( s3_data_q[3:0] )                         
             end
@@ -3636,7 +3629,7 @@ module nvme_sntl_cmd#
         trk_wrdata      = s4_trk_wrdata_q;
         trk_write       = s4_trk_write_q;
         trk_wraddr      = s4_trk_wraddr_q;
-        trk_wraddr_par  = s4_trk_wraddr_par_q;   // added kch 
+        trk_wraddr_par  = s4_trk_wraddr_par_q; 
      end
    
 
@@ -3650,7 +3643,7 @@ module nvme_sntl_cmd#
    
    //-------------------------------------------------------
    // rsp fifo
-   localparam rspif_width = lunidx_width + 1 + 1 + 16 + 2 + 32 + tag_width + 1 + 32; // added 1+ kch 
+   localparam rspif_width = lunidx_width + 1 + 1 + 16 + 2 + 32 + tag_width + 1 + 32;
    wire                   s5_rsp_fifo_valid;
    reg                    s5_rsp_fifo_taken;
    wire [rspif_width-1:0] s5_rsp_fifo_data;
@@ -3748,7 +3741,7 @@ module nvme_sntl_cmd#
    reg              [31:0] s5_rsp_resid;   
    reg              [31:0] s5_rsp_data;   
    reg     [tag_width-1:0] s5_rsp_tag;
-   reg                     s5_rsp_tag_par;   // added kch 
+   reg                     s5_rsp_tag_par; 
    reg                     s5_rsp_passthru;
 
    reg              [19:0] s5_kcq;  // SCSI sense key & additional sense code & qualifier
@@ -3766,11 +3759,11 @@ module nvme_sntl_cmd#
              rsp_v_d            = s5_rsp_fifo_valid;
              s5_rsp_fifo_taken  = s5_rsp_fifo_valid;
              rsp_tag_d          = s5_rsp_tag;
-             rsp_tag_par_d      = s5_rsp_tag_par;   // added kch 
+             rsp_tag_par_d      = s5_rsp_tag_par; 
              rsp_underrun_d     = s5_rsp_resid_under;
              rsp_overrun_d      = s5_rsp_resid_over;
              rsp_resid_d        = s5_rsp_resid;
-             rsp_beats_d        = zero[beatid_width-1:0]; // todo
+             rsp_beats_d        = zero[beatid_width-1:0];
              
              rsp_fc_status_d    = FCP_RSP_GOOD[fcstat_width-1:0];
              rsp_fcx_status_d   = FCX_STAT_NONE[fcxstat_width-1:0];
@@ -3803,7 +3796,7 @@ module nvme_sntl_cmd#
                            s5_kcq             = {SKEY_ILLEGAL_REQUEST, ASCQ_INVALID_FIELD_IN_CDB };
                            rsp_sns_valid_d    = 1'b1;
                         end
-                      // todo: status mapping not specified for this encode
+                      // note: status mapping not specified for this encode
                       // NVME_SC_G_ID_CONFLICT:
                       //  begin                           
                       //  end            
@@ -3872,7 +3865,6 @@ module nvme_sntl_cmd#
                       default:
                         begin
                            // unexpected error status
-                           // todo: review driver handling
                            rsp_fc_status_d = FCP_RSP_NOEXP[fcstat_width-1:0];
                            s5_kcq          = {SKEY_NO_SENSE, 1'b0,  s5_rsp_status[14:0] };
                            rsp_sns_valid_d    = 1'b1;
@@ -3904,7 +3896,6 @@ module nvme_sntl_cmd#
                       default:
                         begin
                            // unexpected error status
-                           // todo: review driver handling
                            rsp_fc_status_d = FCP_RSP_NOEXP[fcstat_width-1:0];
                            s5_kcq          = {SKEY_NO_SENSE, 1'b0,  s5_rsp_status[14:0] };
                            rsp_sns_valid_d    = 1'b1;
@@ -3936,7 +3927,6 @@ module nvme_sntl_cmd#
                       default:
                         begin
                            // unexpected error status
-                           // todo: review driver handling
                            rsp_fc_status_d = FCP_RSP_NOEXP[fcstat_width-1:0];
                            s5_kcq          = {SKEY_NO_SENSE, 1'b0,  s5_rsp_status[14:0] };
                            rsp_sns_valid_d    = 1'b1;
@@ -3946,7 +3936,6 @@ module nvme_sntl_cmd#
                NVME_SCT_VENDOR:
                  begin
                     // unexpected error status
-                    // todo: review driver handling
                     rsp_fc_status_d = FCP_RSP_NOEXP[fcstat_width-1:0];
                     s5_kcq          = {SKEY_NO_SENSE, 1'b0,  s5_rsp_status[14:0] };
                     rsp_sns_valid_d    = 1'b1;
@@ -4065,7 +4054,6 @@ module nvme_sntl_cmd#
                       default:
                         begin
                            // unexpected error status
-                           // todo: review driver handling
                            rsp_fc_status_d = FCP_RSP_NOEXP[fcstat_width-1:0];
                            s5_kcq          = {SKEY_NO_SENSE, 1'b0,  s5_rsp_status[14:0] };
                            rsp_sns_valid_d    = 1'b1;
@@ -4076,7 +4064,6 @@ module nvme_sntl_cmd#
                default:
                  begin
                     // unexpected error status
-                    // todo: review driver handling
                     rsp_fc_status_d = FCP_RSP_NOEXP[fcstat_width-1:0];
                     s5_kcq          = {SKEY_NO_SENSE, 1'b0,  s5_rsp_status[14:0] };  
                     rsp_sns_valid_d    = 1'b1;
@@ -4135,7 +4122,7 @@ module nvme_sntl_cmd#
              s5_rsp_fifo_taken  = 1'b0;
              rsp_v_d            = rsp_v_q & ~rsp_cmd_ack;
              rsp_tag_d          = rsp_tag_q;
-             rsp_tag_par_d      = rsp_tag_par_q;   // added kch 
+             rsp_tag_par_d      = rsp_tag_par_q; 
              rsp_fc_status_d    = rsp_fc_status_q;
              rsp_fcx_status_d   = rsp_fcx_status_q;
              rsp_scsi_status_d  = rsp_scsi_status_q;
@@ -4167,7 +4154,7 @@ module nvme_sntl_cmd#
    // I/O Write command fifo
 
 
-   localparam iowr_width = cid_width+cid_par_width;  // added +cid_par_width kch 
+   localparam iowr_width = cid_width+cid_par_width;
    wire                      s5_iowr_fifo_full;
    wire                      s5_iowr_fifo_almost_full;
    wire       [trk_awidth:0] s5_iowr_fifo_used;
@@ -4373,7 +4360,7 @@ module nvme_sntl_cmd#
         {sntl_ioq_req_sqid, sntl_ioq_req_lba, sntl_ioq_req_numblks, sntl_ioq_req_nsid, sntl_ioq_req_opcode, sntl_ioq_req_cmdid, sntl_ioq_req_fua, sntl_ioq_req_wbufid, sntl_ioq_req_reloff } = s5_ioq_fifo_data;
         sntl_ioq_req_valid = s5_ioq_fifo_valid;
         s5_ioq_fifo_taken = ioq_sntl_req_ack;
-        sntl_ioq_req_wbufid_par = 1'b0;  // kchtodo fix this    
+        sntl_ioq_req_wbufid_par = 1'b0;
      end
 
 
@@ -4382,7 +4369,7 @@ module nvme_sntl_cmd#
 
    // holds a few commands going to admin/microcode
    // when this is full, sislite request interface gets backpressure
-   // todo: resize to 256 and no backpressure or put lun & cdb in tracking table and just queue the cid?
+   // could resize to 256 and no backpressure or put lun & cdb in tracking table and just queue the cid?
    localparam admin_fifo_entries = 16;
    localparam admin_width = cmd_width + 16 + lunid_width + datalen_width + 128;
    localparam admin_par_width = (admin_width+63)/64;
@@ -4394,7 +4381,7 @@ module nvme_sntl_cmd#
    wire   [admin_width-1:0] s5_admin_fifo_data;
    wire [$clog2(admin_fifo_entries):0] s5_admin_fifo_used;
 
-   // gen parity for array kch
+   // gen parity for array
 
    wire          [admin_par_width-1:0] s4_admin_fifo_data_par;
    wire          [admin_par_width-1:0] s5_admin_fifo_data_par;
@@ -4427,8 +4414,7 @@ module nvme_sntl_cmd#
       .almost_full( s5_admin_fifo_almost_full ), 
       .used(        s5_admin_fifo_used));
 
-   // check fifo parity kch 
-
+   // check fifo parity
    nvme_pcheck#
      (
       .bits_per_parity_bit(64),

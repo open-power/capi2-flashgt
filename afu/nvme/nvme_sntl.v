@@ -22,7 +22,7 @@
 //  File : nvme_sntl.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer
+//  Description : FlashGT+ - SCSI to NVMe Layer
 //                
 //  *************************************************************************
 
@@ -60,7 +60,7 @@ module nvme_sntl#
 
     parameter wbuf_numids     = 16,  // 4KB per id
     parameter wbufid_width    = $clog2(wbuf_numids),
-    parameter wbufid_par_width = (wbufid_width + 7)/8,  // added kch 
+    parameter wbufid_par_width = (wbufid_width + 7)/8,
 
     parameter num_isq = 16,  // max number of I/O submissions queues
     parameter isq_idwidth = $clog2(num_isq+2)
@@ -203,7 +203,7 @@ module nvme_sntl#
     // DMA response from SNTL
     //-------------------------------------------------------        
  
-    output                 [144:0] sntl_pcie_cc_data, // changed 127 to 144 kch 
+    output                 [144:0] sntl_pcie_cc_data, 
     output                         sntl_pcie_cc_first,
     output                         sntl_pcie_cc_last,
     output                         sntl_pcie_cc_discard,

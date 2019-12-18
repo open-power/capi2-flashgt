@@ -22,7 +22,7 @@
 //  File : nvme_sntl_dma.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer payload dma 
+//  Description : FlashGT+ - SCSI to NVMe Layer payload dma 
 //                
 //  *************************************************************************
 
@@ -65,13 +65,13 @@ module nvme_sntl_dma#
     (* mark_debug = "false" *)
     output reg      [tag_width-1:0] dma_wdata_req_tag, // afu req tag  
     (* mark_debug = "false" *)
-    output reg                      dma_wdata_req_tag_par, // added kch  
+    output reg                      dma_wdata_req_tag_par,
     (* mark_debug = "false" *)
     output reg  [datalen_width-1:0] dma_wdata_req_reloff, // offset from start address of this command
     (* mark_debug = "false" *)
     output reg [wdatalen_width-1:0] dma_wdata_req_length, // number of bytes to request, max 512B
     (* mark_debug = "false" *)
-    output reg                      dma_wdata_req_length_par, // added kch 
+    output reg                      dma_wdata_req_length_par,
     (* mark_debug = "false" *)
     input                           wdata_dma_req_pause, // backpressure
    
@@ -85,12 +85,12 @@ module nvme_sntl_dma#
     (* mark_debug = "false" *)
     input           [tag_width-1:0] wdata_dma_cpl_tag,
     (* mark_debug = "false" *)
-    input                           wdata_dma_cpl_tag_par, // added kch 
+    input                           wdata_dma_cpl_tag_par,
     (* mark_debug = "false" *)
     input       [datalen_width-1:0] wdata_dma_cpl_reloff,
     (* mark_debug = "false" *)
     input                     [9:0] wdata_dma_cpl_length, // number of bytes in buffer 128B max
-    input                   [129:0] wdata_dma_cpl_data, // changed 127 to 129 kch 
+    input                   [129:0] wdata_dma_cpl_data,
     (* mark_debug = "false" *)
     input                           wdata_dma_cpl_first, // first cycle of this completion
     (* mark_debug = "false" *)
@@ -136,10 +136,10 @@ module nvme_sntl_dma#
 
     input                           admin_dma_req_valid,
     input           [tag_width-1:0] admin_dma_req_tag, // afu req tag
-    input                           admin_dma_req_tag_par, // added kch 
+    input                           admin_dma_req_tag_par,
     input       [datalen_width-1:0] admin_dma_req_reloff, // offset from start address of this command
     input      [wdatalen_width-1:0] admin_dma_req_length, // number of bytes to request, max 512B
-    input                           admin_dma_req_length_par, // added kch 
+    input                           admin_dma_req_length_par,
     output reg                      dma_admin_req_ack, 
     output reg                      dma_admin_req_cpl, 
    
@@ -177,7 +177,7 @@ module nvme_sntl_dma#
     //-------------------------------------------------------
     output reg                      dma_cmd_wdata_valid,
     output reg      [cid_width-1:0] dma_cmd_wdata_cid,
-    output reg  [cid_par_width-1:0] dma_cmd_wdata_cid_par, // added kch 
+    output reg  [cid_par_width-1:0] dma_cmd_wdata_cid_par,
     output reg                      dma_cmd_wdata_error,
     input                           cmd_dma_wdata_ready,
    
@@ -187,7 +187,7 @@ module nvme_sntl_dma#
    
     (* mark_debug = "false" *)
     input                           pcie_sntl_valid,
-    input                   [144:0] pcie_sntl_data, // added parity bits to "left side" 1 control 16 data parity bits  kch 
+    input                   [144:0] pcie_sntl_data,
     (* mark_debug = "false" *)
     input                           pcie_sntl_first, 
     (* mark_debug = "false" *)
@@ -238,7 +238,7 @@ module nvme_sntl_dma#
    wire                       [7:0] s1_perror;
    wire                       [7:0] dma_perror_int;
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors
    nvme_srlat#
      (.width(8))  idma_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(dma_perror_int));
@@ -281,10 +281,10 @@ module nvme_sntl_dma#
    reg                                       s0_first;
    reg                                       s0_last;
    reg                                       s0_discard;
-   reg       [data_par_width+data_width-1:0] s0_data;  // added 1 +data_par_width to include parity bits kch 
+   reg       [data_par_width+data_width-1:0] s0_data; 
    reg                                       s0_ready;
    
-   reg [req_hdr_par_width+req_hdr_width-1:0] s0_req_hdr_q, s0_req_hdr_d;   // added req_hdr_par_width kch 
+   reg [req_hdr_par_width+req_hdr_width-1:0] s0_req_hdr_q, s0_req_hdr_d;  
    reg                                       s0_chkdma_q, s0_chkdma_d;
    reg                                 [1:0] s0_error_q, s0_error_d;
    reg                                       s0_discard_q, s0_discard_d;
@@ -295,7 +295,7 @@ module nvme_sntl_dma#
    reg                                       s1_discard_q, s1_discard_d;
    reg                                 [1:0] s1_error_q, s1_error_d;
    reg                                       s1_rnw_q, s1_rnw_d;
-   reg       [data_par_width+data_width-1:0] s1_data_q, s1_data_d;  // added 16+ to include parity bits and  kch 
+   reg       [data_par_width+data_width-1:0] s1_data_q, s1_data_d; 
    reg                                       s1_chkdma_q, s1_chkdma_d;
 
    reg                                       s2_valid_q, s2_valid_d;
@@ -304,7 +304,7 @@ module nvme_sntl_dma#
    reg                                       s2_discard_q, s2_discard_d;
    reg                                 [1:0] s2_error_q, s2_error_d;
    reg                                       s2_rnw_q, s2_rnw_d;
-   reg       [data_par_width+data_width-1:0] s2_data_q, s2_data_d;  // added 16+ to include parity bits and kch 
+   reg       [data_par_width+data_width-1:0] s2_data_q, s2_data_d; 
    reg                                       s2_chkdma_q, s2_chkdma_d;
 
    reg                                       s3_valid_q, s3_valid_d;
@@ -313,7 +313,7 @@ module nvme_sntl_dma#
    reg                                       s3_discard_q, s3_discard_d;
    reg                                 [1:0] s3_error_q, s3_error_d;
    reg                                       s3_rnw_q, s3_rnw_d;
-   reg       [data_par_width+data_width-1:0] s3_data_q, s3_data_d;   // added 16+ to include parity bits and  kch 
+   reg       [data_par_width+data_width-1:0] s3_data_q, s3_data_d;  
    reg                                       s3_chkdma_q, s3_chkdma_d;
    
    reg                                       s4_valid_q, s4_valid_d;
@@ -355,7 +355,7 @@ module nvme_sntl_dma#
    reg         [datalen_width-1:0] s6_req_reloff_q, s6_req_reloff_d;
    reg        [wdatalen_width-1:0] s6_req_length_q, s6_req_length_d;
    reg                      [15:0] s6_req_cid_q, s6_req_cid_d;
-   reg                       [1:0] s6_req_cid_par_q, s6_req_cid_par_d;   // added 
+   reg                       [1:0] s6_req_cid_par_q, s6_req_cid_par_d; 
    reg         [datalen_width-1:0] s6_req_addr_q, s6_req_addr_d;
   
    localparam REQ_IDLE    = 4'h1;
@@ -366,7 +366,7 @@ module nvme_sntl_dma#
    // DMA read requests for microcode/admin functions
    reg                             admin_valid_q, admin_valid_d;
    reg             [tag_width-1:0] admin_tag_q, admin_tag_d;
-   reg                             admin_tag_par_q, admin_tag_par_d;  // added kch 
+   reg                             admin_tag_par_q, admin_tag_par_d;
    reg         [datalen_width-1:0] admin_reloff_q, admin_reloff_d;
    reg        [wdatalen_width-1:0] admin_length_q, admin_length_d;
    reg                       [7:0] dma_pe_inj_d,dma_pe_inj_q;
@@ -424,12 +424,12 @@ module nvme_sntl_dma#
              s6_req_reloff_q  <= zero[datalen_width-1:0];
              s6_req_length_q  <= zero[wdatalen_width-1:0];
              s6_req_cid_q     <= zero[15:0];              
-             s6_req_cid_par_q <= one[1:0];     // added kch            
+             s6_req_cid_par_q <= one[1:0];   
              s6_req_addr_q    <= zero[datalen_width-1:0];
 
              admin_valid_q    <= 1'b0;
              admin_tag_q      <= zero[tag_width-1:0];
-             admin_tag_par_q  <= 1'b0;                            // added kch 
+             admin_tag_par_q  <= 1'b0;                      
              admin_reloff_q   <= zero[datalen_width-1:0];
              admin_length_q   <= zero[wdatalen_width-1:0];
              dma_pe_inj_q     <= 8'h0;
@@ -486,12 +486,12 @@ module nvme_sntl_dma#
              s6_req_reloff_q  <= s6_req_reloff_d;
              s6_req_length_q  <= s6_req_length_d;
              s6_req_cid_q     <= s6_req_cid_d;                     
-             s6_req_cid_par_q <= s6_req_cid_par_d;      // added kch                
+             s6_req_cid_par_q <= s6_req_cid_par_d;      
              s6_req_addr_q    <= s6_req_addr_d;
              
              admin_valid_q    <= admin_valid_d;
              admin_tag_q      <= admin_tag_d;
-             admin_tag_par_q  <= admin_tag_par_d;  // added kch 
+             admin_tag_par_q  <= admin_tag_par_d;
              admin_reloff_q   <= admin_reloff_d;
              admin_length_q   <= admin_length_d;
              dma_pe_inj_q     <= dma_pe_inj_d;
@@ -663,7 +663,7 @@ module nvme_sntl_dma#
      end // always @ *
 
    
-   localparam s0_width = 6 + data_par_width + data_width;   // added 1 + data_par_widthfor sntl_data byte poarity kch 
+   localparam s0_width = 6 + data_par_width + data_width;  
    reg           [s0_width-1:0] s0_din;
    wire          [s0_width-1:0] s0_dout;
    wire [req_hdr_par_width-1:0] s0_dout_hdr_par;
@@ -686,11 +686,11 @@ module nvme_sntl_dma#
       .width(data_width)
       ) ipcheck_s0_data 
        (.oddpar(1'b1),.data({s0_data[data_width-1:1],(s0_data[0]^dma_pe_inj_q[2])}),.datap(s0_data[data_par_width-1 +data_width-1:data_width]),.check(s0_valid),.parerr(s1_perror[2])); 
-   // fixit. check control parity kch 
+  
 
 
 
-   // generate header parity kch 
+   // generate header parity
    nvme_pgen#
      (
       .bits_per_parity_bit(8),
@@ -720,7 +720,7 @@ module nvme_sntl_dma#
 
         if( s0_valid & s0_first )
           begin
-             s0_req_hdr_d  = {s0_dout_hdr_par,s0_dout[req_hdr_width-1:0]};  // added s0_dout_hdr_par kch 
+             s0_req_hdr_d  = {s0_dout_hdr_par,s0_dout[req_hdr_width-1:0]}; 
              s0_chkdma_d   = s0_chk_dma;
              s0_error_d    = s0_error;
              s0_discard_d  = s0_discard;
@@ -735,7 +735,7 @@ module nvme_sntl_dma#
              s0_discard_d  = s0_discard_q | (s0_valid & s0_discard);
           end         
 
-        { s0_reg_par,                 // added kch 
+        { s0_reg_par,              
           s0_req_addr_type, 
           s0_req_attr, 
           s0_req_tc, 
@@ -752,7 +752,7 @@ module nvme_sntl_dma#
 
      end
 
-   // generate length parity kch s0_req_dcount fixit 
+ 
 
    wire      s0_req_dcount_par;
 
@@ -926,10 +926,10 @@ module nvme_sntl_dma#
         // DMA reads
         dma_wdata_req_valid       = 1'b0;
         dma_wdata_req_tag         = s5_req_cid;       
-        dma_wdata_req_tag_par     = s5_req_cid_par;   // added kch     
+        dma_wdata_req_tag_par     = s5_req_cid_par;  
         dma_wdata_req_reloff      = s5_req_addr[datalen_width-1:0]; // offset from start address of this command
         dma_wdata_req_length      = {s5_req_dcount[wdatalen_width-1-2:0], 2'b00};    // number of bytes to request, max 512B
-        dma_wdata_req_length_par  = s5_req_dcount_par;    // added kch 
+        dma_wdata_req_length_par  = s5_req_dcount_par; 
         cpl_fifo_flush            = 1'b0;
         cpl_fifo_push             = 1'b0;
         cpl_fifo_req_error        = 3'b000;  // {cmd lookup error, completer_abort, unsupported request}
@@ -939,7 +939,7 @@ module nvme_sntl_dma#
         s6_req_reloff_d           = s6_req_reloff_q;
         s6_req_length_d           = s6_req_length_q;
         s6_req_cid_d              = s6_req_cid_q;
-        s6_req_cid_par_d          = s6_req_cid_par_q;    // added kch 
+        s6_req_cid_par_d          = s6_req_cid_par_q;   
         s6_req_addr_d             = s6_req_addr_q;
         dma_rsp_valid             = 1'b0;  
         dma_rsp_first             = 1'b0;
@@ -952,7 +952,6 @@ module nvme_sntl_dma#
         // - no room for DMA read requests in pipeline
         // - no room for 128B DMA write x 2
         // - no room for DMA read completion headers
-        // todo: use credits for non-posted requests on xilinx PCIe core completer request interface
         sntl_pcie_pause           = wdata_dma_req_pause | rsp_dma_pause | cpl_fifo_almost_full; 
         
         
@@ -988,7 +987,7 @@ module nvme_sntl_dma#
                               s6_req_reloff_d = s5_req_addr[datalen_width-1:0];
                               s6_req_length_d = {s5_req_dcount[wdatalen_width-1-2:0], 2'b00};
                               s6_req_cid_d    = s5_req_cid;
-                              s6_req_cid_par_d    = s5_req_cid_par; // added kch 
+                              s6_req_cid_par_d    = s5_req_cid_par; 
                               s6_req_addr_d   = s5_req_addr[datalen_width-1:0];
 
                               if( ~s5_last_q )
@@ -1007,17 +1006,16 @@ module nvme_sntl_dma#
                                 end
                               // else - ignore writes that have no data
                            end
-                         // todo: BMP - consistency checks - invalid length or command
                       end                                                 
                  end 
                else if( admin_dma_req_valid & ~wdata_dma_req_pause & ~admin_valid_q)
                  begin
                     dma_wdata_req_valid   = 1'b1;
                     dma_wdata_req_tag     = admin_dma_req_tag;       
-                    dma_wdata_req_tag_par     = admin_dma_req_tag_par;    // added kch    
+                    dma_wdata_req_tag_par     = admin_dma_req_tag_par;  
                     dma_wdata_req_reloff  = admin_dma_req_reloff;
                     dma_wdata_req_length  = admin_dma_req_length;
-                    dma_wdata_req_length_par  = admin_dma_req_length_par;   // added kch 
+                    dma_wdata_req_length_par  = admin_dma_req_length_par; 
                     dma_admin_req_ack     = 1'b1;
                  end                                
             end
@@ -1030,7 +1028,6 @@ module nvme_sntl_dma#
                  begin
                     dma_rsp_valid = 1'b1;
                     s6_req_addr_d = s6_req_addr_q  + {zero[datalen_width-1:8],8'd16};
-                    // todo: handle discard on last cycle
                     if( s5_last_q )
                       begin
                          dma_rsp_last = 1'b1;
@@ -1050,7 +1047,6 @@ module nvme_sntl_dma#
                  begin
                     dma_rsp_valid = 1'b1;
                     s6_req_addr_d = s6_req_addr_q + {zero[datalen_width-1:8],8'd16};
-                    // todo: handle discard on last cycle
                     if( s5_last_q )
                       begin
                          dma_rsp_last = 1'b1;
@@ -1066,7 +1062,6 @@ module nvme_sntl_dma#
                   begin
                      pcie_admin_valid = 1'b1;
                      s6_req_addr_d = s6_req_addr_q + {zero[datalen_width-1:8],8'd16};
-                     // todo: handle discard on last cycle
                      if( s5_last_q )
                        begin
                           s6_req_state_d = REQ_IDLE;
@@ -1076,8 +1071,7 @@ module nvme_sntl_dma#
           
 
           default:
-            begin
-               // todo: signal error
+            begin            
                s6_req_state_d = REQ_IDLE;
             end
         endcase // case (s6_req_state_q)
@@ -1085,7 +1079,7 @@ module nvme_sntl_dma#
         dma_rsp_reloff   = s6_req_reloff_q;
         dma_rsp_length   = s6_req_length_q;             
         dma_rsp_tag      = s6_req_cid_q[tag_width-1:0];
-        dma_rsp_tag_par  = s6_req_cid_par_q[0];  // added kch 
+        dma_rsp_tag_par  = s6_req_cid_par_q[0];
         dma_rsp_data     = s5_data_q;  // PCIe data starts 1 cycle after header fields, so use s3 here
 
         pcie_admin_addr  = s6_req_addr_q;     
@@ -1096,13 +1090,7 @@ module nvme_sntl_dma#
    //-------------------------------------------------------
    // fifo for DMA read headers
    //-------------------------------------------------------
-
-   // todo: resize smaller after enabling credits for non-posted requests
-   //       set to 256 entries based on 8b pcie tag
-
-   // generate parity on 
-
-   // generate header parity kch 
+ 
 
    wire     [cpl_fifo_par_width-1:0]   cpl_fifo_par;
    nvme_pgen#
@@ -1211,7 +1199,7 @@ module nvme_sntl_dma#
    reg                 [tag_width-1:0] cpl_wdata_tag;
    reg             [datalen_width-1:0] cpl_wdata_reloff;
    reg                           [9:0] cpl_wdata_length; // number of bytes in buffer 128B max
-   reg                         [143:0] cpl_wdata_data;   // changed 127 to 144 kch 
+   reg                         [143:0] cpl_wdata_data;   
    reg                                 cpl_wdata_first; // first cycle of this completion
    reg                                 cpl_wdata_last; // last cycle of this completion
 
@@ -1292,7 +1280,7 @@ module nvme_sntl_dma#
         dma_cmd_wdata_valid    = 1'b0;
         dma_cmd_wdata_error    = 1'b1;
         dma_cmd_wdata_cid      = cpl_s0_req_cid;
-        dma_cmd_wdata_cid_par  = cpl_s0_req_cid_par;   // added kch 
+        dma_cmd_wdata_cid_par  = cpl_s0_req_cid_par; 
 
         cpl_wdata_valid        = 1'b0;
         cpl_wdata_tag          = wdata_dma_cpl_tag;
@@ -1477,8 +1465,7 @@ module nvme_sntl_dma#
             end
           
           default:
-            begin
-               // todo: BMP error
+            begin            
                cplsm_d = CPLSM_IDLE;
             end
         endcase // case (cplsm_q)
@@ -1501,7 +1488,7 @@ module nvme_sntl_dma#
           cpl_s0_req_wr, 
           cpl_s0_req_tag, 
           cpl_s0_req_addr_region,           
-          cpl_s0_req_addr} = cpl_fifo_data;  // added kch 
+          cpl_s0_req_addr} = cpl_fifo_data; 
         cpl_s0_req_cid = cpl_s0_req_addr[addr_width-1:addr_width-cid_width];
 
         // reset progress counts when idle or at the end of a completion
@@ -1512,8 +1499,6 @@ module nvme_sntl_dma#
     
         cpl_dwords_not_sent = cpl_s0_req_dcount - cpl_dwords_sent_q;
 
-        // todo: clean up byte enable/length/dword/dcount handling
-        // todo:  BMP check that cpl_dcount <= cpl_dwords_not_sent
         cpl_dcount = {3'b000, cpl_wdata_length[9:2]}; 
 
         // calculate cpl_lower_address & cpl_byte_count - see "PCI Express System Architecture" pg 187
@@ -1585,8 +1570,6 @@ module nvme_sntl_dma#
                        cpl_s0_req_tag, 
                        cpl_lower_addr};
      end
-
-   //    generate cpl_s0_hdr par kch 
 
    wire           [cpl_hdr_par_width-1:0]   cpl_s0_hdr_par;
 
@@ -1729,7 +1712,7 @@ module nvme_sntl_dma#
         // save request info for admin->host dma request
         admin_valid_d         = admin_valid_q;
         admin_tag_d           = admin_tag_q;
-        admin_tag_par_d       = admin_tag_par_q;  // added kch 
+        admin_tag_par_d       = admin_tag_par_q;
         admin_reloff_d        = admin_reloff_q;
         admin_length_d        = admin_length_q;
 
@@ -1737,7 +1720,7 @@ module nvme_sntl_dma#
           begin
              admin_valid_d         = 1'b1;
              admin_tag_d           = admin_dma_req_tag;
-             admin_tag_par_d       = admin_dma_req_tag_par; // added kch 
+             admin_tag_par_d       = admin_dma_req_tag_par;
              admin_reloff_d        = admin_dma_req_reloff;
              admin_length_d        = admin_dma_req_length;
           end
@@ -1750,8 +1733,7 @@ module nvme_sntl_dma#
 
              if( wdata_dma_cpl_valid & 
                  ~wdata_dma_cpl_first)  // ignore first cycle header used for pcie
-               begin                  
-                  // todo: check tag, error, reloff
+               begin                                   
                   if( wdata_dma_cpl_last  )
                     begin
                        dma_admin_req_cpl = 1'b1;

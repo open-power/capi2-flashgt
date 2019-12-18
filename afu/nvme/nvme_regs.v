@@ -21,7 +21,7 @@
 //  File : nvme_port.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock NVMe - single NVMe port container
+//  Description : FlashGT+ - single NVMe port container
 //                
 //       Takes read/write commands from PSL/AFU and converts to NVMe
 //
@@ -315,9 +315,9 @@ module nvme_regs#
    localparam FC_ERRSET         = 20'h398;
    localparam FC_ERRINJ         = 20'h3A0;
    localparam FC_ERRINJ_DATA    = 20'h3A8;
-   localparam FC_PE_ERRINJ      = 20'h3B0;  // added parity error inject kch 
-   localparam FC_PE_ERRINJ_DATA = 20'h3B8;  // added parity error inject kch 
-   localparam FC_PE_STATUS      = 20'h3C0;  // added parity error inject kch
+   localparam FC_PE_ERRINJ      = 20'h3B0;  
+   localparam FC_PE_ERRINJ_DATA = 20'h3B8;  
+   localparam FC_PE_STATUS      = 20'h3C0; 
    localparam FC_PE_ERRMSK      = 20'h3C8;   
    localparam FC_PE_INFO        = 20'h3D0;   
 
@@ -417,14 +417,14 @@ module nvme_regs#
    reg         [63:0] error_q, error_d, error_set;
    reg         [63:0] errcap_q, errcap_d;
    reg         [63:0] errmsk_q, errmsk_d;
-   reg         [31:0] pe_errinj_q, pe_errinj_d;   // added kch 
-   reg                pe_errinj_s1_q, pe_errinj_s1_d;   // added kch 
-   reg         [31:0] pe_errinj_data_q, pe_errinj_data_d;   // added kch 
-   reg         [63:0] pe_status_data_q = 64'h0000000000000000;   // added kch 
+   reg         [31:0] pe_errinj_q, pe_errinj_d;  
+   reg                pe_errinj_s1_q, pe_errinj_s1_d; 
+   reg         [31:0] pe_errinj_data_q, pe_errinj_data_d; 
+   reg         [63:0] pe_status_data_q = 64'h0000000000000000; 
    reg         [63:0] pe_status_data_d;
    reg         [63:0] pe_errmsk_q = 64'h0000000000000000;
    reg         [63:0] pe_errmsk_d;
-   reg         [31:0] pe_info_q, pe_info_d;   // added kch 
+   reg         [31:0] pe_info_q, pe_info_d; 
    
    
    reg         [31:0] dbgdisp_q,dbgdisp_d;
@@ -882,9 +882,9 @@ module nvme_regs#
              port_error_q          <= 1'b0;
              errmsk_q              <= 64'h0;             
              errinj_q              <= 32'h0;
-             pe_errinj_q           <= 32'h0;  // added kch 
-             pe_errinj_s1_q        <= 1'h0;  // added kch 
-             pe_errinj_data_q      <= 32'h0;  // added kch
+             pe_errinj_q           <= 32'h0;
+             pe_errinj_s1_q        <= 1'h0; 
+             pe_errinj_data_q      <= 32'h0; 
              pe_info_q             <= 32'h0;
              errinj_data_q         <= 48'h0;
 	     errinj_count_q        <= 16'h0;	     
@@ -951,10 +951,10 @@ module nvme_regs#
              port_error_q          <= port_error_d;
              errmsk_q              <= errmsk_d;                        
              errinj_q              <= errinj_d;
-             pe_errinj_q           <= pe_errinj_d;   // added kch 
-             pe_errinj_s1_q        <= pe_errinj_s1_d;   // added kch 
+             pe_errinj_q           <= pe_errinj_d;  
+             pe_errinj_s1_q        <= pe_errinj_s1_d; 
              errinj_data_q         <= errinj_data_d;
-             pe_errinj_data_q      <= pe_errinj_data_d;   // added kch
+             pe_errinj_data_q      <= pe_errinj_data_d; 
              pe_info_q             <= pe_info_d;
 	     errinj_count_q        <= errinj_count_d;	     
              errinj_period_done_q  <= errinj_period_done_d;
@@ -989,7 +989,6 @@ module nvme_regs#
         config3_q <= config3_d;
         freeze_q  <= freeze_d;
         regs_pe_valid_q <= regs_pe_valid_d;
- //       pe_enable_q <= {~pe_  fixit
         pe_status_data_q <= pe_status_data_d;  
         pe_errmsk_q      <= pe_errmsk_d;
      end
@@ -1138,9 +1137,9 @@ module nvme_regs#
         errinj_d            = errinj_q;
         errinj_data_d       = errinj_data_q;
 
-        pe_errinj_d         = pe_errinj_q;   // added kch 
-        pe_errinj_s1_d      = pe_errinj_s1_q;   // added kch 
-        pe_errinj_data_d    = pe_errinj_data_q;   // added kch 
+        pe_errinj_d         = pe_errinj_q;
+        pe_errinj_s1_d      = pe_errinj_s1_q;  
+        pe_errinj_data_d    = pe_errinj_data_q; 
 
         nvme_pe_error       = {cdc_hold_cfg_err_fatal_out,  // 38
                                admin_perror_ind,     // 37:34
@@ -1339,7 +1338,7 @@ module nvme_regs#
                  errinj_data_d[31:0] = wrdata_q[31:0];
                  errinj_d[31] = pe_errinj_q[0];
             end
-          FC_PE_ERRINJ[mmio_awidth-1:3]:   // added kch 
+          FC_PE_ERRINJ[mmio_awidth-1:3]: 
             begin
                rddata_d = {32'h0, pe_errinj_q};
                if (wr_valid_q & wr_lo_q)
@@ -1349,7 +1348,7 @@ module nvme_regs#
                    pe_info_d[1] = wrdata_q[0] & pe_errinj_q[0];
                  end
             end
-          FC_PE_ERRINJ_DATA[mmio_awidth-1:3]:   // added kch 
+          FC_PE_ERRINJ_DATA[mmio_awidth-1:3]:
             begin
                rddata_d = {32'h0, pe_errinj_data_q};
                if (wr_valid_q & wr_lo_q)
@@ -1358,7 +1357,7 @@ module nvme_regs#
                    pe_info_d[2] = pe_errinj_q[0];
                  end
             end
-          FC_PE_STATUS[mmio_awidth-1:3]:   // added kch 
+          FC_PE_STATUS[mmio_awidth-1:3]: 
             begin
                rddata_d = {pe_status_data_q};
                if (wr_valid_q & wr_hi_q)
@@ -1804,7 +1803,7 @@ module nvme_regs#
         // use ~config_q[0] to assert perst continuously
         // use config[4] to start a perst for 100us
         // one cycle pulse, config[4] automatically cleared
-        // regs_pcie_perst = config_q[4] | ~config_q[0] | i_fc_fatal_error;   // added i_fc_fata_error for fc detected perrors kch 
+        // regs_pcie_perst = config_q[4] | ~config_q[0] | i_fc_fatal_error; 
         // config_q[4], config_q[23:16] are used in perst module below
         if( config_q[4] )
           config_d[4]             = 1'b0;
@@ -1867,11 +1866,10 @@ module nvme_regs#
     .pcie_xx_link_up                    (pcie_xx_link_up),
     .pcie_xx_init_done                  (pcie_xx_init_done),
     .pcie_regs_status                   (pcie_regs_status[31:0]),
-//    .perst_in                           (config_q[4] | ~config_q[0]),
-    .perst_in                           (regs_perst_in),                         // added in pe errors kch 
+    .perst_in                           (regs_perst_in),                  
     .debug_in                           (config_q[23:16]));
 
-// generate parity just cause its easier kch dbg_offset_q
+
    wire        regs_cmd_trk_addr_par_in;
    nvme_pgen#
   (

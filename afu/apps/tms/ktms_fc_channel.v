@@ -15,21 +15,6 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
-
 module ktms_fc_channel#
   (
    parameter ea_width = 64,
@@ -38,9 +23,9 @@ module ktms_fc_channel#
    parameter cdb_width_w_par=128+2,
    parameter max_reads = 256,
    parameter max_writes = 256,
-   parameter tag_width = 8,     // this is fc_tag_width kch 
+   parameter tag_width = 8,
    parameter tag_par_width      = (tag_width + 63)/64,
-   parameter tag_width_w_par    = tag_width+tag_par_width, // added kch
+   parameter tag_width_w_par    = tag_width+tag_par_width,
    parameter tstag_width = 1,
    parameter channel_width = 1,
    parameter channel = 0,
@@ -51,21 +36,20 @@ module ktms_fc_channel#
    parameter datalen_width_w_par = datalen_width+datalen_par_width,
 
 
-   //parameter fc_data_width = 32, 
-   parameter fc_data_width = 128, // change data width to 128 bits for nvme 12/23/15 kch
-   parameter fc_data_par_width = fc_data_width/64, //kch
-   parameter fc_data_width_w_par = fc_data_width + fc_data_par_width, //kch
+   parameter fc_data_width = 128,
+   parameter fc_data_par_width = fc_data_width/64,
+   parameter fc_data_width_w_par = fc_data_width + fc_data_par_width,
    parameter fc_data_bytes = fc_data_width/8,
    parameter fc_bytec_width = $clog2(fc_data_bytes+1),
 
    parameter beatid_width = datalen_width-$clog2(fc_data_bytes),
-   parameter afu_data_width = 130,   // changed from 128 to 130 to add parity kch 
+   parameter afu_data_width = 130,
    parameter afu_bytec_width = 4,
    
    parameter fc_cmd_width=2,
-   parameter fc_tag_width       = 8,    // added kch                  
+   parameter fc_tag_width       = 8,         
    parameter fc_tag_par_width      = (fc_tag_width + 63)/64,
-   parameter fc_tag_width_w_par    = fc_tag_width+fc_tag_par_width, // added kch
+   parameter fc_tag_width_w_par    = fc_tag_width+fc_tag_par_width,
    parameter fcstat_width=1,
    parameter fcxstat_width=1,
    parameter scstat_width=1,
@@ -97,13 +81,13 @@ module ktms_fc_channel#
     input 			i_cmd_v,
     input 			i_cmd_rd,
     input 			i_cmd_wr,
-    input [0:tag_width_w_par-1] i_cmd_tag,   // added w_par kch   done
-    input [0:cdb_width_w_par-1] 	i_cmd_cdb,    // added w_par kch 
-    input [0:lunid_width_w_par-1] 	i_cmd_lun,  // parity added lunid_width has parity in the length kch 
-    input [0:ctxtid_width-1] 	i_cmd_ctxt,   // this has parity kch 
+    input [0:tag_width_w_par-1] i_cmd_tag,
+    input [0:cdb_width_w_par-1] 	i_cmd_cdb,
+    input [0:lunid_width_w_par-1] 	i_cmd_lun,
+    input [0:ctxtid_width-1] 	i_cmd_ctxt,
     input [0:tstag_width-1] 	i_cmd_tstag,   
-    input [0:ea_width-1] 	i_cmd_ea,   // has parity 
-    input [0:datalen_width_w_par-1] 	i_cmd_data_len,  // has parity 
+    input [0:ea_width-1] 	i_cmd_ea,
+    input [0:datalen_width_w_par-1] 	i_cmd_data_len,
 
 
     // check to make sure this tag has not timed out.
@@ -123,13 +107,13 @@ module ktms_fc_channel#
     // dma interface
     input 			put_addr_r,
     output 			put_addr_v,
-    output [0:ea_width-1] 	put_addr_ea,   //has parity kch
+    output [0:ea_width-1] 	put_addr_ea,
     output [0:tstag_width-1] 	put_addr_tstag, 
-    output [0:ctxtid_width-1] 	put_addr_ctxt,   //has parity kch 
+    output [0:ctxtid_width-1] 	put_addr_ctxt,
 
     input 			put_data_r,
     output 			put_data_v,
-    output [0:afu_data_width-1] put_data_d,  // has parity kch
+    output [0:afu_data_width-1] put_data_d,
     output 			put_data_e,
     output [0:3] 		put_data_c,
     output 			put_data_f,
@@ -139,9 +123,9 @@ module ktms_fc_channel#
     // dma interface
     input 			get_addr_r,
     output 			get_addr_v,
-    output [0:ea_width-1] 	get_addr_d_ea,  // has parity kch 
+    output [0:ea_width-1] 	get_addr_d_ea,
     output [0:tstag_width-1] 	get_addr_d_tstag,   
-    output [0:ctxtid_width-1] 	get_addr_d_ctxt,  // has parity kch 
+    output [0:ctxtid_width-1] 	get_addr_d_ctxt,
     output [0:ssize_width-1] 	get_addr_d_size,
 
     output 			get_data_r,
@@ -155,7 +139,7 @@ module ktms_fc_channel#
     // completion interface
     input 			o_rslt_r,
     output 			o_rslt_v,
-    output [0:tag_width_w_par-1] 	o_rslt_tag,      // parity checked at this level kch 
+    output [0:tag_width_w_par-1] 	o_rslt_tag,
     output [0:rslt_width-1] 	o_rslt_stat,
    
     input 			o_fc_req_r,
@@ -164,10 +148,10 @@ module ktms_fc_channel#
     output [0:tag_width-1] 	o_fc_req_tag, 
     output [0:tag_par_width-1] 	o_fc_req_tag_par, 
 
-    output [0:lunid_width_w_par-2] 	o_fc_req_lun,   // parity added lunid_length includes parity kch
+    output [0:lunid_width_w_par-2] 	o_fc_req_lun, 
     output              	o_fc_req_lun_par,   
-    output [0:datalen_width_w_par-2] 	o_fc_req_length, // lets change this to bytes rather than beats. 
-    output              	o_fc_req_length_par, // added kch 
+    output [0:datalen_width_w_par-2] 	o_fc_req_length,
+    output              	o_fc_req_length_par,
     output [0:cdb_width-1] 	o_fc_req_cdb,
      output [0:1]       	o_fc_req_cdb_par,
   
@@ -175,23 +159,22 @@ module ktms_fc_channel#
     output 			i_fc_wdata_req_r, // backpressure for write data requests 
     input 			i_fc_wdata_req_v,
     input [0:tag_width-1] 	i_fc_wdata_req_tag,
-    input               	i_fc_wdata_req_tag_par,  // added par kch 
-    input [0:datalen_width-1] 	i_fc_wdata_req_size, // how much data is being requested (bytes) - we might never use the full range here, but no reason to limit ourselves  fix it add parity kch 
-    input               	i_fc_wdata_req_size_par, // add parity kch  
-    input [0:beatid_width-1] 	i_fc_wdata_req_beat, // where in the data stream does this start (beats)  fixit add parity ???
+    input               	i_fc_wdata_req_tag_par,
+    input [0:datalen_width-1] 	i_fc_wdata_req_size, // how much data is being requested (bytes) - we might never use the full range here, but no reason to limit ourselves
+    input               	i_fc_wdata_req_size_par,
+    input [0:beatid_width-1] 	i_fc_wdata_req_beat, // where in the data stream does this start (beats) 
 
     // data response interface (writes) - will come in the same order as requests
     input 			o_fc_wdata_rsp_r,
     output 			o_fc_wdata_rsp_v,
     output [0:fc_data_width-1] 	o_fc_wdata_rsp_data,
-    output [0:1]        	o_fc_wdata_rsp_data_par,   // added parity kch 
+    output [0:1]        	o_fc_wdata_rsp_data_par, 
     output 			o_fc_wdata_rsp_e, // this is the last beat of the transfer
     output 			o_fc_wdata_rsp_error, // there was an error - abort this exchange. only valid when rsp_e and rsp_v are both high
-
-    // optional - could be implemented in my logic or todds
+   
     output [0:tag_width-1] 	o_fc_wdata_rsp_tag, // which  exchange is this stream part of
-    output              	o_fc_wdata_rsp_tag_par, // added par kch 
-    output [0:beatid_width-1] 	o_fc_wdata_rsp_beat, // which beat is this of the transfer  fixit add parity ????
+    output              	o_fc_wdata_rsp_tag_par,
+    output [0:beatid_width-1] 	o_fc_wdata_rsp_beat, // which beat is this of the transfer  
    
 
     // read data response interface
@@ -199,16 +182,16 @@ module ktms_fc_channel#
     input 			i_fc_rdata_rsp_v,
     input 			i_fc_rdata_rsp_e,
     input [0:fc_bytec_width-1] 	i_fc_rdata_rsp_c,
-    input [0:beatid_width-1] 	i_fc_rdata_rsp_beat, // global to the entire exchange, not just local to this data transfer  fixit add parity ???
+    input [0:beatid_width-1] 	i_fc_rdata_rsp_beat, // global to the entire exchange, not just local to this data transfer 
     input [0:tag_width-1] 	i_fc_rdata_rsp_tag,
-    input               	i_fc_rdata_rsp_tag_par,  // added parity kch 
+    input               	i_fc_rdata_rsp_tag_par,
     input [0:fc_data_width-1] 	i_fc_rdata_rsp_data,
-    input [0:fc_data_par_width-1] i_fc_rdata_rsp_data_par,   // add parity kch 
+    input [0:fc_data_par_width-1] i_fc_rdata_rsp_data_par,
 
     // command response interface
     input 			i_fc_rsp_v,
     input [0:tag_width-1] 	i_fc_rsp_tag,
-    input [0:tag_par_width-1] 	i_fc_rsp_tag_par,    //added parity kch   start here fixi
+    input [0:tag_par_width-1] 	i_fc_rsp_tag_par, 
     input 			i_fc_rsp_underrun,
     input 			i_fc_rsp_overrun,
     input [0:32-1] 		i_fc_rsp_resid,
@@ -218,7 +201,7 @@ module ktms_fc_channel#
     input [0:fcinfo_width-1] 	i_fc_rsp_info,
     input 			i_fc_rsp_fcp_valid,
     input 			i_fc_rsp_sns_valid,
-    input [0:beatid_width-1] 	i_fc_rsp_rdata_beats, // number of beats of read data sent. fixit add parity ? not now
+    input [0:beatid_width-1] 	i_fc_rsp_rdata_beats, // number of beats of read data sent. 
     output [0:1]                o_perror
     );
 
@@ -237,13 +220,13 @@ module ktms_fc_channel#
    wire 		       ec2_v;
    wire 		       ec2_rd;
    wire 		       ec2_wr;
-   wire [0:tag_width_w_par-1]  ec2_tag;    // added w_par kch
+   wire [0:tag_width_w_par-1]  ec2_tag;  
    wire [0:lunid_width_w_par-1]      ec2_lun;
    wire [0:ea_width-1] 	       ec2_ea;
-   wire [0:tstag_width-1]      ec2_tstag;  // added w_par kch
+   wire [0:tstag_width-1]      ec2_tstag; 
    wire [0:ctxtid_width-1]     ec2_ctxt;
    wire [0:datalen_width_w_par-1]    ec2_datalen;
-   wire [0:cdb_width_w_par-1]        ec2_cdb;   // added w_par kch
+   wire [0:cdb_width_w_par-1]        ec2_cdb;  
    base_fifo#(.LOG_DEPTH(tag_width),.width(2+tag_width_w_par+lunid_width_w_par+tstag_width+ctxtid_width+ea_width+datalen_width_w_par+cdb_width_w_par)) iec2_lat 
      (.clk(clk),.reset(reset),
       .i_v(i_cmd_v),.i_r(i_cmd_r),.i_d({i_cmd_rd,i_cmd_wr, i_cmd_tag,i_cmd_lun,i_cmd_tstag,i_cmd_ctxt,i_cmd_ea,i_cmd_data_len,i_cmd_cdb}),
@@ -261,14 +244,14 @@ module ktms_fc_channel#
    wire 		       ec3a_v, ec3a_r, ec3a_ok;
    base_alatch#(.width(1)) iec3a_lat(.clk(clk),.reset(reset),.i_v(i_tochk_v),.i_r(),.i_d(i_tochk_ok),.o_v(ec3a_v),.o_r(ec3a_r),.o_d(ec3a_ok));
      
-   wire [0:tag_width_w_par-1]  ec3_tag;    // added w_par kch 
+   wire [0:tag_width_w_par-1]  ec3_tag; 
    wire [0:lunid_width_w_par-1]      ec3_lun;
    wire 		       ec3_rd;
    wire 		       ec3_wr;
-   wire [0:cdb_width_w_par-1]        ec3_cdb;   // added w_par kch 
+   wire [0:cdb_width_w_par-1]        ec3_cdb; 
    wire [0:datalen_width_w_par-1]    ec3_datalen;
    wire [0:1] 		       ec3b_v, ec3b_r; // 0: to check, 1: prev stage
-   base_alatch#(.width(2+tag_width_w_par+lunid_width_w_par+cdb_width_w_par+datalen_width_w_par)) iec3_lat   // added w_par kch
+   base_alatch#(.width(2+tag_width_w_par+lunid_width_w_par+cdb_width_w_par+datalen_width_w_par)) iec3_lat 
      (.clk(clk),.reset(reset),.i_v(ec2a_v[1]),.i_r(ec2a_r[1]),.i_d({ec2_rd,ec2_wr,ec2_tag,ec2_lun,ec2_cdb,ec2_datalen}),.o_v(ec3b_v[1]),.o_r(ec3b_r[1]), .o_d({ec3_rd, ec3_wr, ec3_tag,ec3_lun,ec3_cdb,ec3_datalen}));
 
    base_aforce iec3b_frc(.i_v(ec3a_v),.i_r(ec3a_r),.o_v(ec3b_v[0]),.o_r(ec3b_r[0]),.en(~ec3_rd));
@@ -286,13 +269,13 @@ module ktms_fc_channel#
 			       fcp_tmgmt;
    
    wire [0:fc_cmd_width-1]     ec4_cmd;
-   wire [0:cdb_width_w_par-1]        ec4_cdb;   // added w_par kch 
+   wire [0:cdb_width_w_par-1]        ec4_cdb; 
    wire [0:datalen_width_w_par-1]    ec4_datalen;
    wire [0:tag_width_w_par-1]        ec4_tag;
    wire [0:lunid_width_w_par-1]      ec4_lun;
    wire 		       ec4_v, ec4_r;
    
-   base_aburp#(.width(fc_cmd_width+cdb_width_w_par+datalen_width_w_par+tag_width_w_par+lunid_width_w_par)) iec4_lat   // added w_par kch 
+   base_aburp#(.width(fc_cmd_width+cdb_width_w_par+datalen_width_w_par+tag_width_w_par+lunid_width_w_par)) iec4_lat 
      (.clk(clk),.reset(reset),
       .i_v(ec3d_v[0]),.i_r(ec3d_r[0]),.i_d({ec3_cmd,ec3_cdb,ec3_datalen,ec3_tag,ec3_lun}),
       .o_v(ec4_v),.o_r(ec4_r),.o_d({ec4_cmd,ec4_cdb,ec4_datalen,ec4_tag,ec4_lun}),.burp_v());
@@ -319,17 +302,17 @@ module ktms_fc_channel#
 
    // write data request
    wire 			    wd0_v, wd0_r;
-   wire [0:tag_width_w_par-1] 	    wd0_tag;   // added w_par kch 
-   wire [0:datalen_width_w_par-1] 	    wd0_size;  // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    wd0_tag; 
+   wire [0:datalen_width_w_par-1] 	    wd0_size; 
    wire [0:beatid_width-1] 	    wd0_beat;
    base_aburp_latch#(.width(tag_width_w_par+datalen_width_w_par+beatid_width)) iwd0_lat
      (.clk(clk),.reset(reset),
-      .i_v(i_fc_wdata_req_v),.i_r(i_fc_wdata_req_r),.i_d({i_fc_wdata_req_tag,i_fc_wdata_req_tag_par,i_fc_wdata_req_size,i_fc_wdata_req_size_par,i_fc_wdata_req_beat}),  // added parity kch 
+      .i_v(i_fc_wdata_req_v),.i_r(i_fc_wdata_req_r),.i_d({i_fc_wdata_req_tag,i_fc_wdata_req_tag_par,i_fc_wdata_req_size,i_fc_wdata_req_size_par,i_fc_wdata_req_beat}), 
       .o_v(wd0_v),.o_r(wd0_r),.o_d({wd0_tag,wd0_size,wd0_beat}));
 
    wire 			    wd1_v, wd1_r, wd1_re;
-   wire [0:tag_width_w_par-1] 	    wd1_tag;   // add w_par kch 
-   wire [0:datalen_width_w_par-1] 	    wd1_size;   // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    wd1_tag;  
+   wire [0:datalen_width_w_par-1] 	    wd1_size; 
    wire [0:beatid_width-1] 	    wd1_beat;
 			    
    // from memory
@@ -346,7 +329,7 @@ module ktms_fc_channel#
       .o_v(wd1_v),.o_r(wd1_r),.o_d({wd1_tag,wd1_size,wd1_beat}),.o_en(wd1_re));
 
    wire [0:tag_width_w_par-1] 	    rd1_tag;
-   wire [0:tag_width_w_par-1] 	    wd4_tag;  // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    wd4_tag;
    wire [0:tag_width_w_par-1] 	    s2_rsp_tag;
    wire 			    wd4_v, wd4_r, wd4_e;
    wire 			    rd1_v, rd1_r, rd1_e;
@@ -402,9 +385,9 @@ module ktms_fc_channel#
    wire [0:2] 			    wd2_error;
    wire [0:beatid_width-1] 	    wd2_starting_beat;
    wire [0:tag_width_w_par-1] 	    wd2_tag;
-   wire [0:tstag_width-1] 	    wd2_tstag;  // added w_par kch
+   wire [0:tstag_width-1] 	    wd2_tstag; 
    wire [0:ctxtid_width-1] 	    wd2_ctxt;
-   wire [0:datalen_width_w_par-1] 	    wd2_size;  //added w_par kch 
+   wire [0:datalen_width_w_par-1] 	    wd2_size;  
    wire [0:ea_width-1] 		    wd2_ea;
    base_alatch#(.width(1+3+beatid_width+tag_width_w_par+tstag_width+ctxtid_width+datalen_width_w_par+ea_width)) iwd2_lat     
      (.clk(clk),.reset(reset),
@@ -416,7 +399,7 @@ module ktms_fc_channel#
    base_acombine#(.ni(1),.no(2)) iwd2_cmb(.i_v(wd2_v),.i_r(wd2_r),.o_v(wd2a_v),.o_r(wd2a_r));
    base_afilter iwd2_flt(.i_v(wd2a_v[0]),.i_r(wd2a_r[0]),.o_v(get_addr_v),.o_r(get_addr_r),.en(wd2_ok));
    assign get_addr_d_ea = wd2_ea;
-   assign get_addr_d_size = wd2_size[0:datalen_width_w_par-2];    // strip off parity. kch 
+   assign get_addr_d_size = wd2_size[0:datalen_width_w_par-2]; 
    assign get_addr_d_tstag = wd2_tstag;
    assign get_addr_d_ctxt = wd2_ctxt;
 
@@ -452,7 +435,7 @@ module ktms_fc_channel#
    base_vlat_en#(.width(dma_rc_width)) ig1_errlat(.clk(clk),.reset(reset),.din(get_data_rc),.q(g1_dma_rc),.enable(g1_rcap_en));
 
    wire 			    wd3a_v, wd3a_r, wd3a_e;
-   wire [0:fc_data_width-1+2] 	    wd3_d;   // added +2 for parity kch 
+   wire [0:fc_data_width-1+2] 	    wd3_d;
    wire 			    wd3_data_error;
    wire [0:dma_rc_width-1] 	    wd3_dma_rc;
    
@@ -461,7 +444,7 @@ module ktms_fc_channel#
  //    (.clk(clk),.reset(reset),
  //     .i_v(g1b_v),.i_r(g1b_r),.i_d(get_data_d), .i_e(g1_e),  .i_eaux({g1_cum_err,g1_dma_rc}),     .i_c({~(|get_data_c),get_data_c}),
  //     .o_v(wd3a_v),.o_r(wd3a_r),.o_d(wd3_d),    .o_e(wd3a_e),.o_eaux({wd3_data_error,wd3_dma_rc}),.o_c());
-// connected outpus to inputs for 32 to 128 bit changes kch 01/04/16 
+
    assign wd3a_v = g1b_v;
    assign g1b_r = wd3a_r;
    assign wd3_d = get_data_d;
@@ -498,9 +481,9 @@ module ktms_fc_channel#
      (.clk(clk),.reset(1'b0),
       .din(wd3_beat_in),.q(wd4_beat),.enable(wd3_beat_en));
    wire [0:3] 			    wd4_error;
-   wire [0:fc_data_width_w_par-1] 	    wd4_d;                                       // added +2 for parity kch
+   wire [0:fc_data_width_w_par-1] 	    wd4_d;                                    
    wire [0:dma_rc_width-1] 	    wd4_dma_rc;
-   base_alatch#(.width(4+1+tag_width_w_par+dma_rc_width+fc_data_width_w_par)) iwd4_lat    // added +2 for parity kch
+   base_alatch#(.width(4+1+tag_width_w_par+dma_rc_width+fc_data_width_w_par)) iwd4_lat  
      (.clk(clk),.reset(reset),
       .i_v(wd3_v),.i_r(wd3_r),.i_d({wd3_error,wd3_e,wd3_tag,wd3_dma_rc,wd3_d}),
       .o_v(wd4_v),.o_r(wd4_r),.o_d({wd4_error,wd4_e,wd4_tag,wd4_dma_rc,wd4_d})
@@ -523,7 +506,7 @@ module ktms_fc_channel#
    
    
    // final output - burp for backpresure timing
-   base_aburp_latch#(.width(1+1+tag_width_w_par+beatid_width+fc_data_width_w_par)) iwd5_lat     // added +2 for parity kch
+   base_aburp_latch#(.width(1+1+tag_width_w_par+beatid_width+fc_data_width_w_par)) iwd5_lat 
      (.clk(clk),.reset(reset),
       .i_v(wd4a_v[0]),.i_r(wd4a_r[0]),.i_d({wd4_is_error,wd4_e,wd4_tag,wd4_beat,wd4_d}),
       .o_v(o_fc_wdata_rsp_v),.o_r(o_fc_wdata_rsp_r),.o_d({o_fc_wdata_rsp_error,o_fc_wdata_rsp_e,o_fc_wdata_rsp_tag,o_fc_wdata_rsp_tag_par,o_fc_wdata_rsp_beat,o_fc_wdata_rsp_data,o_fc_wdata_rsp_data_par})
@@ -536,7 +519,7 @@ module ktms_fc_channel#
    wire [0:afu_rsp_width*2-1] 	    s1_error_d;
    
    base_afilter wd4_fltr(.i_v(wd4a_v[1]),.i_r(wd4a_r[1]),.o_v(s1_error_v[0]),.o_r(s1_error_r[0]),.en(wd4_is_error));
-   assign s1_error_tag[0:tag_width_w_par-1] = wd4_tag;   // added w_par kch
+   assign s1_error_tag[0:tag_width_w_par-1] = wd4_tag; 
    assign s1_error_d[0:afu_rsp_width-1] = {wd4_afu_rc,wd4_afu_erc};
    assign s1_error_e[0] = 1'b1;
    assign s2_error_r[0] = 1'b1;
@@ -555,7 +538,7 @@ module ktms_fc_channel#
    wire 			    rd1_f;
    base_aburp_latch#(.width(2+fc_bytec_width+beatid_width+tag_width_w_par+fc_data_width+fc_data_par_width)) ird1_lat
      (.clk(clk),.reset(reset),
-      .i_v(i_fc_rdata_rsp_v),.i_r(i_fc_rdata_rsp_r),.i_d({rd0_f,i_fc_rdata_rsp_e,i_fc_rdata_rsp_c,i_fc_rdata_rsp_beat,i_fc_rdata_rsp_tag,i_fc_rdata_rsp_tag_par,i_fc_rdata_rsp_data,i_fc_rdata_rsp_data_par}), //added parity kch
+      .i_v(i_fc_rdata_rsp_v),.i_r(i_fc_rdata_rsp_r),.i_d({rd0_f,i_fc_rdata_rsp_e,i_fc_rdata_rsp_c,i_fc_rdata_rsp_beat,i_fc_rdata_rsp_tag,i_fc_rdata_rsp_tag_par,i_fc_rdata_rsp_data,i_fc_rdata_rsp_data_par}),
       .o_v(rd1_v),.o_r(rd1_r),.o_d({rd1_f,rd1_e,rd1_c,rd1_beat,rd1_tag,rd1_d})
       );
 
@@ -573,12 +556,12 @@ module ktms_fc_channel#
    wire 			    rd2_v, rd2_r, rd2_f, rd2_e;
    wire [0:fc_bytec_width-1] 	    rd2_c;
    wire [0:beatid_width-1] 	    rd2_beat;
-   wire [0:tag_width_w_par-1] 	    rd2_tag;   // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    rd2_tag;
    wire [0:fc_data_width_w_par-1] 	    rd2_d;
    wire 			    rd2_re;
    wire [0:datalen_width-1] 	    rd2_st_byte;
    wire [0:datalen_width-1] 	    rd2_end;
-   base_alatch_oe#(.width(1+1+fc_bytec_width+beatid_width+tag_width_w_par+fc_data_width_w_par+datalen_width+datalen_width)) ird2_lat  // added _w_par kch
+   base_alatch_oe#(.width(1+1+fc_bytec_width+beatid_width+tag_width_w_par+fc_data_width_w_par+datalen_width+datalen_width)) ird2_lat 
      (.clk(clk),.reset(reset),
       .i_v(rd1_v),.i_r(rd1_r),.i_d({rd1_f,rd1_e,rd1a_c,rd1_beat,rd1_tag,rd1_d,rd1_end,rd1_st_byte}),
       .o_v(rd2_v),.o_r(rd2_r),.o_d({rd2_f,rd2_e,rd2_c,rd2_beat,rd2_tag,rd2_d,rd2_end,rd2_st_byte}),.o_en(rd2_re)
@@ -658,7 +641,7 @@ module ktms_fc_channel#
    
    wire 			    rd4_v, rd4_r, rd4_f, rd4_e;
    wire [0:beatid_width-1] 	    rd4_beat;
-   wire [0:tag_width_w_par-1] 	    rd4_tag;  // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    rd4_tag;
    wire [0:ctxtid_width-1] 	    rd4_ctxt;
    wire [0:tstag_width-1] 	    rd4_tstag;
    wire [0:ea_width-1] 		    rd4_ea;
@@ -680,7 +663,7 @@ module ktms_fc_channel#
    // if the address is not out-of-range, and it is the first beat, send write address
    wire 			    rd4_adr_en = rd4_a_v & rd4_f;
    base_afilter rd4_fltr0(.i_v(rd4a_v[0]),.i_r(rd4a_r[0]),.o_v(put_addr_v),.o_r(put_addr_r),.en(rd4_adr_en));
-   assign put_addr_ea = rd4_ea;   // has parity kch 
+   assign put_addr_ea = rd4_ea;  
    assign put_addr_ctxt = rd4_ctxt;
    assign put_addr_tstag = rd4_tstag;
 
@@ -690,20 +673,12 @@ module ktms_fc_channel#
    wire 			    rd4_dta_en = rd4_a_v & (rd4_ok | rd4_e);
    wire 			    rd4b_v, rd4b_r;
    base_afilter rd3_fltr1(.i_v(rd4a_v[1]),.i_r(rd4a_r[1]),.o_v(rd4b_v),.o_r(rd4b_r),.en(rd4_dta_en));
- //  wire [0:afu_bytec_width] 	    rd5_c; 32 to 128 bit changes kch 12/30/15
 
-// get rid of upconvert since incoming data is now 128 bits 12/30/15 kch                                 
-//   base_upcvt#(.ni(fc_data_width/8),.no(16),.width(8)) ird_gasket
-//     (.clk(clk),.reset(reset),
-//      .i_v(rd4b_v),.i_r(rd4b_r),.i_e(rd4_e),.i_c(rd4_c),.i_d(rd4_d),.i_eaux(1'b0),
-//      .o_v(put_data_v),.o_r(put_data_r),.o_e(put_data_e),.o_c(rd5_c),.o_d(put_data_d),.o_eaux()
-//      );
-//   assign put_data_c = rd5_c[1:afu_bytec_width];
-   assign put_data_c = rd4_c[1:afu_bytec_width]; // changes for 32 to 128 fc 12/30/15 kch
-   assign put_data_e = rd4_e; // changes for 32 to 128 fc kch 12/30/15
-   assign put_data_d = rd4_d; // changes for 32 to 128 fc kch 12/30/15
-   assign rd4b_r = put_data_r; // changes for 32 to 128 fc kch 12/30/15
-   assign put_data_v = rd4b_v; //changes for 32 to 128 fc kch 12/30/15
+   assign put_data_c = rd4_c[1:afu_bytec_width]; 
+   assign put_data_e = rd4_e;
+   assign put_data_d = rd4_d;
+   assign rd4b_r = put_data_r;
+   assign put_data_v = rd4b_v;
    
    // 2: last beat goes to completion
    wire 			    rd4c_v, rd4c_r;
@@ -713,7 +688,7 @@ module ktms_fc_channel#
    wire [0:1] 			    rd5a_v, rd5a_r;
    wire 			    rd5_a_v;
    wire [0:3] 			    rd5_error;
-   wire [0:tag_width_w_par-1] 	    rd5_tag;   // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    rd5_tag; 
    wire [0:beatid_width-1] 	    rd5_beat; 			    
    base_fifo#(.LOG_DEPTH(3),.width(1+4+tag_width_w_par+beatid_width),.output_reg(1)) irda_fifo
      (.clk(clk),.reset(reset),
@@ -736,7 +711,7 @@ module ktms_fc_channel#
    wire [0:beatid_width-1] 	    s2_rsp_act_beats;
    wire 			    s2_rsp_act_v;
 
-   wire [0:tag_width_w_par-1] 	    rd5_tag_del;   // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    rd5_tag_del; 
    wire [0:beatid_width-1] 	    rd5_beat_del;
    wire 			    rd5_wen_del;
 
@@ -759,34 +734,34 @@ module ktms_fc_channel#
    wire 			    rd5_ok = ~(|{rd5_error,rd5_dma_error});
 
    wire 			    s1_rd_error_v, s1_rd_error_r;
-   wire [0:tag_width_w_par-1] 	    s1_rd_error_d;    // not used ??? KCH 
+   wire [0:tag_width_w_par-1] 	    s1_rd_error_d;
 
    assign s1_error_v[1] = rd5_v;
    assign rd5_r = s1_error_r[1];
    assign s1_error_e[1] = ~rd5_ok;
-   assign s1_error_tag[tag_width_w_par:2*tag_width_w_par-1] = rd5_tag;   // added w_par kch 
+   assign s1_error_tag[tag_width_w_par:2*tag_width_w_par-1] = rd5_tag; 
    assign s1_error_d[(afu_rsp_width): 2*afu_rsp_width-1] = {rd5_afu_rc,rd5_afu_erc};
 
 
    // responses
    localparam aux_width = rslt_width-afu_rsp_width;
    
-   wire [0:tag_width_w_par-1] 	    s0_rsp_tag;   // added w_par kch 
+   wire [0:tag_width_w_par-1] 	    s0_rsp_tag; 
    wire [0:aux_width-1] 	    s0_rsp_aux;
    wire [0:beatid_width-1] 	    s0_rsp_rdata_beats;
    wire 			    s0_rsp_v, s0_rsp_r;
      
-   base_alatch#(.width(tag_width_w_par+aux_width+beatid_width)) irsp_s1  // added w_par kch 
+   base_alatch#(.width(tag_width_w_par+aux_width+beatid_width)) irsp_s1
      (.clk(clk),.reset(reset),
       .i_v(i_fc_rsp_v),.i_r(),      
-      .i_d({i_fc_rsp_tag,i_fc_rsp_tag_par,  // added i_fc_rsp_tag_par kch
+      .i_d({i_fc_rsp_tag,i_fc_rsp_tag_par, 
 	    i_fc_rsp_underrun,i_fc_rsp_overrun,i_fc_rsp_resid,i_fc_rsp_fcstat,i_fc_rsp_fcxstat,i_fc_rsp_scstat,i_fc_rsp_sns_valid,i_fc_rsp_fcp_valid,i_fc_rsp_info,i_fc_rsp_rdata_beats}),
       .o_v(s0_rsp_v),.o_r(s0_rsp_r),.o_d({s0_rsp_tag, s0_rsp_aux,s0_rsp_rdata_beats}));
 
    wire [0:aux_width-1] 	    s1_rsp_aux;
    wire [0:beatid_width-1] 	    s1_rsp_rdata_beats;
 
-   base_fifo#(.LOG_DEPTH(tag_width),.width(tag_width_w_par+aux_width+beatid_width),.output_reg(1)) irsp_fifo    // added w_par kch 
+   base_fifo#(.LOG_DEPTH(tag_width),.width(tag_width_w_par+aux_width+beatid_width),.output_reg(1)) irsp_fifo  
      (.clk(clk),.reset(reset),
       .i_v(s0_rsp_v),.i_r(s0_rsp_r),.i_d({s0_rsp_tag, s0_rsp_aux,s0_rsp_rdata_beats}),
       .o_v(s1_rsp_v),.o_r(s1_rsp_r),.o_d({s1_rsp_tag, s1_rsp_aux,s1_rsp_rdata_beats}));

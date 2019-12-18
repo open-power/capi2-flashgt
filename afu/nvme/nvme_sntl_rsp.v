@@ -79,9 +79,9 @@ module nvme_sntl_rsp#
     input          [datalen_width-1:0] dma_rsp_reloff, // byte offset from start of payload
     input                        [9:0] dma_rsp_length, // length of this packet in bytes (max 128)
     input              [tag_width-1:0] dma_rsp_tag, // sislite interface tag
-    input                              dma_rsp_tag_par, // sislite interface tag parity added kch 
+    input                              dma_rsp_tag_par, // sislite interface tag parity 
     input             [data_width-1:0] dma_rsp_data, // payload data
-    input      [data_fc_par_width-1:0] dma_rsp_data_par, // payload data par added kch 
+    input      [data_fc_par_width-1:0] dma_rsp_data_par, // payload data par 
     input                              dma_rsp_first, // asserted with first cycle
     input                              dma_rsp_last, // asserted with last cycle 
 
@@ -115,7 +115,7 @@ module nvme_sntl_rsp#
     output reg         [tag_width-1:0] o_rdata_rsp_tag_out,
     output reg                         o_rdata_rsp_tag_par_out,
     output reg        [data_width-1:0] o_rdata_rsp_data_out,
-    output reg [data_fc_par_width-1:0] o_rdata_rsp_data_par_out, // added kch 
+    output reg [data_fc_par_width-1:0] o_rdata_rsp_data_par_out,
     
 
     // ---------------------------------------------------------
@@ -174,9 +174,9 @@ module nvme_sntl_rsp#
    // header fifo is used for keeping responses in order with payload
    // sislite interface requires that payload is complete before sending status
 
-   localparam hdrff_cmd_width = 4 + 1 + 1+ tag_width + fcstat_width + fcxstat_width + 8 + 1 + 1 + 32 + 1 + 1 + rsp_info_width + beatid_width;  // added +1 for tag_parity kch 
-   localparam hdrff_adm_width = 4 + 1 + tag_width + datalen_width + 13;   // added +1 for tag parity kch 
-   localparam hdrff_dma_width = 4 + 1+ tag_width + datalen_width + 10;   // added +1 for tag_parity 
+   localparam hdrff_cmd_width = 4 + 1 + 1+ tag_width + fcstat_width + fcxstat_width + 8 + 1 + 1 + 32 + 1 + 1 + rsp_info_width + beatid_width;
+   localparam hdrff_adm_width = 4 + 1 + tag_width + datalen_width + 13; 
+   localparam hdrff_dma_width = 4 + 1+ tag_width + datalen_width + 10;
    localparam hdrff_tmp_width = (hdrff_dma_width > hdrff_adm_width) ? hdrff_dma_width : hdrff_adm_width;
    localparam hdrff_width = (hdrff_tmp_width > hdrff_cmd_width) ? hdrff_tmp_width : hdrff_cmd_width;
    localparam hdrff_par_width = (hdrff_width + 63)/64;
@@ -187,7 +187,7 @@ module nvme_sntl_rsp#
    localparam [3:0] HDRFF_T_ADM = 4'h2;
    localparam [3:0] HDRFF_T_DMA = 4'h4;
 
-// set/reset/ latch for parity errors kch 
+// set/reset/ latch for parity errors 
 
     wire              s1_perror;
     wire              rsp_perror_int;
@@ -209,7 +209,7 @@ module nvme_sntl_rsp#
    wire                             hdrff_almost_full;
    wire                             hdrff_full;
 
-   // lets just put parity on the array also kch 
+   // lets just put parity on the array also
 
    wire       [hdrff_par_width-1:0] hdrff_wdata_par;
    wire       [hdrff_par_width-1:0] hdrff_rdata_par;
@@ -263,7 +263,7 @@ module nvme_sntl_rsp#
         if (rsp_pe_inj_q & hdrff_valid)
           rsp_pe_inj_d = 1'b0; 
      end  
-   // check fifo parity kch fixit
+  
 
    nvme_pcheck#
      (
@@ -403,7 +403,6 @@ module nvme_sntl_rsp#
 
    reg                      rdata_paused_q, rdata_paused_d;
    
-   // parity gen kch 
    reg                      s0_dma_tag_par;
    reg                      s0_adm_tag_par;
 
@@ -544,7 +543,7 @@ module nvme_sntl_rsp#
                end
              else
                begin
-                  // todo: error
+                  // 
                end
           end
      end // always @ *
@@ -569,7 +568,7 @@ module nvme_sntl_rsp#
         o_rdata_rsp_tag_par_out   = s1_tag_par_q;
         {s1_first, s1_last}       = payldff_rdata[data_width+data_fc_par_width+1:data_width+data_fc_par_width];
         o_rdata_rsp_data_out      = byteswap128(payldff_rdata[127:0]);
-        o_rdata_rsp_data_par_out  = {payldff_rdata[128],payldff_rdata[129]};  // added kch 
+        o_rdata_rsp_data_par_out  = {payldff_rdata[128],payldff_rdata[129]}; 
 
         s1_beat_d = s1_beat_q;
         s1_state_d = s1_state_q;
@@ -608,7 +607,6 @@ module nvme_sntl_rsp#
                       end
                     if( o_rdata_rsp_r_in | regs_sntl_rsp_debug )
                       begin
-                         // todo: check length vs last for consistency
                          if( s1_last )
                            begin                            
                               s1_state_d = ST_END;
@@ -633,7 +631,6 @@ module nvme_sntl_rsp#
                       end
                     if( o_rdata_rsp_r_in )
                       begin
-                         // todo: check length vs last for consistency
                          if( admin_rsp_last )
                            begin                            
                               s1_state_d = ST_ADMEND;
@@ -672,7 +669,6 @@ module nvme_sntl_rsp#
                o_rdata_rsp_v_out = payldff_valid & ~regs_sntl_rsp_debug;
                if( o_rdata_rsp_r_in  | regs_sntl_rsp_debug)
                  begin
-                    // todo: check length vs last for consistency
                     if( s1_last )
                       begin
                          if( s1_payld_continue_q )
@@ -704,7 +700,6 @@ module nvme_sntl_rsp#
                o_rdata_rsp_v_out = admin_rsp_valid;
                if( o_rdata_rsp_r_in )
                  begin
-                    // todo: check length vs last for consistency
                     if( admin_rsp_last )
                       begin                            
                          s1_state_d = ST_ADMEND;

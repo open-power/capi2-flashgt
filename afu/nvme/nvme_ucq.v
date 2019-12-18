@@ -22,7 +22,7 @@
 //  File : nvme_ucq.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe submission/completion queues with
+//  Description : FlashGT+ NVMe submission/completion queues with
 //                microcode interface
 //
 //  Implements Admin Submission Queue (ASQ) and Admin Completion Queue (ACQ)
@@ -57,7 +57,7 @@ module nvme_ucq#
     //-------------------------------------------------------
     input      [31:0] ctl_adq_ioaddress,
     input             ctl_adq_ioread_strobe, 
-    input      [35:0] ctl_adq_iowrite_data, // change 31 to 35 kch 
+    input      [35:0] ctl_adq_iowrite_data,
     input             ctl_adq_iowrite_strobe,
     output reg [35:0] adq_ctl_ioread_data, // read_data is sampled when ioack=1
     output reg        adq_ctl_ioack,
@@ -75,7 +75,7 @@ module nvme_ucq#
     //-------------------------------------------------------
   
     input             pcie_adq_valid,
-    input     [144:0] pcie_adq_data, // changed 127 to 144 kch 
+    input     [144:0] pcie_adq_data,
     input             pcie_adq_first, 
     input             pcie_adq_last, 
     input             pcie_adq_discard, 

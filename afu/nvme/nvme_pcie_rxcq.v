@@ -114,8 +114,8 @@ module nvme_pcie_rxcq
      output                [1:0] user_rxcq_perror_ind, 
      input                       regs_pcie_pe_errinj_valid,
      input                [15:0] regs_xxx_pe_errinj_decode, 
-     input                       user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain kch 
-     input                       regs_wdata_pe_errinj_valid  // 1 cycle pulse in sislite domain kch 
+     input                       user_regs_wdata_pe_errinj_valid, // 1 cycle pulse in nvme domain
+     input                       regs_wdata_pe_errinj_valid  // 1 cycle pulse in sislite domain
    
      );
 
@@ -124,12 +124,12 @@ module nvme_pcie_rxcq
 `include "nvme_func.svh"
 
    // Parity error srlat 
-   wire                          s1_perror;  // added kch 
+   wire                          s1_perror; 
    wire                          rxcq_perror_int;
-   wire                    [1:0] s1_uperror;  // added kch 
+   wire                    [1:0] s1_uperror; 
    wire                    [1:0] rxcq_uperror_int;
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors
    nvme_srlat#
      (.width(1))  irxcq_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(rxcq_perror_int));
@@ -159,8 +159,8 @@ module nvme_pcie_rxcq
    (* mark_debug = "true" *)
    reg                        [1:0] s0_addr_type;
    (* mark_debug = "true" *)
-   reg [data_width-data_pwidth-1:0] s0_data;   // added -data_pwidth kch 
-   reg            [data_pwidth-1:0] s0_data_par;   // added kch 
+   reg [data_width-data_pwidth-1:0] s0_data;  
+   reg            [data_pwidth-1:0] s0_data_par;
    (* mark_debug = "true" *)
    reg             [addr_width-1:0] s0_addr;
    (* mark_debug = "true" *)
@@ -442,8 +442,7 @@ module nvme_pcie_rxcq
             begin
                // not a valid read or write command 
                if( req_rval )
-                 begin
-                    // todo: does this need a completion?
+                 begin                   
                     req_rack = 1'b1;
                     if( s0_last )
                       begin
@@ -946,7 +945,7 @@ module nvme_pcie_rxcq
              cnt_event_q[14] <= cnt_event[4];
              cnt_event_q[15] <= cnt_event[6];
              // cnt_event_q[15:11] <= cnt_event[6:0];
-             // todo: counters for wbuf
+         
            end  
      end
    
@@ -1045,8 +1044,7 @@ module nvme_pcie_rxcq
         addr_type             = m_axis_cq_tdata[1:0];  
         addr[1:0]             = 2'b00;
         addr[addr_width-1:2]  = m_axis_cq_tdata[addr_width-1:2];  
-        addr_region           = m_axis_cq_tdata[3+addr_width:addr_width];
-        // todo: check that upper address bits are zero?
+        addr_region           = m_axis_cq_tdata[3+addr_width:addr_width];      
         dcount                = m_axis_cq_tdata[74:64];
         req_rd                = m_axis_cq_tdata[78:75] == 4'h0;  // memory read
         req_wr                = m_axis_cq_tdata[78:75] == 4'h1;  // memory write
@@ -1070,8 +1068,7 @@ module nvme_pcie_rxcq
           begin
              s0u_wdata  = {m_axis_cq_tdata_par, discard, first, last, m_axis_cq_tdata};
           end
-        
-        // todo: check m_axis_cq_tkeep ?        
+             
         s0u_valid          = m_axis_cq_tvalid;
         m_axis_cq_tready  = s0u_ready;       
      end
@@ -1124,17 +1121,9 @@ module nvme_pcie_rxcq
       .oddpar(1'b1),
       .datap(req_wdata[req_fifo_width-1:req_fifo_width-req_fifo_pwidth]),
       .check(req_write),
-      .parerr(s1_uperror[0])   // clk kch 
+      .parerr(s1_uperror[0])  
       );
-
-   //no need to regenerate parity at this point
-   //nvme_pgen#(.bits_per_parity_bit(8), .width(req_fifo_width-req_fifo_pwidth)) cq1_pgen
-   //  (.data(req_wdata[req_fifo_width-1-req_fifo_pwidth:0]),
-   //   .oddpar(1'b1),
-   //   .datap(req_wdata[req_fifo_width-1 : req_fifo_width-req_fifo_pwidth] )
-   //  );
-
-
+  
    // debug counts
    reg [15:0] cnt_event_user_q;
    

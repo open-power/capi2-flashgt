@@ -15,19 +15,7 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// // IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
+
 
 module capi_dma_mc_top_plus#  
   (
@@ -38,12 +26,11 @@ module capi_dma_mc_top_plus#
    parameter gets = 1,
    parameter ssize_width = 32,
    parameter mmio_base = 0,
-//   parameter tag_width=12,
-   parameter tag_width=10,   // changet to 11 to reduce the number of lcltags from 128 to 32 kch
-   parameter ctag_width=8,   // should be 9
+   parameter tag_width=10, 
+   parameter ctag_width=8,   
    parameter tsize_width =12,
    parameter ea_width = 65,
-   parameter ctxtid_width = 10 ,  // changed from 16 to 10 9 + parity kch,
+   parameter ctxtid_width = 10 ,  
    parameter tstag_width = 14,
    parameter irqsrc_width = 11,
    parameter beat_width = 3,
@@ -59,12 +46,7 @@ module capi_dma_mc_top_plus#
    
    parameter uid_width = 5,         // unit id - up to 32 units
    parameter sid_width = 3,
-//   parameter sid_width = 5,    // let's try 32 tags instead of 8
    parameter csid_width = uid_width+sid_width,
-
-   // Propogating parity throught the mmio logic 5/20/16 kch
-
-   //  ctag, use_tstag, uid, sid, sfirst, ctxt, cpad, size, ea
 
 
    parameter wdata_addr_width = tag_width+beat_width,
@@ -72,8 +54,8 @@ module capi_dma_mc_top_plus#
    parameter wdata_512_addr_width = tag_width+beat_512_width,
    parameter rdata_512_addr_width = tag_width+beat_512_width,
    
-   parameter mmiobus_awidth = 29,   // changed from 28 to 29 to include pairuty bit 05/20/16 kch
-   parameter mmiobus_width = mmiobus_awidth+65,  // changed from 64 to 65 to include data pariy signal kch 05/20/16
+   parameter mmiobus_awidth = 29,  
+   parameter mmiobus_width = mmiobus_awidth+65, 
    parameter mmioaddr_bad_rsp=0,
    parameter [0:7] psl_rsp_cinv=0,
 
@@ -97,7 +79,7 @@ module capi_dma_mc_top_plus#
 
     input [0:mmio_timeout_width-1] 	i_mmio_timeout_d,
     output [0:63] 			o_status,
-    output [0:(gets+puts)*64-1] 	o_cnt_pend_d,   // has ctxt_id par in it kch 
+    output [0:(gets+puts)*64-1] 	o_cnt_pend_d, 
 
     output 				o_bad_rsp_v,
     output [127:0] 			o_bad_rsp_d,
@@ -144,7 +126,7 @@ module capi_dma_mc_top_plus#
    
     input [0:ngets-1] 			get_data_r,
     output [0:ngets-1] 			get_data_v,
-    output [0:(130*ngets)-1] 		get_data_d,  // changed 128 to 130 to add parity kch 
+    output [0:(130*ngets)-1] 		get_data_d,
     output [0:(4*ngets)-1] 		get_data_c,
     output [0:ngets-1] 			get_data_e,
     output [0:ngets*rc_width-1] 	get_data_rc,
@@ -158,7 +140,7 @@ module capi_dma_mc_top_plus#
 	      
     output [0:nputs-1] 			put_data_r,
     input [0:nputs-1] 			put_data_v,
-    input [0:(130*nputs)-1] 		put_data_d,   //changed 128 to 130 kch
+    input [0:(130*nputs)-1] 		put_data_d, 
     input [0:nputs-1] 			put_data_e,
     input [0:(4*nputs)-1] 		put_data_c,
     input [0:nputs-1] 			put_data_f,
@@ -196,14 +178,14 @@ module capi_dma_mc_top_plus#
     input 				ha_jval, // A valid job control command is present
     input [0:7] 			ha_jcom, // Job control command opcode
     input 				ha_jcompar,
-    input [0:63] 			ha_jea, // Save/Restore address  added parity checking kch 
+    input [0:63] 			ha_jea, // Save/Restore address  
     input 				ha_jeapar,
-    input [0:4] 			ha_lop, //   lpc capp ttype  not used kch 
+    input [0:4] 			ha_lop, //   lpc capp ttype  not used
     input 				ha_loppar,
     input [0:6] 			ha_lsize, //   lpc size/secondary ttype
     input [0:11] 			ha_ltag, //   lpc command tag
     output 				ah_ldone, //   lpc operation is done
-    output [0:11] 			ah_ldtag, //   lpc tag identifying done operation ok from parity logic kch 
+    output [0:11] 			ah_ldtag, //   lpc tag identifying done operation ok 
     output 				ah_ldtagpar,
     output [0:7] 			ah_lroom, //   how many LPC/Internal commands
     output 				ah_jrunning, // Accelerator is running
@@ -214,9 +196,9 @@ module capi_dma_mc_top_plus#
 
    // Accelerator Command Interface
     output 				ah_cvalid, // A valid command is present
-    output [0:7] 			ah_ctag, // request id  no parity for now kch not much coverage 
+    output [0:7] 			ah_ctag, // request id 
     output 				ah_ctagpar,
-    output [0:12] 			ah_com, // command PSL will execute    no parity for now will revisit todo kch 
+    output [0:12] 			ah_com, // command PSL will execute   
     output 				ah_compar,
     output [0:2] 			ah_cpad, // prefetch inattributes
     output [0:2] 			ah_cabt, // abort if translation intr is generated
@@ -254,9 +236,9 @@ module capi_dma_mc_top_plus#
 
    //x PSL Response Interface
     input 				ha_rvalid, // A response is present
-    input [0:7] 			ha_rtag, // Accelerator generated request ID  not implementing parity yet kch 
+    input [0:7] 			ha_rtag, // Accelerator generated request ID 
     input 				ha_rtagpar,  
-    input [0:8] 		        ha_rditag, // Accelerator generated request ID  not implementing parity yet kch 
+    input [0:8] 		        ha_rditag, // Accelerator generated request ID
     input 				ha_rditagpar,  
     input [0:7] 			ha_response, // response code
     input [0:8] 			ha_rcredits, // twos compliment number of credits
@@ -383,7 +365,7 @@ module capi_dma_mc_top_plus#
 `endif
    
    wire [0:6] 				hld_perror;
-   wire [0:6] 				hld_perror_msk = hld_perror & {6'b11111,~i_ah_cch_msk_pe}; //fixit look at ~i_ah.....
+   wire [0:6] 				hld_perror_msk = hld_perror & {6'b11111,~i_ah_cch_msk_pe}; 
    wire                        capi_jctrl_s1_perror;
    wire [0:(gets*5-1)]                       capi_get_s1_perror;
    wire [0:5]                 dma_retry_s1_perror;
@@ -411,7 +393,7 @@ module capi_dma_mc_top_plus#
 
    // MMIO STUFF
   
-   wire [0:mmiobus_width-1] ha_mmiobus = {ha_mmval,ha_mmcfg,ha_mmrnw,ha_mmdw,ha_mmad,ha_mmadpar,ha_mmdata,ha_mmdatapar};  // added ha_madpar and ha_mmdatapar kch 05/20/16 
+   wire [0:mmiobus_width-1] ha_mmiobus = {ha_mmval,ha_mmcfg,ha_mmrnw,ha_mmdw,ha_mmad,ha_mmadpar,ha_mmdata,ha_mmdatapar};
    wire [0:mmiobus_width-1] s1_mmiobus;
 
    base_vlat#(.width(1))             immiobus_s1vlat(.clk(clk),.reset(reset),.din(ha_mmiobus[0]),.q(s1_mmiobus[0]));
@@ -419,16 +401,15 @@ module capi_dma_mc_top_plus#
 
    // address only portion 
    wire [0:mmiobus_awidth-1] s1_mmioabus = s1_mmiobus[0:mmiobus_awidth-1];
-   wire [0:64]               s1_mmiodbus = s1_mmiobus[mmiobus_awidth:mmiobus_width-1];   // changed 63 to 64 for parity kch 
-   wire 		       s1_mmval, s1_mmcfg, s1_mmrnw, s1_mmdw, s1_mmadpar; // added s1_mmdadapar kch 05/20/16
-   wire [0:24] 		       s1_mmad;    // changed 23 to 24 to add parity kch 
-   assign {s1_mmval, s1_mmcfg, s1_mmrnw, s1_mmdw, s1_mmad, s1_mmadpar} = s1_mmioabus;  // added s1_mmdatapar kch 05/20/16 i don't think this is used
+   wire [0:64]               s1_mmiodbus = s1_mmiobus[mmiobus_awidth:mmiobus_width-1]; 
+   wire 		       s1_mmval, s1_mmcfg, s1_mmrnw, s1_mmdw, s1_mmadpar; 
+   wire [0:24] 		       s1_mmad;   
+   assign {s1_mmval, s1_mmcfg, s1_mmrnw, s1_mmdw, s1_mmad, s1_mmadpar} = s1_mmioabus; 
 
-   wire [0:64] 		       s2_mmiodbus;  // changed 63 to 64 to add parity kch 
+   wire [0:64] 		       s2_mmiodbus; 
    wire                        s2_mmval;
-   base_vlat#(.width(1+65)) immibus_s2lat(.clk(clk),.reset(reset),.din({s1_mmval,s1_mmiodbus}),.q({s2_mmval,s2_mmiodbus}));  //changed 64 to 65 to add data parity 05/20/16 kch
+   base_vlat#(.width(1+65)) immibus_s2lat(.clk(clk),.reset(reset),.din({s1_mmval,s1_mmiodbus}),.q({s2_mmval,s2_mmiodbus})); 
    assign o_mmiobus = {s1_mmioabus,s2_mmiodbus}; // data comes one cycle late
-// check address and data parity as outputs so sinks do not have to kch 
    capi_parcheck#(.width(64)) s2_mmiodbus_pcheck(.clk(clk),.reset(reset),.i_v(s2_mmval),.i_d(s2_mmiodbus[0:63]),.i_p(s2_mmiodbus[64]),.o_error(s1_perror[2]));
    capi_parcheck#(.width(24)) s1_mmioabus_pcheck(.clk(clk),.reset(reset),.i_v(s1_mmval),.i_d(s1_mmioabus[0:23]),.i_p(s1_mmioabus[24]),.o_error(s1_perror[3]));
       
@@ -441,7 +422,7 @@ module capi_dma_mc_top_plus#
    base_vlat#(.width(1)) iah_mmack(.clk(clk),.reset(reset),.din(i_mmack),.q(s3_mmack));
    base_vlat#(.width(64)) iah_mmdat(.clk(clk),.reset(1'b0),.din(s2_mmio_data),.q(s3_mmdata));
 
-   capi_mmio_timeout#(.mmiobus_width(mmiobus_width),.mmio_addr_width(25),.timeout_width(mmio_timeout_width)) immio_watchdog   // changed 24 to 25 kch 
+   capi_mmio_timeout#(.mmiobus_width(mmiobus_width),.mmio_addr_width(25),.timeout_width(mmio_timeout_width)) immio_watchdog
      (.clk(clk),.reset(reset),
       .i_timeout(i_mmio_timeout_d),.i_mmiobus(o_mmiobus),.i_mmack(s3_mmack),.i_mmdata(s3_mmdata),.o_mmack(ah_mmack),.o_mmdata(ah_mmdata), .o_mmpar(ah_mmdatapar)
       );
@@ -500,7 +481,7 @@ module capi_dma_mc_top_plus#
       .i_rsp_rcvd(jc_rsp_rcvd),
       .o_dbg_cnt_inc(o_dbg_cnt_inc[11:14]),
       .o_s1_perror(capi_jctrl_s1_perror),
-      .o_perror(o_perror[1])       // added o_perror kch 
+      .o_perror(o_perror[1])   
       );
    assign o_reset = reset;
    
@@ -532,7 +513,7 @@ module capi_dma_mc_top_plus#
    
    wire [0:gets-1]		       capi_rdata_plus_v;
    wire [0:(gets)*rdata_512_addr_width-1] capi_rdata_plus_a;
-   wire [0:gets*130-1] 	       capi_rdata_plus_d; // changed from 127 to 129 to add parity kch 
+   wire [0:gets*130-1] 	       capi_rdata_plus_d;
 
 
    
@@ -553,13 +534,13 @@ module capi_dma_mc_top_plus#
 
    // format: cpad(3), size, uid, tag, ctxt, ea   
    wire [0:rmux_ways-1]        rd_requ_plus_v, rd_requ_plus_r;
-   wire [0:(rmux_ways * rd_req_width)-1] rd_requ_plus_d;    // parity added to rd_req_width kch 
+   wire [0:(rmux_ways * rd_req_width)-1] rd_requ_plus_d;  
    
    wire [0:wmux_ways-1] 		  wr_requ_plus_v, wr_requ_plus_r;
    wire [0:(wmux_ways * wr_req_width)-1] wr_requ_plus_d;  
  
    wire [0:dmux_ways-1] 		  capi_wdata_rspu_plus_v;
-   wire [0:(dmux_ways * 1024)-1] 	  capi_wdata_rspu_plus_d;    // changed 128 to 130 kch
+   wire [0:(dmux_ways * 1024)-1] 	  capi_wdata_rspu_plus_d;  
 
 
    wire 			     s3_ctxt_trm_v;
@@ -611,7 +592,7 @@ module capi_dma_mc_top_plus#
 	     .get_acc(get_r[i]),
 	     .get_data_r(get_data_r[i]),
 	     .get_data_v(get_data_v[i]),
-	     .get_data_d(get_data_d[130*i:((i+1)*130)-1]),   // changed 128 to 130 to add parity kch 
+	     .get_data_d(get_data_d[130*i:((i+1)*130)-1]), 
 	     .get_data_e(get_data_e[i]),
 	     .get_data_c(get_data_c[4*i:((i+1)*4)-1]),
 	     .get_data_rc(get_data_rc[rc_width*i:(i+1)*rc_width-1]),
@@ -619,7 +600,7 @@ module capi_dma_mc_top_plus#
 	     
 	     .o_req_r(rd_requ_plus_r[i]),
 	     .o_req_v(rd_requ_plus_v[i]),
-	     .o_req_d(rd_requ_plus_d[i*rd_req_width:((i+1)*rd_req_width)-1]), // aprity added to rd_req_width kch 
+	     .o_req_d(rd_requ_plus_d[i*rd_req_width:((i+1)*rd_req_width)-1]), 
 
 	     .i_rsp_v(capi_rd_rsp_plus_v[i]),
 	     .i_rsp_d(capi_rd_rsp_plus_d[rsp_width*i:((i+1)*rsp_width)-1]),
@@ -669,7 +650,7 @@ module capi_dma_mc_top_plus#
 	     .put_addr_d_ctxt(put_addr_d_ctxt[i*ctxtid_width:((i+1)*ctxtid_width)-1]),
 	     .put_data_r(put_data_r[i]),
 	     .put_data_v(put_data_v[i]),
-	     .put_data_d(put_data_d[i*130:((i+1)*130)-1]),    //changed 128 to 130 kch
+	     .put_data_d(put_data_d[i*130:((i+1)*130)-1]), 
 	     .put_data_e(put_data_e[i]),
 	     .put_data_c(put_data_c[i*4:((i+1)*4)-1]),
 	     .put_done_v(put_done_v[i]),
@@ -692,7 +673,7 @@ module capi_dma_mc_top_plus#
 	     
 	     .o_wdata_rsp_v(capi_wdata_rspu_plus_v[i]),
 	     .o_wdata_rsp_d(capi_wdata_rspu_plus_d[i*1024 : ((i+1)*1024)-1]), 
-             .o_perror(o_perror[23+2*i:23+2*i+1]),  // added o_perror kch  i=0:3  bits 23:34 
+             .o_perror(o_perror[23+2*i:23+2*i+1]), 
              .o_s1_perror(capi_put_s1_perror[3*i:3*i+2]),
              .o_crossing_enable(crossing_enable[i]),
              .i_gate_sid(i_gate_sid)
@@ -732,7 +713,7 @@ module capi_dma_mc_top_plus#
 	     .get_acc(get_r[i]),
 	     .get_data_r(get_data_r[i]),
 	     .get_data_v(get_data_v[i]),
-	     .get_data_d(get_data_d[130*i:((i+1)*130)-1]),   // changed 128 to 130 to add parity kch 
+	     .get_data_d(get_data_d[130*i:((i+1)*130)-1]),
 	     .get_data_e(get_data_e[i]),
 	     .get_data_c(get_data_c[4*i:((i+1)*4)-1]),
 	     .get_data_rc(get_data_rc[rc_width*i:(i+1)*rc_width-1]),
@@ -740,7 +721,7 @@ module capi_dma_mc_top_plus#
 	     
 	     .o_req_r(rd_requ_plus_r[i]),
 	     .o_req_v(rd_requ_plus_v[i]),
-	     .o_req_d(rd_requ_plus_d[i*rd_req_width:((i+1)*rd_req_width)-1]), // aprity added to rd_req_width kch 
+	     .o_req_d(rd_requ_plus_d[i*rd_req_width:((i+1)*rd_req_width)-1]), 
 
 	     .i_rsp_v(capi_rd_rsp_plus_v[i]),
 	     .i_rsp_d(capi_rd_rsp_plus_d[rsp_width*i:((i+1)*rsp_width)-1]),
@@ -797,7 +778,7 @@ module capi_dma_mc_top_plus#
 	     .put_addr_d_ctxt(put_addr_d_ctxt[i*ctxtid_width:((i+1)*ctxtid_width)-1]),
 	     .put_data_r(put_data_r[i]),
 	     .put_data_v(put_data_v[i]),
-	     .put_data_d(put_data_d[i*130:((i+1)*130)-1]),    //changed 128 to 130 kch
+	     .put_data_d(put_data_d[i*130:((i+1)*130)-1]),
 	     .put_data_e(put_data_e[i]),
 	     .put_data_c(put_data_c[i*4:((i+1)*4)-1]),
 	     .put_done_v(put_done_v[i]),
@@ -820,7 +801,7 @@ module capi_dma_mc_top_plus#
 	     
 	     .o_wdata_rsp_v(capi_wdata_rspu_plus_v[i]),
 	     .o_wdata_rsp_d(capi_wdata_rspu_plus_d[i*1024 : ((i+1)*1024)-1]), 
-             .o_perror(o_perror[23+2*i:23+2*i+1]),  // added o_perror kch  i=0:3  bits 23:34 
+             .o_perror(o_perror[23+2*i:23+2*i+1]),
              .o_s1_perror(capi_put_s1_perror[3*i:3*i+2]),
              .o_put128_dbg_cnt_inc(put128_dbg_cnt_inc[i-4]),
              .i_gate_sid(i_gate_sid)
@@ -875,41 +856,21 @@ endgenerate
    assign o_cnt_pend_dropped = s2_cnt_pend_dropped;
    
 
-   base_amlrr_arb#(.width(rd_req_width),.stages(rmux_stages),.stage_ways(stage_ways),.ways(rmux_ways)) irmux_plus   // parity added to rd_req_width kch 
+   base_amlrr_arb#(.width(rd_req_width),.stages(rmux_stages),.stage_ways(stage_ways),.ways(rmux_ways)) irmux_plus 
      (.clk(clk),.reset(reset),
       .i_r(rd_requ_plus_r),.i_v(rd_requ_plus_v),.i_d(rd_requ_plus_d),.i_h({rmux_ways{1'b0}}),
       .o_r(rd_req_plus_r), .o_v(rd_req_plus_v), .o_d(rd_req_plus_d),.o_h()
       );
 
-// temp unready generation remove when done also remove all temp_ signals
-//   wire [0:5] temp_wr_requ_plus_v; 
-//   wire [0:5] temp_wr_requ_plus_r;
-//   assign temp_wr_requ_plus_v[0] = wr_requ_plus_v[0]; 
-//   assign temp_wr_requ_plus_v[1] = wr_requ_plus_v[1]; 
-//   assign temp_wr_requ_plus_v[2] = wr_requ_plus_v[2]; 
-//   assign temp_wr_requ_plus_v[3] = wr_requ_plus_v[3]; 
-//   assign temp_wr_requ_plus_v[5] = wr_requ_plus_v[5]; 
-//   assign wr_requ_plus_r[0] = temp_wr_requ_plus_r[0]; 
-//   assign wr_requ_plus_r[1] = temp_wr_requ_plus_r[1]; 
-//   assign wr_requ_plus_r[2] = temp_wr_requ_plus_r[2]; 
-//   assign wr_requ_plus_r[3] = temp_wr_requ_plus_r[3]; 
-//   assign wr_requ_plus_r[5] = temp_wr_requ_plus_r[5];
-//   wire temp_gate ;
-//   wire temp_gate_delay ;
-//   base_delay#(.n(1000),.width(1)) temp_delay (.clk(clk),.reset(reset),.i_d(temp_gate), .o_d(temp_gate_delay));
-//   base_vlat_sr itemp(.clk(clk),.reset(reset),.set(wr_requ_plus_v[4] & wr_requ_plus_r[4] ),.rst(temp_gate_delay),.q(temp_gate));
-//   assign temp_wr_requ_plus_v[4] = wr_requ_plus_v[4] & ~(temp_gate);
-//   assign wr_requ_plus_r[4] = temp_wr_requ_plus_r[4] & ~(temp_gate);
- 
 
-   base_amlrr_arb#(.width(wr_req_width),.stages(wmux_stages),.stage_ways(stage_ways),.ways(wmux_ways)) iwmux_plus  //parity added to wr_req_width kch  
+   base_amlrr_arb#(.width(wr_req_width),.stages(wmux_stages),.stage_ways(stage_ways),.ways(wmux_ways)) iwmux_plus 
      (.clk(clk),.reset(reset),
       .i_r(wr_requ_plus_r),.i_v(wr_requ_plus_v),.i_d(wr_requ_plus_d),.i_h({wmux_ways{1'b0}}),
       .o_r(wr_req_plus_r), .o_v(wr_req_plus_v), .o_d(wr_req_plus_d),.o_h()
       );
 
 
-   base_multicycle_mux#(.width(1024),.stages(dmux_stages),.stage_ways(stage_ways),.ways(dmux_ways),.early_valid(1)) idmux_plus  //changed 128 to 130 kch
+   base_multicycle_mux#(.width(1024),.stages(dmux_stages),.stage_ways(stage_ways),.ways(dmux_ways),.early_valid(1)) idmux_plus
      (.clk(clk),.reset(reset),
       .i_v(capi_wdata_rspu_plus_v),.i_d({capi_wdata_rspu_plus_d}),
       .o_v(capi_wdata_rsp_plus_v),.o_d({capi_wdata_rsp_plus_d})
@@ -1084,7 +1045,7 @@ wire [0:7]   ha_error_response = response_error ? 8'h01 :8'h00;
 	.i_ctxt_ctrl_id(o_ctxt_upd_d),
 	
 	.i_restart_dat({13'h01, {nt_req_width-14{1'b0}},1'b1}),
-	.i_restart_ctxt({{ctxtid_width-1{1'b0}},1'b1}),  /// added parity bit kch
+	.i_restart_ctxt({{ctxtid_width-1{1'b0}},1'b1}),
 	.i_restart_tstag({{tstag_width-1{1'b0}},1'b1}),
 
 	.i_rsp_v(r1_tag_plus_total_v), 
@@ -1110,7 +1071,7 @@ wire [0:7]   ha_error_response = response_error ? 8'h01 :8'h00;
         .o_dbg_dma_retry_s0(),
         .i_dma_retry_msk_pe025(i_dma_retry_msk_pe025),
         .i_dma_retry_msk_pe34(i_dma_retry_msk_pe34),
-        .o_perror(o_perror[35:36])    // added o_perror kch  
+        .o_perror(o_perror[35:36])  
 
 	);
 
@@ -1147,7 +1108,7 @@ wire [0:7]   ha_error_response = response_error ? 8'h01 :8'h00;
       .hd0_cpl_valid(hd0_cpl_valid),.hd0_cpl_utag(hd0_cpl_utag),.hd0_cpl_type(hd0_cpl_type),.hd0_cpl_laddr(hd0_cpl_laddr),.hd0_cpl_byte_count(hd0_cpl_byte_count),.hd0_cpl_data(hd0_cpl_data),.hd0_cpl_size(hd0_cpl_size),.i_tag_plus_v(r1_tag_plus_v),.i_rtag_plus(r1_rtag_plus),.i_rtag_response_plus(r1_response_plus),
       .i_sent_utag_valid(hd0_sent_utag_valid),.i_sent_utag(hd0_sent_utag[2:9]),
       .o_ctag_error_hld(),.o_rtag_error_hld(),.o_u_sent_tag_error_hld(),.o_cmplt_utag_error_hld(),
-      .o_perror(o_perror[37:38]),.o_tag_error(read_tag_error),   // added o_perror kch 
+      .o_perror(o_perror[37:38]),.o_tag_error(read_tag_error), 
       .o_latency_d(read_tag_latency),.i_reset_lat_cntrs(i_reset_lat_cntrs)
       );
 
@@ -1271,7 +1232,7 @@ wire [0:7]   ha_error_response = response_error ? 8'h01 :8'h00;
       .o_v(s3_plus_v),.o_d({s3_plus_ctag,s3_plus_cmd,s3_plus_cch,s3_plus_cea,s3_plus_csize,s3_dma_req_plus_uid}),.o_r(1'b1));
 
    wire 		       s3_tag_outst_plus;
-   base_vmem#(.a_width(ctag_width),.rports(2)) itag_vmem_plus   //added -1 kch  -2 to _a inputs to strip off parity
+   base_vmem#(.a_width(ctag_width),.rports(2)) itag_vmem_plus 
      (.clk(clk),.reset(reset),
       .i_set_v(s3_plus_v),.i_set_a(s3_plus_ctag),
       .i_rst_v(r1_tag_plus_total_v),.i_rst_a(r1_rtag_plus_total),
@@ -1344,14 +1305,14 @@ wire [0:7]   ha_error_response = response_error ? 8'h01 :8'h00;
    
    
 
-   base_vlat#(.width(ahc_width+2)) iahc_lat_plus  // changed +3 to +1 kch 
+   base_vlat#(.width(ahc_width+2)) iahc_lat_plus 
      (.clk(clk),.reset(reset),
-      .din({(s3a_plus_v & ~i_error_status_hld),s3_plus_ctag,s3_plus_ctagpar,s3_plus_cmd,s3_plus_cmdpar,s3_plus_cch,s3_plus_cea,s3_plus_csize}), // temp remove error_status_hld kch
+      .din({(s3a_plus_v & ~i_error_status_hld),s3_plus_ctag,s3_plus_ctagpar,s3_plus_cmd,s3_plus_cmdpar,s3_plus_cch,s3_plus_cea,s3_plus_csize}), 
       .q({ah_cvalid,ah_ctag,ah_ctagpar,ah_com,ah_compar,ah_lcl_cch,ah_cea,ah_ceapar,ah_csize}));
 
    base_vlat#(.width(3)) icabt_lat(.clk(clk),.reset(reset),.din(i_ah_cabt),.q(ah_cabt)); 
    capi_parcheck#(.width(ctxtid_width-1)) ah_lcl_cch_pcheck(.clk(clk),.reset(reset),.i_v(ah_cvalid),.i_d(ah_lcl_cch[0:ctxtid_width-2]),.i_p(ah_lcl_cch[ctxtid_width-1]),.o_error(s1_perror[5]));
-   assign ah_cch = ah_lcl_cch[0:ctxtid_width-2]; // parity not supported on ah command kch
+   assign ah_cch = ah_lcl_cch[0:ctxtid_width-2]; 
    assign ah_cpad = 3'b010;
    assign ah_ldone = 1'b0;
    

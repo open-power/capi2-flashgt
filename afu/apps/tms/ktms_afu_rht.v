@@ -89,7 +89,7 @@ module ktms_afu_rht#
 
     // tracking for debug and performance
     output                         o_trk_v,
-    output       [0:tstag_width-1] o_trk_tag, // parity added kch 
+    output       [0:tstag_width-1] o_trk_tag,
     output                  [0:47] o_trk_d,
 
     // dma get address (0=rht, 1=lxt)
@@ -98,12 +98,12 @@ module ktms_afu_rht#
     output        [0:ea_width*2-1] o_get_addr_ea,
     output    [0:ctxtid_width*2-1] o_get_addr_ctxt,
     output     [0:ssize_width*2-1] o_get_addr_size,
-    output     [0:tstag_width*2-1] o_get_addr_tstag, // parity added kch 
+    output     [0:tstag_width*2-1] o_get_addr_tstag,
 
     // dma get data (0=rht, 1=lxt)
     output                   [0:1] i_get_data_r,
     input                    [0:1] i_get_data_v,
-    input              [0:130*2-1] i_get_data_d, // changed 128 to 130 to add parity kch
+    input              [0:130*2-1] i_get_data_d,
     input                    [0:1] i_get_data_e,
     input     [0:dma_rc_width*2-1] i_get_data_rc,
     output                   [0:3] o_perror , 
@@ -151,15 +151,15 @@ module ktms_afu_rht#
       .i_r(s0b_r[0]),.i_v(s0b_v[0]),.i_d({i_req_ok,i_req_wnr,i_req_rc,i_req_erc,i_req_vrh,i_req_rh,i_req_lba,i_req_tstag,i_req_ctxt, (i_req_transfer_len==32'h1)}),
       .o_r(s1_r),    .o_v(s1_v),    .o_d({s1_ok,      s1_wnr,   s1_rc,   s1_erc,   s1_vrh,   s1_rh,   s1_lba,   s1_tstag,   s1_ctxt, s1_transfer_eq_1}));
 
-   wire [0:64] 			 mmio_rht0_d, mmio_rht1_d, mmio_rht2_d;   // changed 63 to 64 for parity kch 
+   wire [0:64] 			 mmio_rht0_d, mmio_rht1_d, mmio_rht2_d;  
    wire [0:ctxtid_width-1] 	 mmio_rht0_ctxt, mmio_rht1_ctxt, mmio_rht2_ctxt;
    wire 			 mmio_rht0_v, mmio_rht1_v, mmio_rht2_v;
-   capi_mmio_mc_reg#(.addr(mmio_cpc_addr),.ctxtid_start(5))   immio_rht0(.clk(clk),.reset(reset),.i_mmiobus(i_mmiobus),.q(mmio_rht0_d),.trg(mmio_rht0_v),.ctxt(mmio_rht0_ctxt),.o_perror(o_perror[1]));  // ctxt has parity kch 
+   capi_mmio_mc_reg#(.addr(mmio_cpc_addr),.ctxtid_start(5))   immio_rht0(.clk(clk),.reset(reset),.i_mmiobus(i_mmiobus),.q(mmio_rht0_d),.trg(mmio_rht0_v),.ctxt(mmio_rht0_ctxt),.o_perror(o_perror[1])); 
    capi_mmio_mc_reg#(.addr(mmio_cpc_addr+2),.ctxtid_start(5)) immio_rht1(.clk(clk),.reset(reset),.i_mmiobus(i_mmiobus),.q(mmio_rht1_d),.trg(mmio_rht1_v),.ctxt(mmio_rht1_ctxt),.o_perror(o_perror[2]));
    capi_mmio_mc_reg#(.addr(mmio_cpc_addr+4),.ctxtid_start(5)) immio_rht2(.clk(clk),.reset(reset),.i_mmiobus(i_mmiobus),.q(mmio_rht2_d),.trg(mmio_rht2_v),.ctxt(mmio_rht2_ctxt),.o_perror(o_perror[3]));
 
    wire [0:7]                    s1_perror;
-   capi_parcheck#(.width(ea_width-1)) mmio_rht2_d_pcheck(.clk(clk),.reset(reset),.i_v(mmio_rht2_v),.i_d(mmio_rht2_d[0:ea_width-2]),.i_p(mmio_rht2_d[ea_width-1]),.o_error(s1_perror[0])); //kch
+   capi_parcheck#(.width(ea_width-1)) mmio_rht2_d_pcheck(.clk(clk),.reset(reset),.i_v(mmio_rht2_v),.i_d(mmio_rht2_d[0:ea_width-2]),.i_p(mmio_rht2_d[ea_width-1]),.o_error(s1_perror[0]));
    wire [0:7] 				hld_perror;
    wire  				any_hld_perror = |(hld_perror);
    base_vlat_sr#(.width(8)) iperror_lat(.clk(clk),.reset(reset),.set(s1_perror),.rst(8'd0),.q(hld_perror));
@@ -197,18 +197,18 @@ module ktms_afu_rht#
       .i_v(s1_v),.i_r(s1_r),.i_d({s1_ok,s1_rc,s1_erc,s1_vrh,s1_rh,s1_lba,s1_tstag,s1_wnr,s1_transfer_eq_1}),
       .o_v(s2_v),.o_r(s2_r),.o_d({s2_ok,s2_rc,s2_erc,s2_vrh,s2_rh,s2_lba,s2_tstag,s2_wnr,s2_transfer_eq_1}));
 
-   capi_parcheck#(.width(ea_width-1)) s2_rht1_d_pcheck(.clk(clk),.reset(reset),.i_v(s2_v & s2_vrh),.i_d(s2_rht1_d[0:ea_width-2]),.i_p(s2_rht1_d[ea_width-1]),.o_error(s1_perror[1])); //kch changed s1_rd_en to s2_v&s2_vrh
+   capi_parcheck#(.width(ea_width-1)) s2_rht1_d_pcheck(.clk(clk),.reset(reset),.i_v(s2_v & s2_vrh),.i_d(s2_rht1_d[0:ea_width-2]),.i_p(s2_rht1_d[ea_width-1]),.o_error(s1_perror[1])); 
 
    wire [0:15] 			 s2_rht_cnt = s2_rht1_d[0:15];
    wire                          s2_rht_ctxt_par;
-   wire [0:ctxtid_width-1] 	 s2_rht_ctxt = {s2_rht1_d[31-ctxtid_width+2:31],s2_rht_ctxt_par};   //changed -1 to -2 and +1 to +2 to strip off parity , added parity 
-   capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) s2_rht_ctxt_pgen(.i_d(s2_rht_ctxt[0:ctxtid_width-2]),.o_d(s2_rht_ctxt_par));   //kch
-   capi_parcheck#(.width(ea_width-1)) s2_rht0_pcheck(.clk(clk),.reset(reset),.i_v(s2_v & s2_vrh),.i_d(s2_rht0_d[0:ea_width-2]),.i_p(s2_rht0_d[ea_width-1]),.o_error(s1_perror[2])); //kch changed s1_rd_en to s2_v&s2_vrh
+   wire [0:ctxtid_width-1] 	 s2_rht_ctxt = {s2_rht1_d[31-ctxtid_width+2:31],s2_rht_ctxt_par}; 
+   capi_parity_gen#(.dwidth(ctxtid_width-1),.width(1)) s2_rht_ctxt_pgen(.i_d(s2_rht_ctxt[0:ctxtid_width-2]),.o_d(s2_rht_ctxt_par));
+   capi_parcheck#(.width(ea_width-1)) s2_rht0_pcheck(.clk(clk),.reset(reset),.i_v(s2_v & s2_vrh),.i_d(s2_rht0_d[0:ea_width-2]),.i_p(s2_rht0_d[ea_width-1]),.o_error(s1_perror[2])); 
    
    
    wire [0:ea_width-1] 		 s2_rht_addr;
    assign s2_rht_addr[0:ea_width-2] = s2_rht0_d[0:ea_width-2] + {s2_rh,4'd0};
-   capi_parity_gen#(.dwidth(ea_width-1),.width(1)) s2_rht_addr_pgen(.i_d(s2_rht_addr[0:ea_width-2]),.o_d(s2_rht_addr[ea_width-1]));   //kch 
+   capi_parity_gen#(.dwidth(ea_width-1),.width(1)) s2_rht_addr_pgen(.i_d(s2_rht_addr[0:ea_width-2]),.o_d(s2_rht_addr[ea_width-1])); 
    wire 			 s2_rht_rhv = s2_rht_cnt > s2_rh;
    wire 			 s2_rht_v = s2_rht0_v & s2_rht1_v;
    wire 			 s2_rht_algn_err = | s2_rht0_d[60:63];
@@ -289,7 +289,7 @@ module ktms_afu_rht#
       .o_v(s4a_v[1]),.o_r(s4a_r[1]),.o_d({s4_vrh,s4_ok_in, s4_rc_in, s4_erc_in, s4_lba, s4_rht_ctxt, s4_ec,s4_tstag,s4_wnr,s4_transfer_eq_1}));
    base_aforce is4_frc(.i_v(i_get_data_v[0]),.i_r(i_get_data_r[0]),.o_v(s4a_v[0]),.o_r(s4a_r[0]),.en(s4_ok_in & s4_vrh));
   
-   capi_parcheck#(.width(64)) i_get_data_d_pcheck0(.clk(clk),.reset(reset),.i_v(i_get_data_v[0]),.i_d(i_get_data_d[0:63]),.i_p(i_get_data_d[128]),.o_error(s1_perror[3])); //fixit it chec i_v connections kch 
+   capi_parcheck#(.width(64)) i_get_data_d_pcheck0(.clk(clk),.reset(reset),.i_v(i_get_data_v[0]),.i_d(i_get_data_d[0:63]),.i_p(i_get_data_d[128]),.o_error(s1_perror[3]));
    capi_parcheck#(.width(64)) i_get_data_d_pcheck1(.clk(clk),.reset(reset),.i_v(i_get_data_v[1]),.i_d(i_get_data_d[64:127]),.i_p(i_get_data_d[129]),.o_error(s1_perror[4]));
  
    wire [0:ea_width-1] s4_lxt_start_lunid;
@@ -309,12 +309,11 @@ module ktms_afu_rht#
 
    wire [0:dma_rc_width-1] s4_dmarc = i_errinj[0] ? dma_rc_paged : (i_errinj[1] ? dma_rc_addr : i_get_data_rc[0:dma_rc_width-1]);
 
-   /* four possible errors in order of priority */
+   /* five possible errors in order of priority */
    wire 		 s4_dma_err = | s4_dmarc ;
-   wire 		 s4_fmt_err = (| s4_lxt_fmt[1:2]) & s4_vrh;  // added s4_vrh. not necessary but need for sim. may change it back
+   wire 		 s4_fmt_err = (| s4_lxt_fmt[1:2]) & s4_vrh; 
    wire 		 s4_inv_err = s4_fmt_one & ~s4_lunid_vld;
-   wire 		 s4_perm_err = (s4_wnr ? ~s4_lxt_wp : ~s4_lxt_rp) & s4_vrh;  // added s4_vrh. not necessary but need for sim. may change it back 
-   /* bugfix: add 5th error - length!= 1 for virtual lun */
+   wire 		 s4_perm_err = (s4_wnr ? ~s4_lxt_wp : ~s4_lxt_rp) & s4_vrh;  
    wire                  s4_vlength_err = s4_fmt_zero & ~s4_transfer_eq_1;
    
 	
@@ -337,7 +336,6 @@ module ktms_afu_rht#
                                            afuxerr_lxt_vlen;
    
    wire 		   s4_err_v = (s4_dma_err | s4_fmt_err | s4_inv_err | s4_perm_err | s4_vlength_err) & s4_vrh;
-//   wire 		   s4_err_v = (s4_dma_err | s4_fmt_err | s4_inv_err | s4_perm_err | s4_vlength_err) & 1'b1; // temp fix to recreate error
    wire [0:7]              vrh_error_hld;
    wire [0:7]              vrh_error_in = (s4_err_v & s4a_v[1] & (vrh_error_hld == 8'h00)) ? s4_err_erc : vrh_error_hld;
 
@@ -365,8 +363,7 @@ module ktms_afu_rht#
    wire [0:lba_width-1]    s5_lba;
    wire [0:tstag_width-1]  s5_tstag;   
    wire [0:nmsk_width-1]   s5_lxt_nmsk;
-//   wire [ea_width-1:0] 	   s5_lxt_start_lunid;  original kch 
-   wire [0:ea_width-1] 	   s5_lxt_start_lunid; // change to 0 to n kch 
+   wire [0:ea_width-1] 	   s5_lxt_start_lunid;
    wire [0:31] 		   s5_lxt_cnt;
    wire [0:ctxtid_width-1] s5_rht_ctxt;
    wire 		   s5_ec;
@@ -393,9 +390,8 @@ module ktms_afu_rht#
    wire [0:lba_width-1] s5_lba_lsb = s5_lba & ~s5_lba_msk_b;
 
    // detect alignment error
-   capi_parcheck#(.width(64)) s5_lxt_start_lunid_pcheck(.clk(clk),.reset(reset),.i_v(s5_v & s5_vrh),.i_d(s5_lxt_start_lunid[0:ea_width-2]),.i_p(s5_lxt_start_lunid[ea_width-1]),.o_error(s1_perror[5])); // added s5_vrh kch 
-//   wire 		s5_tr_err = s5_fmt[0] & (|(s5_lxt_start_lunid[2:0]));  // original 
-   wire 		s5_tr_err = s5_fmt[0] & (|(s5_lxt_start_lunid[61:63]));  // changed to 0:n numbering
+   capi_parcheck#(.width(64)) s5_lxt_start_lunid_pcheck(.clk(clk),.reset(reset),.i_v(s5_v & s5_vrh),.i_d(s5_lxt_start_lunid[0:ea_width-2]),.i_p(s5_lxt_start_lunid[ea_width-1]),.o_error(s1_perror[5])); 
+   wire 		s5_tr_err = s5_fmt[0] & (|(s5_lxt_start_lunid[61:63])); 
    
    wire s5_ok;
    wire [0:rc_width-1] s5_rc;
@@ -426,13 +422,13 @@ module ktms_afu_rht#
    .o_v(s6_v),.o_r(s6_r),.o_d({s6_vrh,s6_ok_in,s6_fmt,s6_rc_in,s6_erc_in, s6_lxt_nmsk,s6_chunk,s6_lba_lsb,s6_lxt_start_lunid,s6_lxt_cnt,s6_rht_ctxt,s6_ec,s6_tstag,s6_wnr,s6_fmt1_pmsk}));
 
    // stage 6: compute address
-   capi_parcheck#(.width(64)) s6_lxt_start_lunid_pcheck(.clk(clk),.reset(reset),.i_v(s6_v & s6_vrh),.i_d(s6_lxt_start_lunid[0:ea_width-2]),.i_p(s6_lxt_start_lunid[ea_width-1]),.o_error(s1_perror[6])); // added s6_vrh kch 
+   capi_parcheck#(.width(64)) s6_lxt_start_lunid_pcheck(.clk(clk),.reset(reset),.i_v(s6_v & s6_vrh),.i_d(s6_lxt_start_lunid[0:ea_width-2]),.i_p(s6_lxt_start_lunid[ea_width-1]),.o_error(s1_perror[6]));
    wire                   s6_get_ea_par;
    wire [0:ea_width-1] s6_get_ea;
    assign s6_get_ea[0:ea_width-2] = s6_lxt_start_lunid[0:ea_width-2] + {s6_chunk,3'b0};
    assign s6_get_ea[ea_width-1] = s6_get_ea_par;
    
-   capi_parity_gen#(.dwidth(ea_width-1),.width(1)) s6_get_ea_pgen(.i_d(s6_get_ea[0:ea_width-2]),.o_d(s6_get_ea_par));   //kch
+   capi_parity_gen#(.dwidth(ea_width-1),.width(1)) s6_get_ea_pgen(.i_d(s6_get_ea[0:ea_width-2]),.o_d(s6_get_ea_par)); 
    wire s6_lba_ok = s6_chunk < s6_lxt_cnt;
    wire s6_tr_err = s6_fmt[0] & (~s6_lba_ok);
    wire s6_ok;
@@ -501,7 +497,7 @@ module ktms_afu_rht#
     .i_v(s7b_v[1]),.i_r(s7b_r[1]),.i_d({s7_vrh,s7_ok,   s7_fmt,s7_rc,   s7_erc,   s7_lxt_nmsk,s7_fmt1_lunid,s7_lba_lsb,s7_rht_ctxt,s7_ec,s7_wnr,s7_fmt1_pmsk}),
     .o_v(s8a_v[1]),.o_r(s8a_r[1]),.o_d({s8_vrh,s8_ok_in,s8_fmt,s8_rc_in,s8_erc_in,s8_lxt_nmsk,s8_fmt1_lunid,s8_lba_lsb,s8_rht_ctxt,s8_ec,s8_wnr,s8_fmt1_pmsk}));
 
-   capi_parcheck#(.width(ctxtid_width-1)) s8_rht_ctxt_pcheck(.clk(clk),.reset(reset),.i_v(s8a_v[1] & s8_vrh),.i_d(s8_rht_ctxt[0:ctxtid_width-2]),.i_p(s8_rht_ctxt[ctxtid_width-1]),.o_error(s1_perror[7]));  // added s8_vrh kch 
+   capi_parcheck#(.width(ctxtid_width-1)) s8_rht_ctxt_pcheck(.clk(clk),.reset(reset),.i_v(s8a_v[1] & s8_vrh),.i_d(s8_rht_ctxt[0:ctxtid_width-2]),.i_p(s8_rht_ctxt[ctxtid_width-1]),.o_error(s1_perror[7])); 
 
    wire [0:channels-1] 	s8_ntr_pmsk;
    wire [0:lunid_width_w_par-1] s8_org_lunid;
@@ -523,8 +519,7 @@ module ktms_afu_rht#
    wire 		  s8b_v, s8b_r;
    base_acombine#(.ni(3),.no(1)) is8_cmb(.i_v(s8a_v),.i_r(s8a_r),.o_v(s8b_v),.o_r(s8b_r));
    wire [0:63] 		  s8_get_data_d0;
-//   base_mux#(.ways(2),.width(64)) is8_dmux(.din(i_get_data_d[128:255]),.dout(s8_get_data_d0),.sel({~s8_dmux_sel,s8_dmux_sel}));
-   assign s8_get_data_d0 = i_get_data_d[130:130+63]; // changed 128 to 130 kch
+   assign s8_get_data_d0 = i_get_data_d[130:130+63];
    
    
    wire [0:63] 		  s8_get_data_d1;
@@ -537,7 +532,6 @@ module ktms_afu_rht#
 
    // force to 0 on error so we don't get "X" showing up when we write the port field of ioasa
    wire [0:lidx_width-1]  s8_lidx    = s8_lidx_raw[lidx_width-1:0];
-//   wire [0:1] 		  s8_tr_pmsk = s8_fmt[0] ? {s8_get_data_d1[63],s8_get_data_d1[62]} : s8_fmt1_pmsk;  // orig kch
    wire [0:3] 		  s8_tr_pmsk = s8_fmt[0] ? {s8_get_data_d1[63],s8_get_data_d1[62],s8_get_data_d1[61],s8_get_data_d1[60]} : s8_fmt1_pmsk;
 
    wire 			 s8_perm_wp = s8_get_data_d1[58];

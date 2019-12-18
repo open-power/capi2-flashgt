@@ -144,11 +144,11 @@ module ktms_afu_perfmon#
    wire 		       pm_rnw;  // read not write
    wire 		       pm_vld;  // valid 
    wire 		       pm_dw;   // double word
-   wire [0:64] 		       pm_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       pm_data;
    wire [0:24]  	       pm_addr;
    wire [0:4+24+64-1]          pm_mmiobus;
-   assign {pm_vld,pm_cfg,pm_rnw,pm_dw,pm_addr,pm_data} = i_mmiobus; // omit any extra data bits
-   assign pm_mmiobus = {pm_vld,pm_cfg,pm_rnw,pm_dw,pm_addr[0:23],pm_data[0:63]};  // created to strip of parity 
+   assign {pm_vld,pm_cfg,pm_rnw,pm_dw,pm_addr,pm_data} = i_mmiobus;
+   assign pm_mmiobus = {pm_vld,pm_cfg,pm_rnw,pm_dw,pm_addr[0:23],pm_data[0:63]};  
    ktms_mmrd_dec#(.lcladdr_width(lcl_addr_width),.addr(mmioaddr),.mmiobus_width(mmiobus_width-2)) immrd_dec
      (.clk(clk),.reset(reset),.i_mmiobus(pm_mmiobus),
       .o_rd_r(s1_rd_r),.o_rd_v(s1_rd_v),.o_rd_addr(s1_rd_ra),

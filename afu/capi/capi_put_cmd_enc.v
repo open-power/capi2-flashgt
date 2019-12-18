@@ -15,34 +15,9 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-//----------------------------------------------------------------------------- 
-// 
-// IBM Confidential 
-// 
-// IBM Confidential Disclosure Agreement Number: 20160104OPPG01 
-// Supplement Number: 20160104OPPG02
-// 
-// (C) Copyright IBM Corp. 2016 
-// 
-//    The source code for this program is not published or otherwise 
-//    divested of its trade secrets, irrespective of what has been 
-//    deposited with the U.S. Copyright Office. 
-// 
-//----------------------------------------------------------------------------- 
 
 
 `timescale 1 ns / 10 ps
-
-//  *************************************************************************
-//  File : nvme_sntl_cmd.v
-//  *************************************************************************
-//  KC Hinz
-//  IBM
-//  kchinz@us.ibm.com
-//  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer command processing
-//                
-//  *************************************************************************
 
 module capi_put_cmd_enc#
   (// afu/psl   interface parameters
@@ -62,7 +37,7 @@ module capi_put_cmd_enc#
     input       	        i_data_r,
     input       	        i_data_e,
     input [0:4]                 i_cmd_tag,
-    input [0:sid_width-1]                 i_sid,
+    input [0:sid_width-1]       i_sid,
     input                       i_f,
     input [0:10]                i_addr_aux,
     input [0:9]                 i_addr_ctxt,
@@ -79,24 +54,18 @@ module capi_put_cmd_enc#
     output                      o_cmd_f,
     output [0:10]               o_cmd_addr_aux,
     output [0:9]                o_cmd_addr_ctxt,
-//    output                      o_crossing_enable,
-//    output                      o_s0_crossing_enable,
     output                      o_s1_crossing_enable,
     output                      o_crossing_end,
     output                      o_s1_data_e
    );
    // register command request interface  
-   reg [0:ea_width-2]       cmd_addr_q,cmd_addr_d;  // drop parity bit for now.  -1 -2 
-//   reg [0:ea_width-1]       cmd_addr2_q,cmd_addr2_d;
+   reg [0:ea_width-2]       cmd_addr_q,cmd_addr_d; 
    reg                      cmd_addr_v_q,cmd_addr_v_d;
-//   reg                      cmd_addr2_v_q,cmd_addr2_v_d;
    reg [0:ea_width-2]       s0_cmd_addr_q,s0_cmd_addr_d;
-//   reg [0:ea_width-1]       s1_cmd_addr_q,s1_cmd_addr_d;
    reg [0:9]                cmd_tsize_q,cmd_tsize_d;
    reg [0:9]                s1_cmd_tsize_q,s1_cmd_tsize_d;
    reg                      cmd_v_q,cmd_v_d;
    reg                      reset_beat_cnt_q,reset_beat_cnt_d;
-//   reg                      s1_cmd_v_q,s1_cmd_v_d;
    reg [0:2]                crossing_active_q,crossing_active_d;
    reg [0:3]                data_align_offset_q,data_align_offset_d;
    reg [0:3]                s0_data_align_offset_q,s0_data_align_offset_d;
@@ -114,55 +83,47 @@ module capi_put_cmd_enc#
      begin
        if ( reset == 1'b1 )
        begin
-         cmd_addr_q     <= 1'b0;
- //        cmd_addr2_q     <= 1'b0;
-         cmd_addr_v_q     <= 1'b0;
-//         cmd_addr2_v_q     <= 1'b0;
-         s0_cmd_addr_q     <= 1'b0;
-//         s1_cmd_addr_q     <= 1'b0;
-         cmd_length_q   <= 1'b0;
-         data_align_offset_q  <= 1'b0;
-         s0_data_align_offset_q  <= 1'b0;
-         cmd_v_q              <= 1'b0;
-         reset_beat_cnt_q              <= 1'b0;
-//         s1_cmd_v_q              <= 1'b0;
-         crossing_active_q <= 3'b000;
-         cmd_tsize_q          <= 1'b0;
-         s1_cmd_tsize_q          <= 1'b0;
-         crossing_end_enable_q          <= 1'b0;
-         s1_cross512_active_q <= 1'b0;
-         s1_cross4k_active_q <= 1'b0;
-         s0_put_data_e_q <= 1'b0;
-         s1_put_data_e_q <= 1'b0;
-         multicycle_cmd_q <= 1'b0 ;
-         s1_multicycle_cmd_q <= 1'b0 ;
-         s2_multicycle_cmd_q <= 1'b0 ;
+          cmd_addr_q             <= 1'b0;
+          cmd_addr_v_q           <= 1'b0;
+          s0_cmd_addr_q          <= 1'b0;
+          cmd_length_q           <= 1'b0;
+          data_align_offset_q    <= 1'b0;
+          s0_data_align_offset_q <= 1'b0;
+          cmd_v_q                <= 1'b0;
+          reset_beat_cnt_q       <= 1'b0;
+          crossing_active_q      <= 3'b000;
+          cmd_tsize_q            <= 1'b0;
+          s1_cmd_tsize_q         <= 1'b0;
+          crossing_end_enable_q  <= 1'b0;
+          s1_cross512_active_q   <= 1'b0;
+          s1_cross4k_active_q    <= 1'b0;
+          s0_put_data_e_q        <= 1'b0;
+          s1_put_data_e_q        <= 1'b0;
+          multicycle_cmd_q       <= 1'b0 ;
+          s1_multicycle_cmd_q    <= 1'b0 ;
+          s2_multicycle_cmd_q    <= 1'b0 ;
        end
        else
        begin
-         cmd_addr_q     <= cmd_addr_d;
-//         cmd_addr2_q     <= cmd_addr2_d;
-         cmd_addr_v_q     <= cmd_addr_v_d;
-//         cmd_addr2_v_q     <= cmd_addr2_v_d;
-         s0_cmd_addr_q     <= s0_cmd_addr_d;
-//         s1_cmd_addr_q     <= s1_cmd_addr_d;
-         data_align_offset_q  <= data_align_offset_d; 
-         s0_data_align_offset_q  <= s0_data_align_offset_d; 
-         cmd_v_q              <= cmd_v_d;
-         reset_beat_cnt_q     <= reset_beat_cnt_d;
-//         s1_cmd_v_q           <= s1_cmd_v_d;
-         cmd_length_q         <= cmd_length_d; 
-         cmd_tsize_q          <= cmd_tsize_d;
-         s1_cmd_tsize_q       <= s1_cmd_tsize_d;
-         crossing_active_q    <= crossing_active_d;
-         crossing_end_enable_q          <= crossing_end_enable_d;
-         s1_cross512_active_q <= s1_cross512_active_d;
-         s1_cross4k_active_q <= s1_cross4k_active_d;
-         s0_put_data_e_q <= s0_put_data_e_d;
-         s1_put_data_e_q <= s1_put_data_e_d;
-         multicycle_cmd_q <= multicycle_cmd_d ;
-         s1_multicycle_cmd_q <= s1_multicycle_cmd_d ;
-         s2_multicycle_cmd_q <= s2_multicycle_cmd_d ;
+          cmd_addr_q             <= cmd_addr_d;
+          cmd_addr_v_q           <= cmd_addr_v_d;
+          s0_cmd_addr_q          <= s0_cmd_addr_d;
+          data_align_offset_q    <= data_align_offset_d; 
+          s0_data_align_offset_q <= s0_data_align_offset_d; 
+          cmd_v_q                <= cmd_v_d;
+          reset_beat_cnt_q       <= reset_beat_cnt_d;
+          cmd_length_q           <= cmd_length_d; 
+          cmd_tsize_q            <= cmd_tsize_d;
+          s1_cmd_tsize_q         <= s1_cmd_tsize_d;
+          crossing_active_q      <= crossing_active_d;
+          crossing_end_enable_q  <= crossing_end_enable_d;
+          s1_cross512_active_q   <= s1_cross512_active_d;
+          s1_cross4k_active_q    <= s1_cross4k_active_d;
+          s0_put_data_e_q        <= s0_put_data_e_d;
+          s1_put_data_e_q        <= s1_put_data_e_d;
+          multicycle_cmd_q       <= multicycle_cmd_d ;
+          s1_multicycle_cmd_q    <= s1_multicycle_cmd_d ;
+          s2_multicycle_cmd_q    <= s2_multicycle_cmd_d ;
        end
      end
 
@@ -181,17 +142,13 @@ module capi_put_cmd_enc#
      begin
 
        cmd_addr_d     = cmd_addr_q;
-//       cmd_addr2_d     = cmd_addr2_q;
        cmd_addr_v_d     = cmd_addr_v_q;
-//       cmd_addr2_v_d     = cmd_addr2_v_q;
        s0_cmd_addr_d     = s0_cmd_addr_q;
-//       s1_cmd_addr_d     = s0_cmd_addr_q;
        cmd_length_d   = cmd_length_q;
        data_align_offset_d  = data_align_offset_q;
        s0_data_align_offset_d  = data_align_offset_q;
        cmd_v_d            = 1'b0; 
        reset_beat_cnt_d   = 1'b0;        
-//       s1_cmd_v_d            = cmd_v_q;         
        cmd_v_d            = cmd_v_q;         
        cmd_tsize_d          = cmd_tsize_q;
        s1_cmd_tsize_d       = cmd_tsize_q;
@@ -247,7 +204,6 @@ module capi_put_cmd_enc#
          data_align_offset_d = data_align_offset_q;
          data_align_offset_d = data_align_offset_q;
          reset_beat_cnt_d   = reset_beat_cnt_q;
-//         s1_cmd_v_d         = s1_cmd_v_q;         
          s0_put_data_e_d = s0_put_data_e_q;
          s1_put_data_e_d = s1_put_data_e_q;
        end
@@ -289,14 +245,12 @@ module capi_put_cmd_enc#
              if (~cmd_addr_v_q) 
              begin  
                s0_cmd_addr_d[0:ea_width-2] = {cmd_addr_q[0:63] + current_tsize}; 
-  //             s0_cmd_addr_d[ea_width-1] = ~^(cmd_addr_q[0:63] + current_tsize);  // generate parity 
              end
              else
              begin          
                s0_cmd_addr_d       = cmd_addr_q;
              end         
              cmd_addr_d[0:ea_width-2] = {cmd_addr_q[0:63] + current_tsize}; 
-//             cmd_addr_d[ea_width-1] = ~^(cmd_addr_q[0:63] + current_tsize);  // generate parity 
              cmd_v_d = 1'b1;
              reset_beat_cnt_d = 1'b1;
              multicycle_cmd_d = 1'b1;
@@ -317,20 +271,18 @@ module capi_put_cmd_enc#
              if (~cmd_addr_v_q) 
              begin  
                s0_cmd_addr_d[0:ea_width-2] = {cmd_addr_q[0:63] + current_tsize}; 
-//               s0_cmd_addr_d[ea_width-1] = ~^(cmd_addr_q[0:63] + current_tsize);  // generate parity 
              end
              else
              begin          
                s0_cmd_addr_d       = cmd_addr_q;
              end         
              cmd_addr_d[0:ea_width-2] = {cmd_addr_q[0:63] + current_tsize} ;
-//             cmd_addr_d[ea_width-1] = ~^(cmd_addr_q[0:63] + current_tsize);  // generate parity 
              s0_cmd_addr_d = cmd_addr_q;
              multicycle_cmd_d = 1'b1;
              cmd_addr_v_d = 1'b1;
            end   
          end
-       end // cmd_gen_r I hope 
+       end // cmd_gen_r 
      end 
 
    nvme_fifo#(
@@ -341,7 +293,7 @@ module capi_put_cmd_enc#
      (.clk(clk), .reset(reset), 
       .flush(       1'b0 ),
       .push(        cmd_v_q & i_cmd_v ),
-      .din(         {i_cmd_tag,cmd_tsize_q,s0_cmd_addr_q,~^(s0_cmd_addr_q),i_sid,i_f,i_addr_aux,i_addr_ctxt} ), // generate parity here. fixit where to check parity 
+      .din(         {i_cmd_tag,cmd_tsize_q,s0_cmd_addr_q,~^(s0_cmd_addr_q),i_sid,i_f,i_addr_aux,i_addr_ctxt} ),
       .dval(        o_cmd_gen_v ), 
       .pop(         i_data_cmd_gen_r & o_cmd_gen_v ),
       .dout(        {o_cmd_tag,o_cmd_tsize,o_cmd_addr_ea,o_cmd_sid,o_cmd_f,o_cmd_addr_aux,o_cmd_addr_ctxt} ),
@@ -349,11 +301,9 @@ module capi_put_cmd_enc#
       .almost_full( ), 
       .used());
 
-//    assign o_data_align_offset = (data_align_offset_q & {4{~i_data_e}}); 
     assign o_data_align_offset = (data_align_offset_q); 
     assign o_cmd_v = cmd_v_q & i_cmd_v;
     assign o_reset_beat_cnt = reset_beat_cnt_q & i_data_r;
-//    assign o_s0_crossing_enable =  (crossing_active_q[2] & ~multicycle_cmd_q) | (crossing_active_q[1] & s1_multicycle_cmd_q);
     assign o_s1_crossing_enable =  (crossing_active_q[1] & ~s1_multicycle_cmd_q) | (crossing_active_q[0] & s2_multicycle_cmd_q);
     assign o_crossing_end = crossing_active_q[1] & crossing_end_enable_q;
     assign o_s1_data_e = crossing_active_q[2] ? i_data_e : s0_put_data_e_q;

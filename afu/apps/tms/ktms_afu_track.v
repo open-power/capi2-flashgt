@@ -197,11 +197,11 @@ module ktms_afu_track#
    wire 		       at_rnw;  // read not write
    wire 		       at_vld;  // valid 
    wire 		       at_dw;   // double word
-   wire [0:64] 		       at_data;   // change 63 to 64 to add parity kch 
+   wire [0:64] 		       at_data; 
    wire [0:24]  	       at_addr;
    wire [0:4+24+64-1]          at_mmiobus;
    assign {at_vld,at_cfg,at_rnw,at_dw,at_addr,at_data} = i_mmiobus; // omit any extra data bits
-   assign at_mmiobus = {at_vld,at_cfg,at_rnw,at_dw,at_addr[0:23],at_data[0:63]};  // created to strip of parity 
+   assign at_mmiobus = {at_vld,at_cfg,at_rnw,at_dw,at_addr[0:23],at_data[0:63]}; 
    ktms_mmrd_dec#(.lcladdr_width(lcladdr_width),.addr(mmioaddr),.mmiobus_width(mmiobus_width-2)) immrd_dec
      (.clk(clk),.reset(reset),.i_mmiobus(at_mmiobus),
       .o_rd_r(s1_rd_r),.o_rd_v(s1_rd_v),.o_rd_addr(s1_rd_ra),

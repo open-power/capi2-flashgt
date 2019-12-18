@@ -66,7 +66,7 @@ module nvme_pcie_txrq
     output reg         txrq_dbg_user_tracevalid,
     input              regs_pcie_pe_errinj_valid,
     input       [15:0] regs_xxx_pe_errinj_decode, 
-    input              user_regs_wdata_pe_errinj_valid  // 1 cycle pulse in nvme domain kch 
+    input              user_regs_wdata_pe_errinj_valid  // 1 cycle pulse in nvme domain 
   
 );
 
@@ -77,7 +77,7 @@ module nvme_pcie_txrq
 
    assign  s1_uperror = 1'b0;
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors 
    nvme_srlat#
      (.width(1))  itxrq_sr   
        (.clk(user_clk),.reset(user_reset),.set_in(s1_uperror),.hold_out(txrq_uperror_int));
@@ -180,14 +180,14 @@ module nvme_pcie_txrq
           2'b10:   req_type = 4'hA; // Type 0 Config Write
           default: req_type = 4'h8; // Type 0 Config Read
         endcase
-        poison           = 1'b0;     // todo: force for error inject
+        poison           = 1'b0;     // could force this for error inject
         requester_id     = 16'h0000; // bus[7:0],dev[4:0],func[2:0]        
         tag              = { 2'b00, ctlff_txrq_tag };
         completer_id     = 16'h0100;
         requester_id_en  = 1'b1;     // must be set for root complex
         trans_class      = 3'h0; 
         attrib           = 3'h0;     // {ID-Based Ordering, Relaxed Ordering, No Snoop}
-        force_ecrc       = 1'b0;     // todo: force ECRC for error inject
+        force_ecrc       = 1'b0;     // for error inject
 
         first_be         = ctlff_txrq_be[3:0];
         last_be          = ctlff_txrq_be[7:4];

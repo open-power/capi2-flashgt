@@ -22,7 +22,7 @@
 //  File : nvme_control.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe microcontroller
+//  Description : FlashGT+ NVMe microcontroller
 //                
 //       - PCIe init/enumeration
 //       - NVMe initialization
@@ -69,7 +69,7 @@ module nvme_control#
 
     // PCIe port interface for MMIO & CFG ops
     output reg [31:0] ctl_pcie_ioaddress, //      valid with ioread_strobe or iowrite_strobe
-    output reg [35:0] ctl_pcie_iowrite_data, //   valid with iowrite_strobe changed 31 to 35 kch 
+    output reg [35:0] ctl_pcie_iowrite_data, //   valid with iowrite_strobe
     output reg        ctl_pcie_ioread_strobe, //  1 cycle pulse
     output reg        ctl_pcie_iowrite_strobe, // 1 cycle pulse
     input      [31:0] pcie_ctl_ioread_data, //    valid with ioack if ioread_strobe was asserted
@@ -77,7 +77,7 @@ module nvme_control#
 
     // Admin Queue interface
     output reg [31:0] ctl_adq_ioaddress,
-    output reg [35:0] ctl_adq_iowrite_data, // changed 31 to 35 kch 
+    output reg [35:0] ctl_adq_iowrite_data, 
     output reg        ctl_adq_ioread_strobe, 
     output reg        ctl_adq_iowrite_strobe,
     input      [31:0] adq_ctl_ioread_data,
@@ -85,7 +85,7 @@ module nvme_control#
 
     // SCSI to NVME Translation interface
     output reg [31:0] ctl_sntl_ioaddress,
-    output reg [35:0] ctl_sntl_iowrite_data, // changed 31 to 35 kch 
+    output reg [35:0] ctl_sntl_iowrite_data, 
     output reg        ctl_sntl_ioread_strobe, 
     output reg        ctl_sntl_iowrite_strobe,
     input      [31:0] sntl_ctl_ioread_data,
@@ -93,7 +93,7 @@ module nvme_control#
 
     // IOQ configuration interface
     output reg [31:0] ctl_ioq_ioaddress,
-    output reg [35:0] ctl_ioq_iowrite_data, // changed 31 to 35 kch 
+    output reg [35:0] ctl_ioq_iowrite_data, 
     output reg        ctl_ioq_ioread_strobe, 
     output reg        ctl_ioq_iowrite_strobe,
     input      [31:0] ioq_ctl_ioread_data,
@@ -102,7 +102,7 @@ module nvme_control#
    
     // mmio register access
     output reg [31:0] ctl_regs_ioaddress,
-    output reg [35:0] ctl_regs_iowrite_data, // changed 31 to 35 kch 
+    output reg [35:0] ctl_regs_iowrite_data,
     output reg        ctl_regs_ioread_strobe, 
     output reg        ctl_regs_iowrite_strobe,
     input      [31:0] regs_ctl_ioread_data,
@@ -155,7 +155,7 @@ module nvme_control#
    wire         [3:0] IO_BUS_byte_enable;    
    wire               IO_BUS_read_strobe;   
    wire        [31:0] IO_BUS_write_data;      
-   wire         [3:0] IO_BUS_write_data_par;     // added kch   
+   wire         [3:0] IO_BUS_write_data_par;  
    wire               IO_BUS_write_strobe;        
    wire               IO_BUS_ready;
    wire        [31:0] IO_BUS_read_data;
@@ -428,7 +428,6 @@ module nvme_control#
    (* mark_debug = "true" *) 
    wire        TRACE_valid_instr;
    
-   // todo: route CE/UE to regs for status
    wire        CE, CE_1;
    wire        UE, UE_1;
 

@@ -21,7 +21,7 @@
 //  File : nvme_xxq_dma.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe DMA handler
+//  Description : FlashGT+ NVMe DMA handler
 //                read/write from PCIe endpoint to SQ/CQ/payload buffer
 //
 
@@ -75,7 +75,7 @@ module nvme_xxq_dma#
     //-------------------------------------------------------
   
     input                                      pcie_xxq_valid,
-    input                              [144:0] pcie_xxq_data, // changed 127 to 144 to add parity kch 
+    input                              [144:0] pcie_xxq_data, 
     input                                      pcie_xxq_first, 
     input                                      pcie_xxq_last, 
     input                                      pcie_xxq_discard, 
@@ -85,7 +85,7 @@ module nvme_xxq_dma#
     // DMA response from SQ/CQ
     //-------------------------------------------------------        
  
-    output reg                         [144:0] xxq_pcie_cc_data, // changed 127 to 144 kch 
+    output reg                         [144:0] xxq_pcie_cc_data,
     output reg                                 xxq_pcie_cc_first,
     output reg                                 xxq_pcie_cc_last,
     output reg                                 xxq_pcie_cc_discard,
@@ -189,7 +189,7 @@ module nvme_xxq_dma#
    reg                     [2:0] req_attr;
    reg                    [10:0] req_dcount;
 
-   // generate parity on register header kch 
+   // generate parity on register header
    wire  [req_hdr_par_width-1:0] pcie_xxq_hdr_par;
 
    nvme_pgen#
@@ -203,14 +203,14 @@ module nvme_xxq_dma#
   wire           [1:0]  xxq_dma_perror_int;
    
 
-   // set/reset/ latch for parity errors kch 
+   // set/reset/ latch for parity errors
    nvme_srlat#
      (.width(2))  ixxq_sr   
        (.clk(clk),.reset(reset),.set_in(s1_perror),.hold_out(xxq_dma_perror_int[1:0]));
 
    assign xxq_dma_perror = |(xxq_dma_perror_int);
 
-   // check parity kch 
+   // check parity
    nvme_pcheck#
      (
       .bits_per_parity_bit(64),
@@ -382,8 +382,8 @@ module nvme_xxq_dma#
    reg              [10:0] cpl_s0_req_dcount;
    
    // completion header fields
-   reg [cpl_hdr_width-1:0] cpl_s0_hdr;   // added cpl_hdr_par_width kch 
-   wire  [cpl_hdr_par_width-1:0] cpl_s0_hdr_par;   // added cpl_hdr_par_width kch 
+   reg [cpl_hdr_width-1:0] cpl_s0_hdr; 
+   wire  [cpl_hdr_par_width-1:0] cpl_s0_hdr_par; 
    reg              [10:0] cpl_dcount;  // number of dwords in this packet
    reg               [2:0] cpl_status;  // 0x0 - success; 0x1 - unsupported request; 0x2 - completer abort
    reg              [12:0] byte_count;  // remaining bytes to be transferred including this packet
@@ -509,8 +509,8 @@ module nvme_xxq_dma#
    reg                     cpl_s1_last_q, cpl_s1_last_d;
    reg                     cpl_s1_discard_q, cpl_s1_discard_d;
    reg                     cpl_s1_cntl_par_q, cpl_s1_cntl_par_d;
-   reg [cpl_hdr_par_width+cpl_hdr_width-1:0] cpl_s1_hdr_q, cpl_s1_hdr_d;  // added cpl_hdr_par_width kch 
-   reg             [16+127:0] cpl_s1_data;   // added 16+
+   reg [cpl_hdr_par_width+cpl_hdr_width-1:0] cpl_s1_hdr_q, cpl_s1_hdr_d; 
+   reg             [16+127:0] cpl_s1_data;  
    
    wire                   cpl_s2_ready;
   
@@ -521,7 +521,7 @@ module nvme_xxq_dma#
    localparam CPL_IDLE = 4'h1;
    localparam CPL_PAY  = 4'h2;
 
-   // check parity kch 
+   // check parity
    nvme_pcheck#
      (
       .bits_per_parity_bit(64),
@@ -552,7 +552,7 @@ module nvme_xxq_dma#
              cpl_s1_last_q     <= zero[0];
              cpl_s1_discard_q  <= zero[0];
              cpl_s1_cntl_par_q <= one[0];
-             cpl_s1_hdr_q      <= zero[cpl_hdr_par_width+cpl_hdr_width-1:0];  // adeed cpl_hdr_par_width kch           
+             cpl_s1_hdr_q      <= zero[cpl_hdr_par_width+cpl_hdr_width-1:0];  
           end
         else
           begin
@@ -731,8 +731,7 @@ module nvme_xxq_dma#
 
         if( cpl_s1_first_q )
           begin
-             cpl_s1_data =  { 7'b1111111,cpl_s1_hdr_q[cpl_hdr_par_width-1+cpl_hdr_width:cpl_hdr_width],zero[127:cpl_hdr_width], cpl_s1_hdr_q[cpl_hdr_width-1:0] }; // testing kch 
-             // cpl_s1_data =  { one[143:128+cpl_hdr_par_width],cpl_s1_hdr_q[cpl_hdr_par_width+cpl_hdr_width:cpl_hdr_par_width],zero[127:cpl_hdr_width], cpl_s1_hdr_q[cpl_hdr_width-1:0] }; // added header
+             cpl_s1_data =  { 7'b1111111,cpl_s1_hdr_q[cpl_hdr_par_width-1+cpl_hdr_width:cpl_hdr_width],zero[127:cpl_hdr_width], cpl_s1_hdr_q[cpl_hdr_width-1:0] };
           end
         else if( cpl_s1_rdval_q != zero[sq_num_queues-1:0] )
           begin
@@ -740,15 +739,15 @@ module nvme_xxq_dma#
           end
         else
           begin
-             cpl_s1_data = {16'hFFFF,zero[127:0]}; // added 17+ kch
+             cpl_s1_data = {16'hFFFF,zero[127:0]}; 
           end
      end   
 
 
    // stage 2 - with pipeline backpressure relief
-   wire [1+sq_par_rdwidth+sq_rdwidth-1+3:0] cpl_s2_pl_data; // added 17 bits parity 
+   wire [1+sq_par_rdwidth+sq_rdwidth-1+3:0] cpl_s2_pl_data;
    wire                                     cpl_s2_valid;
-   nvme_pl_burp#(.width(1+sq_par_rdwidth+sq_rdwidth+3), .stage(1)) cpl_s2  // added sq_par_rdwidth kch 
+   nvme_pl_burp#(.width(1+sq_par_rdwidth+sq_rdwidth+3), .stage(1)) cpl_s2 
      (.clk(clk),.reset(reset),
       .valid_in(cpl_s1_valid_q),
       .data_in( {cpl_s1_first_q,cpl_s1_last_q,cpl_s1_discard_q,cpl_s1_cntl_par_q,cpl_s1_data} ),
