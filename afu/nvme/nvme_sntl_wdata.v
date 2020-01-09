@@ -212,7 +212,7 @@ module nvme_sntl_wdata#
    wire                            req_fifo_full;
    wire                            req_fifo_afull;
    
-   // 256 entries for 8b pcie tag.  Note: PM953 doesn't support extended tag so this is oversized
+   // 256 entries for 8b pcie tag.  Note: currently supported NVMe part doesn't support extended tag so this is oversized
    // 1 entry for admin request
    nvme_fifo#(
               .width(req_fifo_width), 

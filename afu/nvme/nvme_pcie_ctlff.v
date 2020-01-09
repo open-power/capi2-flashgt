@@ -453,7 +453,6 @@ module nvme_pcie_ctlff
         // if ucontroller pcie request is valid and not completed
         // timeout counts down to zero
         // 50ms timeout
-        // 9/19/16 - make timeout controllable by microcode for SW363607
         if( cmd_q[0] & ~status_q[0])
           begin
              if( timeout_q==20'h0 )

@@ -21,7 +21,7 @@
 //  File : nvme_xxq_doorbell.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe doorbell mmio write generator
+//  Description : NVMe doorbell mmio write generator
 //
 
 

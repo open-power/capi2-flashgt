@@ -22,7 +22,7 @@
 //  File : nvme_sntl_wbuf.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer payload write buffer
+//  Description : SCSI to NVMe Layer payload write buffer
 //                
 //  *************************************************************************
 

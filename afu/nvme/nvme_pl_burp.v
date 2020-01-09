@@ -19,8 +19,6 @@
 `timescale 1ns/1ns
 
 // pipeline stage to "burp" on backpressure for timing
-// based on Andy Martin's base_aburp
-
 module nvme_pl_burp
   #(
     parameter width = 128,

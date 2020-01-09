@@ -498,8 +498,3 @@ module nvme_control#
   
 
 endmodule
-
-// for xemacs verilog-mode AUTOINST
-// Local Variables:
-// verilog-library-directories:("." "../../ip/2017.2/ublaze_0/hdl")
-// End:

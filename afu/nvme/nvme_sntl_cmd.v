@@ -72,7 +72,7 @@ module nvme_sntl_cmd#
    
     //  req_r    - ready
     //  req_v    - valid.  xfer occurs only if valid & ready, otherwise no xfer
-    //  req_cmd  - tbd: define encodes.  use SCSI opcodes?
+    //  req_cmd  - command encode FCP_*
     //  req_tag  - identifier for the command
     //  req_lun  - logical unit number
     output reg                        i_req_r_out,
@@ -190,7 +190,7 @@ module nvme_sntl_cmd#
     input          [wbufid_width-1:0] wbuf_cmd_status_wbufid,
     input      [wbufid_par_width-1:0] wbuf_cmd_status_wbufid_par,
     input             [cid_width-1:0] wbuf_cmd_status_cid,
-    input         [cid_par_width-1:0] wbuf_cmd_status_cid_par, // need to add this 
+    input         [cid_par_width-1:0] wbuf_cmd_status_cid_par, 
     input                             wbuf_cmd_status_error, // 0 = data is in the buffer  1 = error, data is not valid
     output reg                        cmd_wbuf_status_ready,
 
@@ -2187,7 +2187,7 @@ module nvme_sntl_cmd#
         s3_transfer_length_m1  = {s2_trk_rd_xferlen, 3'b000} - one[maxxfer_width-1+3:0];
 
         // new requests
-        // sislite uses 4k block size. Samsung NVMe only supports 512B block size
+        // sislite uses 4k block size. Currently supported NVMe part only supports 512B block size
         // use lookup table result to allow for future 4K NVMe block size
         // NVMe uses "0-based" value for number of blocks. SCSI uses actual number of blocks 
         // calculate number of NVMe 512B blocks based on SCSI 4K blocks
@@ -2641,7 +2641,7 @@ module nvme_sntl_cmd#
                          //    LBPWS10=0 - write_same(10) cannot be used to unmap
                          //    according to SBC-3 5.43, the unmap and anchor bits can be ignored when
                          //    read_capacity LBPME=0.
-                         //    4/24/2017 - added support for unmap so now LBPME=1
+                         //    added support for unmap => LBPME=1
                          
                          /* send write to queue */
                          /* when first block completes, next block will be written using same buffer */
@@ -4292,7 +4292,7 @@ module nvme_sntl_cmd#
    // Write buffer request fifo
    // no backpressure.  
    // original design had # of fifo entries == number of write buffers.  only 1 write buffer request per buffer allowed
-   // 8/15/2017 - unmap change. size to match tracking table.  each tag could write to buffer for unmap command
+   // unmap performance change: size to match tracking table.  each tag could write to buffer for unmap command
    
    localparam wbuf_fifo_width = 64 + 16 + 1 + 2 + cid_width + datalen_width + 1 + wbufid_width;
    localparam wbuf_fifo_entries = trk_entries;

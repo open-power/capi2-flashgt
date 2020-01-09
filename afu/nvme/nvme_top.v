@@ -82,7 +82,7 @@ module nvme_top#
     // request command interface
     //  req_r    - ready
     //  req_v    - valid.  xfer occurs only if valid & ready, otherwise no xfer
-    //  req_cmd  - tbd: define encodes.  use SCSI opcodes?
+    //  req_cmd  - command encode FCP_*
     //  req_tag  - identifier for the command
     //  req_lba  - logical block address
     //  req_lun  - logical unit number
@@ -190,7 +190,7 @@ module nvme_top#
     // request command interface
     //  req_r    - ready
     //  req_v    - valid.  xfer occurs only if valid & ready, otherwise no xfer
-    //  req_cmd  - tbd: define encodes.  use SCSI opcodes?
+    //  req_cmd  - command encode FCP_*
     //  req_tag  - identifier for the command
     //  req_lba  - logical block address
     //  req_lun  - logical unit number
@@ -295,7 +295,7 @@ module nvme_top#
     // request command interface
     //  req_r    - ready
     //  req_v    - valid.  xfer occurs only if valid & ready, otherwise no xfer
-    //  req_cmd  - tbd: define encodes.  use SCSI opcodes?
+    //  req_cmd  - command encode FCP_*
     //  req_tag  - identifier for the command
     //  req_lba  - logical block address
     //  req_lun  - logical unit number
@@ -402,7 +402,7 @@ module nvme_top#
     // request command interface
     //  req_r    - ready
     //  req_v    - valid.  xfer occurs only if valid & ready, otherwise no xfer
-    //  req_cmd  - tbd: define encodes.  use SCSI opcodes?
+    //  req_cmd  - command encode FCP_*
     //  req_tag  - identifier for the command
     //  req_lba  - logical block address
     //  req_lun  - logical unit number

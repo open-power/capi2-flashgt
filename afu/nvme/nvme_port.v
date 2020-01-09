@@ -22,7 +22,7 @@
 //  File : nvme_port.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock NVMe - single NVMe port container
+//  Description : FlashGT single NVMe port container
 //                
 //       Takes read/write commands from PSL/AFU and converts to NVMe
 //

@@ -78,7 +78,7 @@ module nvme_sntl#
     // request command interface
     //  req_r    - ready
     //  req_v    - valid.  xfer occurs only if valid & ready, otherwise no xfer
-    //  req_cmd  - tbd: define encodes.  use SCSI opcodes?
+    //  req_cmd  - command encode FCP_*
     //  req_tag  - identifier for the command
     //  req_lun  - logical unit number
     output                         i_req_r_out,

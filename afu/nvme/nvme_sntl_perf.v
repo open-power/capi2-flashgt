@@ -22,7 +22,7 @@
 //  File : nvme_sntl_perf.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : SurelockNVME - SCSI to NVMe Layer performance counters
+//  Description : SCSI to NVMe Layer performance counters
 //                
 //  *************************************************************************
 

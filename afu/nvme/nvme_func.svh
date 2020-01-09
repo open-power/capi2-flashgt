@@ -267,7 +267,6 @@ localparam [7:0] SISL_TMF_LUNRESET = 8'h01;
 localparam [7:0] SISL_TMF_CLEARACA = 8'h02;
 
 // SCSI opcodes
-// perl -ne 'if( /.define\s*(SCSI_\S+)\s*0x(\S+)/ ) { print "localparam [7:0] $1 = 8'"'"'h$2;\n";}' ../../surelock-sw/src/include/cflash_scsi_user.h
 localparam [7:0] SCSI_FORMAT_UNIT = 8'h04;
 localparam [7:0] SCSI_INQUIRY = 8'h12;
 localparam [7:0] SCSI_MODE_SELECT = 8'h15;

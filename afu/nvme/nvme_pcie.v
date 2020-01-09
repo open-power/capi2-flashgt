@@ -22,7 +22,7 @@
 //  File : nvme_pcie.v
 //  *************************************************************************
 //  *************************************************************************
-//  Description : Surelock Express NVMe PCIe port
+//  Description : FlashGT NVMe PCIe port
 //                
 //       Xilinx PCIe IP plus async fifos for each interface
 //

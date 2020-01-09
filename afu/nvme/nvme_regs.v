@@ -1588,9 +1588,9 @@ module nvme_regs#
         // config reg initial values
         // -------------
         config_init[0]      = 1'b1; // enable login after link up.  0 = perst to NVMe link
-        config_init[1]      = 1'b0; // N/A (Surelock FC = single login)
-        config_init[2]      = 1'b0; // N/A (Surelock FC = send LOGO and log out) 
-        config_init[3]      = 1'b0; // N/A (Surelock FC = send LOGO before login)
+        config_init[1]      = 1'b0; // N/A
+        config_init[2]      = 1'b0; // N/A  
+        config_init[3]      = 1'b0; // N/A 
         
         config_init[4]      = 1'b0; // perst (was hard reset)
         config_init[5]      = 1'b0; // N/A (mask crc errors)

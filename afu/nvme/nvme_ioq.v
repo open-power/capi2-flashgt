@@ -45,7 +45,7 @@
 //
 //    submissions queues: 16 max
 //      1 queue is not enough to keep the NVMe controller busy.
-//      16 queues max is based on fio performance test of Samsung PM1725a
+//      16 queues max is based on fio performance tests
 //      Need to have enough entries to avoid backpressure on the sislite interface.
 //        NVMe spec says a queue is full when there's one entry unused, so need to
 //        take care here.
