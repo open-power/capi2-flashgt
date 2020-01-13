@@ -88,60 +88,6 @@ module psl_hdk_vpd#
      end
    assign vpdbuf_rddata = vpdbuf_mem[vpdbuf_rdaddr];
 
-   // rom to hold default vpd if reading from I2C fails
-   reg [31:0] vpdrom_rddata;
-   always @*
-     begin
-        case(vpdbuf_rdaddr)
-          0: vpdrom_rddata = 32'h46001b82;
-          1: vpdrom_rddata = 32'h6873616c;
-          2: vpdrom_rddata = 32'h202b5447;
-          3: vpdrom_rddata = 32'h65494350;
-          4: vpdrom_rddata = 32'h50414320;
-          5: vpdrom_rddata = 32'h41203249;
-          6: vpdrom_rddata = 32'h74706164;
-          7: vpdrom_rddata = 32'h8e907265;
-          8: vpdrom_rddata = 32'h074e5000;
-          9: vpdrom_rddata = 32'h48443130;
-          10: vpdrom_rddata = 32'h45383837;
-          11: vpdrom_rddata = 32'h31500643;
-          12: vpdrom_rddata = 32'h37313031;
-          13: vpdrom_rddata = 32'h30074e46;
-          14: vpdrom_rddata = 32'h37484431;
-          15: vpdrom_rddata = 32'h4e533934;
-          16: vpdrom_rddata = 32'h30313707;
-          17: vpdrom_rddata = 32'h58585839;
-          18: vpdrom_rddata = 32'h45043156;
-          19: vpdrom_rddata = 32'h564b314a;
-          20: vpdrom_rddata = 32'h38350432;
-          21: vpdrom_rddata = 32'h33564443;
-          22: vpdrom_rddata = 32'h30303004;
-          23: vpdrom_rddata = 32'h10355630;
-          24: vpdrom_rddata = 32'h30303030;
-          25: vpdrom_rddata = 32'h30303030;
-          26: vpdrom_rddata = 32'h30303030;
-          27: vpdrom_rddata = 32'h30303030;
-          28: vpdrom_rddata = 32'h30103656;
-          29: vpdrom_rddata = 32'h30303030;
-          30: vpdrom_rddata = 32'h30303030;
-          31: vpdrom_rddata = 32'h30303030;
-          32: vpdrom_rddata = 32'h56303030;
-          33: vpdrom_rddata = 32'h30301037;
-          34: vpdrom_rddata = 32'h30303030;
-          35: vpdrom_rddata = 32'h30303030;
-          36: vpdrom_rddata = 32'h30303030;
-          37: vpdrom_rddata = 32'h38563030;
-          38: vpdrom_rddata = 32'h30303010;
-          39: vpdrom_rddata = 32'h30303030;
-          40: vpdrom_rddata = 32'h30303030;
-          41: vpdrom_rddata = 32'h30303030;
-          42: vpdrom_rddata = 32'h03565230;
-          43: vpdrom_rddata = 32'h780000a2;
-          default: vpdrom_rddata = 32'h0;
-        endcase // case (vpdbuf_rdaddr)        
-     end
-   
-   
    //-------------------------------------------------------
    // state machine to handle vpd reads and writes
    // at pcie link up, read vpd data from i2c
@@ -403,7 +349,7 @@ module psl_hdk_vpd#
                   if(vpdbuf_valid)
                     vpd_dat_d = vpdbuf_rddata;
                   else
-                    vpd_dat_d = vpdrom_rddata;
+                    vpd_dat_d = 32'hffffffff;
                end
              else if( use_fixed_q & vpd_adr_q[24] )
                begin
