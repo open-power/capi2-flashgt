@@ -6,7 +6,7 @@ Provides RTL source for building FPGA images for the IBM Data Engine for NoSQL A
 * [IBM Data Engine for NoSQL Software Libraries](https://github.com/open-power/capiflash)
 
 To build an FPGA image for N250SP:
-```
+
 1. clone this repository
 2. install vivado 2017.4 and add to the search path
 3. download [PSL9 IP](https://www-355.ibm.com/systems/power/openpower/posting.xhtml?postingId=1BED44BCA884D845852582B70076A89A)
@@ -14,7 +14,8 @@ To build an FPGA image for N250SP:
 5. cd build/
 6. ./flashgtp_prj.tcl
 7. In the vivado gui, choose "Generate bitstream"
-```
+
+
 ##### Project directories
 
 |directory    | Description |
