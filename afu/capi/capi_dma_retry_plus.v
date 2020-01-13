@@ -71,7 +71,7 @@ module capi_dma_retry_plus#
     input [0:rc_width-1]      i_rsp_d,
     input [0:tag_width-1]     i_rsp_tag,
     input [0:9]               i_rsp_itag,
-    input 		      i_rsp_tag_outst, // is this a good tag?
+    input 		      i_rsp_tag_outst,
     input [0:cred_width-1]    i_rsp_credits, // how many credits being returned
 
     output 		      o_rsp_v,
@@ -513,11 +513,7 @@ module capi_dma_retry_plus#
       .i_rst_v(s2_rsp_sid_rst),.i_rst_a(s2_rsp_sid),
       .i_rd_en(s6_req_re),.i_rd_a(s6_req_sid),.o_rd_d(s7_req_sid_vld)
       );
-   
-   // we are going to move this function to dma engine
-   // assign s7_req_sid_vld = 1'b1;
-
-	      
+ 	      
    // abort this transaction if (the context is invalid or too new) and it is not a restart (restarts don't have a context)
    wire 		   s7_req_tag_old = (s7_req_tag_ts < s7_req_ctxt_ts);
    wire [0:2] 		   s7_req_ctrl_sel = s7_req_tstag[tstag_width-3:tstag_width-1];
@@ -559,7 +555,6 @@ module capi_dma_retry_plus#
    base_ademux#(.ways(4)) is8_req_dmux(.i_v(s8_req_v),.i_r(s8_req_r),.o_v({o_tscheck_v, s8_ctxt_ctrl_v, s8a_req_v,s8b_req_v}),.o_r({o_tscheck_r, s8_ctxt_ctrl_r, s8a_req_r,s8b_req_r}),.sel(s8_req_dmux_sel));
 
    // allow context termination to proceed if we are not configured to stop it (hence penindg = 0) or the transaction count has reached 0
-   // wire 		   s8_ctxt_ctrl_gt_en = ~s2_ctxt_trm_pending | s1_tcnt_zro;
    wire 		   s8_ctxt_ctrl_gt_en = 1'b1;
    wire 		   s8b_ctxt_ctrl_v, s8b_ctxt_ctrl_r;
    
@@ -675,12 +670,6 @@ module capi_dma_retry_plus#
    assign s12c_ctxt_ctrl_r[0:2] = 3'b111;
 
 
-/*
-   assign o_dbg_cnt_inc[5] = s3_rtry_v & s3_rtry_r;
-   assign o_dbg_cnt_inc[6] = s4_req_v & s4_req_r;
-   assign o_dbg_cnt_inc[7] = o_tscheck_v & o_tscheck_r;
-   assign o_dbg_cnt_inc[8] = s8_ctxt_ctrl_v & s8_ctxt_ctrl_r;
- */
    assign o_dbg_cnt_inc[9] = s8a_req_v & s8a_req_r;
    assign o_dbg_cnt_inc[10] = s8b_req_v & s8b_req_r;
 

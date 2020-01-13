@@ -61,7 +61,7 @@ module capi_get#
     output 			 get_data_e, // aligned with get_data_valid
     output [0:3] 		 get_data_c, // count - valid only with _e, zero = 16 
     output [0:129] 		 get_data_d, // follows get_data_valid by one cycle 
-    output [0:rc_width-1] 	 get_data_rc, // tbd
+    output [0:rc_width-1] 	 get_data_rc,
    
     /* gx address interface */
     output 			 o_req_v,
@@ -258,7 +258,6 @@ module capi_get#
 	);	
 
      assign o_s1_perror = {get_retry_s1_perror,get_data_s1_perror};
-//
 
    
 endmodule // capi_get

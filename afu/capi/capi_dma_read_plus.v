@@ -61,7 +61,7 @@
     input                         i_sent_utag_valid,
     input [0:7]                   i_sent_utag,   
 
-// new dma interface ///
+    // dma interface ///
       input                       hd0_cpl_valid,
       input [0:9]                 hd0_cpl_utag,
       input [0:2]                 hd0_cpl_type,
@@ -137,10 +137,8 @@
    
     /* send read reqeust as soon as we have a tag */
    wire 			   tag_v, tag_r;
-//   wire 			   read_utag_v, read_utag_r;
    wire [0:5] 	                   r5_ltag;
    wire [0:5] 	                   s1_ltag;
-//   wire [0:6]                      s1_read_utag;
    wire                            r1_utag_read_ctag_valid;
    wire                            r1_rtag_ctag_valid;
    wire                            r1_utag_sent_ctag_valid;
@@ -149,7 +147,6 @@
    wire                            r1_utag_sent_rtag_valid;
    wire                            s1_read_utag_outst;
    wire 			   r1_v, r1_r;
-//   wire [0:5]                      r1_ctag_free_id;
 
 // create a ctag and utag for a command
    wire [0:gets-1]        r3_e;
@@ -157,9 +154,6 @@
    wire 		   r3_e_total = |(r3_e);
    wire [0:5]              r3_ltag_total    = r3_ltag[0:5] | r3_ltag[6:11] | r3_ltag[12:17] | r3_ltag[18:23] | r3_ltag[24:29] | r3_ltag[30:35]  | r3_ltag[36:41];
    
-
-// temp delay to debug problem 
-
 
    capi_res_mgr#(.id_width(6)) irmgr
      (.clk(clk),.reset(reset),.o_avail_v(tag_v),.o_avail_r(tag_r),.o_avail_id(s1_ltag),
@@ -218,25 +212,7 @@
    assign o_u_sent_tag_error_hld = u_sent_tag_error_hld;
    assign o_cmplt_utag_error_hld = cmplt_utag_error_hld;
 
-
-
-//   wire r1_read_cmplt_utag_v ;
-//   wire s1_read_dma_utag_v ;
-
-//   base_vlat#(.width(2)) utag_d1 (.clk(clk),.reset(reset),.din({read_cmplt_utag_v,tag_r}),.q({r1_read_cmplt_utag_v,s1_read_dma_utag_v}));
-
-//   wire read_cmplt_utag_error = r1_read_cmplt_utag_v & ~r1_read_utag_outst;
-//   wire read_dma_utag_error = s1_read_dma_utag_v & s1_read_utag_outst;
-
-//   wire [0:1] tag_error;
-//   wire [0:1] tag_error_in = tag_error | {read_cmplt_utag_error,read_dma_utag_error};
-
-//   base_vlat#(.width(2)) tag_error_lat(.clk(clk),.reset(reset),.din(tag_error_in),.q(tag_error));
-
-//   assign o_tag_error = tag_error;
    assign o_tag_error = 2'b00;
-
-
    
    wire [0:tag_width-1] 	   s1_tag;
    wire [0:tsize_width-1] 	   s1_size;
@@ -320,7 +296,7 @@
 
    assign o_req_d = {s1_ctag, s1_tag[0:uid_width-1], s1_sid, s1_f,s1_aux, s1_size, s1_ea_cla};
 
-   wire 		  i_cmplt_ok = read_cmplt_ok; // repsonse errors reported elsewhere
+   wire 		  i_cmplt_ok = read_cmplt_ok; // response errors reported elsewhere
    wire [0:5]             i_cmplt_ltag = read_cmplt_utag;
    wire [0:rc_width-1] 	  i_cmplt_rc = read_cmplt_rc;
    wire 		  i_cmplt_v = read_cmplt_utag_v;

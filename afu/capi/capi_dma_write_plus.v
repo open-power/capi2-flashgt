@@ -48,7 +48,6 @@ module capi_dma_write_plus#
 
     input 			  i_rsp_v,
     input [0:ctag_width-1] 	  i_rsp_ctag,
-//    input [0:9] 	          i_rsp_utag,
     input [0:rc_width-1] 	  i_rsp_rc,
 
     input 			  i_usent_v,
@@ -82,7 +81,6 @@ module capi_dma_write_plus#
 
 
    localparam pwidth=2;  // parity bits per 128 bits of data
-//   wire [0:pwidth-1]   data_par;
    wire [0:1023]          mem_wd;
 
    wire 	       s0_wdata_rsp_v;
@@ -98,7 +96,6 @@ module capi_dma_write_plus#
    wire [0:rc_width-1] s1_rsp_rc = i_rsp_rc;
    wire [0:9]          s2_utag;
    wire [0:ltag_width-1] s1_rsp_ltag = i_rsp_ctag[ctag_width-ltag_width:ctag_width-1];
-//   base_vlat#(.width(10)) iutag_lat(.clk(clk),.reset(reset),.din(i_rsp_utag),.q(s2_utag));  
    base_vlat#(.width(1)) s2_rsp_lat(.clk(clk),.reset(reset),.din(s1_rsp_v),.q(s2_rsp_v));  
 
 
@@ -113,52 +110,18 @@ module capi_dma_write_plus#
    
    wire [0:1023] 	 s1_ddata;
    wire [0:15] 		 s1_brpar;
-//   wire [0:7] 		 s1_brvld0, s1_brvld1;
 	   base_mem#(.width(1024),.addr_width(ltag_width+2)) imem
 	    (.clk(clk),
 	     .we(data_we),.wa(data_wa),.wd(mem_wd),
 	     .re(s0_dvalid),.ra(s0_dwad),.rd(s1_ddata)
 	     );
-//	   base_vmem#(.a_width(ltag_width)) ivmem0
-//	     (.clk(clk),.reset(reset),
-//	      .i_set_a(data_wa[0:ltag_width-1]),.i_set_v(data_we[i] & ~data_wa[ltag_width]),
-//	      .i_rst_a(s1_rsp_ltag),.i_rst_v(s1_rsp_v),
-//	      .i_rd_a(s0_brtag[ctag_width-ltag_width:ctag_width-1]),.i_rd_en(s0_brvalid),.o_rd_d(s1_brvld0[i])
-//	      );
-//	   base_vmem#(.a_width(ltag_width)) ivmem1
-//	     (.clk(clk),.reset(reset),
-//	      .i_set_a(data_wa[0:ltag_width-1]),.i_set_v(data_we[i] & data_wa[ltag_width]),
-//	      .i_rst_a(s1_rsp_ltag),.i_rst_v(s1_rsp_v),
-//	      .i_rd_a(s0_brtag[ctag_width-ltag_width:ctag_width-1]),.i_rd_en(s0_brvalid),.o_rd_d(s1_brvld1[i])
-//	      );
    wire s2_brad_5;
-//   base_vlat#(.width(1)) is2_brad5(.clk(clk),.reset(reset),.din(s0_brad[5]),.q(s1_brad_5));
-
-//   wire [0:3]   s1_brvld = s1_brad_5 ? s1_brvld1 : s1_brvld0;
 
      wire [0:1023] s2_ddata;
-//   wire [0:7] 	s2_brpar;
-//   wire [0:3] 	s2_brvld;
    
    base_vlat#(.width(1024)) is2_brdata(.clk(clk),.reset(1'b0),.din(s1_ddata),.q(s2_ddata));
 
    assign d0h_ddata = s2_ddata;
- //  base_vlat#(.width(16))  is2_brpar(.clk(clk),.reset(1'b0),.din(s1_brpar),.q(s2_brpar));
-//   base_vlat#(.width(8))  is2_brvld(.clk(clk),.reset(1'b0),.din(s1_brvld),.q(s2_brvld));
-
-//   wire [0:511] s2a_brdata;
-//   wire [0:7] 	s2a_brpar;
-//   genvar 	j;
-//   generate
-//      for(j=0; j<4; j=j+1)
-//	begin : p0
-//	   assign s2a_brdata[128*j:128*(j+1)-1] = s2_brvld[j] ? s2_brdata[128*j:128*(j+1)-1] : {128{1'b0}};
-//	   assign s2a_brpar[2*j:2*(j+1)-1] = s2_brvld[j] ? ({i_force_perror,1'b0} ^ s2_brpar[2*j:2*(j+1)-1]) : {2'b11};
-//	end
-//   endgenerate
-
-//   base_vlat#(.width(1024)) is3_brdata(.clk(clk),.reset(1'b0),.din(s2a_brdata),.q(d0h_ddata));
-//   base_vlat#(.width(16))  is3_brpar(.clk(clk),.reset(1'b0),.din(s2a_brpar),.q(ah_brpar));
    
    wire [0:tag_width-1]   s1_tag;
    wire tag_v, tag_r;
@@ -203,13 +166,8 @@ module capi_dma_write_plus#
 
    wire 	       s1_usent_v = i_usent_v;
    wire [0:7]          s1_usent_sts = i_usent_sts;
-//   wire [0:9]          s1_usent_tag = i_usent_tag;
    wire                usent_error = (s1_usent_sts == 3'd2) ||  (s1_usent_sts == 3'd3); 
    wire [0:7]          s1_usent_rc = usent_error ?8'h01 : 8'h00;
-
-//   base_mem#(.addr_width(10),.width(sid_width+tstag_width+tag_width+ltag_width)) utag_mem
-//     (.clk(clk),.re(1'b1),.ra(s1_usent_tag),.rd({s3_rsp_sid,s3_rsp_tstag,s3_rsp_tag,s3_ltag_free_tag}),
-//      .we(s2_rsp_v),.wa(s2_utag),.wd({s2_rsp_sid,s2_rsp_tstag,s2_rsp_tag,s2_ltag_free_tag}));
 
    wire 	       s2_usent_v;
    wire [0:7]          s2_usent_rc;
@@ -298,7 +256,6 @@ module capi_dma_write_plus#
       .i_v(s3_both_v),.i_r(),.i_d({s3_both_rc,s3_both_ltag,s3_both_sid,s3_both_tstag,s3_both_tag}),
       .o_v(o_rsp_v),.o_r(1'b1),.o_d({s4_rsp_rc,s4_rsp_ltag,s4_rsp_sid,s4_rsp_tstag,s4_rsp_tag}));
 
-//    wire [0:7]  s3_rsp_total_rc = s2_usent_sts | s3_rsp_rc;
 
    assign o_rsp_d = {s4_rsp_rc,s4_rsp_sid,s4_rsp_tstag,s4_rsp_tag};
 
@@ -407,15 +364,6 @@ module capi_dma_write_plus#
    wire [0:sid_width-1]   s2_sid;
    wire 		  s2_f;
 
-//   assign s2a_v = s1_v;
-//   assign s1_r = s2a_r;
-//   assign s2_tag = s1_tag;
-//   assign s2_sid = s1_sid;
-//   assign s2_ltag = s1_ltag;
-//   assign s2_tsize = s1_size;
-//   assign s2_aux = s1_aux;
-//   assign s2_ea = s1_ea; 
-//   assign s2_e = 1'b1; 
    
    capi_unroll_cnt#(.dwidth(tag_width+sid_width+1+ltag_width+tsize_width+aux_width+ea_width),.iwidth(width_512-3),.cwidth(count_width))iunrl
      (.clk(clk),.reset(reset),

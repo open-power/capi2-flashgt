@@ -33,10 +33,8 @@ create_clock -period 10.000 -name pcie_clk4 -waveform {0.000 5.000} [get_ports p
 set_input_jitter [get_clocks -of_objects [get_ports pci_pi_refclk_p4]] 0.200
 
 # create_clock -period 3.75 -name quad_clk  [get_ports quad_refclk_p]
-set_clock_groups -asynchronous -group [get_clocks [get_ports quad_refclk_p] -include_generated_clocks ]
-
-
-# 7/14/2016 
+# set_clock_groups -asynchronous -group [get_clocks [get_ports quad_refclk_p] -include_generated_clocks ]
+#
 # don't use clock_groups - difficult to ensure async crossings are correct with this
 # instead, set set_max_delay -datapath_only 
 

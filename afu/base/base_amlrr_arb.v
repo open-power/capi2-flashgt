@@ -17,8 +17,7 @@
 // *!***************************************************************************
 // mutli-level round-robin arbiter.
 // constructs a round-robin arbiter, which might be pipelined over several cycles to achieve timing for the
-// requested number of ways.     This isn't quite right, but works for the values for which we use it.  One day
-// I need to come back to this
+// requested number of ways.    
  module base_amlrr_arb#
   (parameter width = 1,
    parameter stages = 1,

@@ -62,7 +62,7 @@ module capi_get_plus#
     output 			 get_data_e, // aligned with get_data_valid
     output [0:3] 		 get_data_c, // count - valid only with _e, zero = 16 
     output [0:129] 		 get_data_d, // follows get_data_valid by one cycle  
-    output [0:rc_width-1] 	 get_data_rc, // tbd
+    output [0:rc_width-1] 	 get_data_rc, 
    
     /* gx address interface */
     output 			 o_req_v,
@@ -139,7 +139,6 @@ module capi_get_plus#
    wire [0:8] 		    r2_d_extra;
    wire [0:ssize_width-10]   r2_d_cachelines;
 
-//      capi_parity_gen#(.dwidth(ea_width-8),.width(1)) r1_d_ea_pgen(.i_d(r1_d_ea[0:ea_width-8-1]),.o_d(r1_d_ea_par));
       capi_parity_gen#(.dwidth(ea_width-10),.width(1)) r1_d_ea_pgen(.i_d(r1_d_ea[0:ea_width-10-1]),.o_d(r1_d_ea_par));   // addresses on a 512 byte boundary 
 
    base_alatch#(.width(aux_width+ctxtid_width+(ea_width-9)+18+(ssize_width-9))) ir1ltch   
@@ -271,9 +270,9 @@ module capi_get_plus#
 	);	
 
      assign o_s1_perror = {get_retry_s1_perror,get_data_s1_perror};
-//
+
 
    
-endmodule // capi_get
+endmodule // capi_get_plus
 
 

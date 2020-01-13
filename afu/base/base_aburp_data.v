@@ -15,7 +15,7 @@
 // *! See the License for the specific language governing permissions and
 // *! limitations under the License.
 // *!***************************************************************************
-// component of base_aburp.  Do not use directly
+// base_aburp_data is used by base_aburp
 module base_aburp_data#
   ( parameter width=1
    )
@@ -28,7 +28,7 @@ module base_aburp_data#
    wire [0:width-1]   burp_d;
    assign dout = burp_v ? burp_d : din;
    base_vlat_en#(.width(width)) idlat(.clk(clk), .reset(1'b0), .enable(~burp_v), .din(din), .q(burp_d));
-endmodule // base_burp
+endmodule
 
    
 	     

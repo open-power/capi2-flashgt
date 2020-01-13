@@ -74,8 +74,7 @@ module capi_unroll_cnt#
       .i_v(din_v), .i_d({din_d, din_i, din_c}), .i_r(din_r),
       .burp_v(),
       .o_v(s0_v), .o_d(s0_dic), .o_r(s0_r));
-
-   /* s1 := pmux(s2,s0) */
+  
    base_primux#(.ways(2),.width(dic_width+1)) iarb1
      (.i_v({s2_v,s0_v}),
       .i_r({s2_r,s0_r}),
@@ -86,8 +85,6 @@ module capi_unroll_cnt#
       .o_sel()
       );
 
-
-   /* (s1a,s1b) = split s1 */
    base_acombine#(.ni(1),.no(2)) isplt
      (.i_v(s1_v),   .i_r(s1_r),
       .o_v({s1a_v,s1b_v}), .o_r({s1a_r,s1b_r})
@@ -109,7 +106,7 @@ module capi_unroll_cnt#
       .i_v(s1b_v),.i_r(s1b_r),.i_d({s1_d,s1_i,s1_e,s1_s}),
       .o_v(dout_v), .o_r(dout_r), .o_d({dout_d,dout_i,dout_e,dout_s})
       );
-endmodule // capi_unroll
+endmodule // capi_unroll_cnt
 
 					   
   
